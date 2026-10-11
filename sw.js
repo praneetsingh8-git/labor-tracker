@@ -1,5 +1,5 @@
 // Network-first for the app shell so updates land; cache fallback keeps it working offline.
-const CACHE = 'lt-v3';
+const CACHE = 'lt-v4';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-180.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });

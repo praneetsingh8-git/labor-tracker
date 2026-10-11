@@ -681,7 +681,8 @@ async function rpc(fn, body){
     body: JSON.stringify(body)
   });
   if(!res.ok) throw new Error(fn + ' ' + res.status + ' ' + (await res.text()).slice(0,200));
-  return res.json();
+  const text = await res.text(); // lt_push returns 204 with an empty body
+  return text ? JSON.parse(text) : null;
 }
 async function sync(){
   if(!syncKey){ setSync('local'); return; }
