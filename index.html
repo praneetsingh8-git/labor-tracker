@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Labor">
+<meta name="theme-color" content="#121014">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<title>Labor & Baby Tracker</title>
+<style>
+:root{
+  --bg:#121014; --card:#1d1a21; --card2:#26222b; --line:#332e39;
+  --text:#f1ece6; --dim:#a39aa8; --faint:#6f6774;
+  --accent:#ff8a65; --accent2:#ffb38f; --go:#5fd3a4; --warn:#ffcf5c; --bad:#ff6b7a; --blue:#7fb5ff;
+  --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom));min-height:100vh;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;width:100%;user-select:text;-webkit-user-select:text}
+textarea{min-height:90px;resize:vertical}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 0 6px}
+.clock{font-variant-numeric:tabular-nums;font-size:30px;font-weight:600;letter-spacing:.5px}
+.date{color:var(--dim);font-size:13px}
+.sync{font-size:12px;color:var(--faint);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.dot.ok{background:var(--go)}.dot.busy{background:var(--warn)}.dot.err{background:var(--bad)}
+.gear{width:40px;height:40px;border-radius:12px;background:var(--card);font-size:20px}
+.card{background:var(--card);border-radius:var(--r);padding:16px;margin:12px 0}
+.h{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);margin:0 0 10px;font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+.bigbtn{display:block;width:100%;aspect-ratio:1/0.62;border-radius:28px;background:linear-gradient(160deg,#ff9a76,#ff6f61);color:#2a0f0a;font-weight:800;font-size:30px;letter-spacing:1px;box-shadow:0 10px 30px rgba(255,111,97,.25);transition:transform .08s}
+.bigbtn:active{transform:scale(.98)}
+.bigbtn.running{background:linear-gradient(160deg,#5fd3a4,#2fb784);color:#06281b;box-shadow:0 10px 30px rgba(47,183,132,.3)}
+.bigbtn .t{display:block;font-size:56px;font-weight:700;letter-spacing:0;font-variant-numeric:tabular-nums;line-height:1.1}
+.bigbtn .s{display:block;font-size:15px;font-weight:600;opacity:.8;letter-spacing:.5px}
+.timers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.timer{background:var(--card2);border-radius:14px;padding:12px}
+.timer .l{font-size:12px;color:var(--dim)}
+.timer .v{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stat .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .l{font-size:11px;color:var(--dim)}
+.banner{border-radius:14px;padding:12px 14px;margin:12px 0;font-weight:600;font-size:15px}
+.banner.warn{background:rgba(255,207,92,.15);color:var(--warn);border:1px solid rgba(255,207,92,.35)}
+.banner.info{background:var(--card2);color:var(--dim);font-weight:400;font-size:13px}
+.row{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .main{flex:1;min-width:0}
+.row .t1{font-weight:600}
+.row .t2{color:var(--dim);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .ic{width:34px;height:34px;border-radius:10px;background:var(--card2);display:grid;place-items:center;font-size:18px;flex:none}
+.row .side{text-align:right;font-variant-numeric:tabular-nums;font-size:14px;color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 14px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-size:15px;font-weight:600}
+.chip.on{background:var(--accent);color:#2a0f0a;border-color:var(--accent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.tile{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;font-weight:700;font-size:16px;min-height:74px}
+.tile small{display:block;font-weight:500;color:var(--dim);font-size:12px;margin-top:2px}
+.tile.live{background:rgba(95,211,164,.15);border-color:var(--go);color:var(--go)}
+.tile .big{font-size:24px;font-variant-numeric:tabular-nums}
+.btn{display:block;width:100%;padding:14px;border-radius:14px;background:var(--card2);border:1px solid var(--line);font-weight:600;text-align:center}
+.btn.primary{background:var(--accent);color:#2a0f0a;border-color:var(--accent)}
+.btn.danger{color:var(--bad)}
+.muted{color:var(--dim);font-size:13px}
+.empty{color:var(--faint);text-align:center;padding:18px 0;font-size:14px}
+.ago{font-size:22px;font-weight:700}
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(18,16,20,.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;padding:8px 0;border-radius:12px;font-size:12px;color:var(--dim);font-weight:600}
+nav button b{display:block;font-size:22px;line-height:1.1}
+nav button.on{color:var(--accent)}
+.page{display:none}.page.on{display:block}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10;display:none}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:11;background:var(--card);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;display:none}
+.sheet.on,.sheet-bg.on{display:block}
+.sheet h3{margin:0 0 14px;font-size:20px}
+.field{margin:0 0 12px}
+.field label{display:block;font-size:13px;color:var(--dim);margin:0 0 6px}
+.stack>*+*{margin-top:10px}
+.day{font-size:13px;color:var(--accent2);font-weight:700;margin:14px 0 2px;text-transform:uppercase;letter-spacing:.6px}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:10px 16px;border-radius:999px;font-size:14px;z-index:20;display:none;align-items:center;gap:12px;white-space:nowrap}
+.toast.on{display:flex}
+.toast button{color:var(--accent);font-weight:700}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all;background:var(--card2);padding:10px;border-radius:10px;user-select:text;-webkit-user-select:text}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="clock num" id="clock">--:--:--</div>
+      <div class="date" id="date"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="sync" id="syncState"><span class="dot"></span><span>local</span></div>
+      <button class="gear" id="gearBtn" aria-label="Settings">⚙︎</button>
+    </div>
+  </header>
+
+  <!-- LABOR -->
+  <section class="page on" id="p-labor">
+    <button class="bigbtn" id="cBtn">
+      <span class="s" id="cBtnSub">TAP WHEN IT STARTS</span>
+      <span class="t" id="cBtnTime">START</span>
+    </button>
+    <div class="timers">
+      <div class="timer"><div class="l">Since last one started</div><div class="v" id="tSinceStart">—</div></div>
+      <div class="timer"><div class="l">Resting since it ended</div><div class="v" id="tRest">—</div></div>
+    </div>
+    <div id="rateLast"></div>
+    <div id="pattern"></div>
+
+    <div class="card">
+      <div class="h">Last 60 minutes</div>
+      <div class="stats">
+        <div class="stat"><div class="v" id="sCount">0</div><div class="l">contractions</div></div>
+        <div class="stat"><div class="v" id="sDur">—</div><div class="l">avg length</div></div>
+        <div class="stat"><div class="v" id="sInt">—</div><div class="l">avg apart</div></div>
+      </div>
+    </div>
+
+    <div class="chips" style="margin:4px 0 4px">
+      <button class="chip" data-quick="Water broke">💧 Water broke</button>
+      <button class="chip" data-quick="Bloody show">🩸 Bloody show</button>
+      <button class="chip" data-quick="Called hospital">📞 Called</button>
+      <button class="chip" data-note="labor">✏️ Note</button>
+    </div>
+
+    <div class="card">
+      <div class="h">Contractions</div>
+      <div id="cList"></div>
+    </div>
+  </section>
+
+  <!-- BABY -->
+  <section class="page" id="p-baby">
+    <div class="card">
+      <div class="h">Last feed</div>
+      <div class="ago num" id="lastFeedAgo">—</div>
+      <div class="muted" id="lastFeedInfo"></div>
+    </div>
+
+    <div class="card">
+      <div class="h">Breastfeed</div>
+      <div class="grid2">
+        <button class="tile" id="bfL"><div class="big" id="bfLt">Left</div><small id="bfLs">tap to start</small></button>
+        <button class="tile" id="bfR"><div class="big" id="bfRt">Right</div><small id="bfRs">tap to start</small></button>
+      </div>
+      <div class="muted" style="margin-top:8px">Tap the other side to switch. Tap the running side to stop.</div>
+    </div>
+
+    <div class="card">
+      <div class="h">Bottle</div>
+      <div class="grid2">
+        <button class="tile" data-bottle="formula">🍼 Formula</button>
+        <button class="tile" data-bottle="breastmilk">🍼 Breast milk</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="h">Diaper</div>
+      <div class="grid3">
+        <button class="tile" data-diaper="wet">💧<small>Wet</small></button>
+        <button class="tile" data-diaper="dirty">💩<small>Dirty</small></button>
+        <button class="tile" data-diaper="both">💧💩<small>Both</small></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="h">Last 24 hours</div>
+      <div class="stats">
+        <div class="stat"><div class="v" id="dFeeds">0</div><div class="l">feeds</div></div>
+        <div class="stat"><div class="v" id="dWet">0</div><div class="l">wet</div></div>
+        <div class="stat"><div class="v" id="dDirty">0</div><div class="l">dirty</div></div>
+      </div>
+      <div class="muted" id="lastDiaper" style="margin-top:10px;text-align:center"></div>
+    </div>
+
+    <button class="btn" data-note="baby">✏️ Add note</button>
+
+    <div class="card">
+      <div class="h">Recent</div>
+      <div id="babyList"></div>
+    </div>
+  </section>
+
+  <!-- LOG -->
+  <section class="page" id="p-log">
+    <div class="chips" id="logFilter" style="margin:10px 0">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="contraction">Contractions</button>
+      <button class="chip" data-f="feed">Feeds</button>
+      <button class="chip" data-f="diaper">Diapers</button>
+      <button class="chip" data-f="note">Notes</button>
+    </div>
+    <div class="card"><div id="logList"></div></div>
+    <div class="grid2">
+      <button class="btn" id="shareBtn">Share summary</button>
+      <button class="btn" id="csvBtn">Export CSV</button>
+    </div>
+  </section>
+</div>
+
+<nav>
+  <button class="on" data-tab="labor"><b>⏱</b>Labor</button>
+  <button data-tab="baby"><b>👶</b>Baby</button>
+  <button data-tab="log"><b>📋</b>Log</button>
+</nav>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
+
+<script>
+'use strict';
+// ---------- Config ----------
+const SB_URL = 'https://urvdztlqvfpzifdcndur.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVydmR6dGxxdmZwemlmZGNuZHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MzgyMTgsImV4cCI6MjEwMjExNDIxOH0.ABqrNa197i5rY0wZZ6bhoAjTXH8cPlkphwmBGkFlr6U';
+
+// ---------- Storage ----------
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let events = LS.get('lt_events', {});      // id -> event
+let dirty = new Set(LS.get('lt_dirty', []));
+let syncKey = LS.get('lt_key', null);
+let lastPull = LS.get('lt_lastpull', null);
+let settings = LS.get('lt_settings', { wake: true });
+
+function save(){ LS.set('lt_events', events); LS.set('lt_dirty', [...dirty]); }
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() :
+  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); }));
+
+function put(ev){
+  ev.updated = Date.now();
+  events[ev.id] = ev;
+  dirty.add(ev.id);
+  save(); render(); scheduleSync();
+}
+function add(type, start, end, data){
+  const ev = { id: uid(), type, start, end, data: data || {}, deleted: false };
+  put(ev); return ev;
+}
+function remove(id){
+  const ev = events[id]; if(!ev) return;
+  ev.deleted = true; put(ev);
+  toast('Deleted', () => { ev.deleted = false; put(ev); });
+}
+const live = () => Object.values(events).filter(e => !e.deleted);
+const byType = t => live().filter(e => e.type === t).sort((a,b) => b.start - a.start);
+
+// ---------- Formatting ----------
+const pad = n => String(n).padStart(2,'0');
+function dur(ms, withH){
+  if(ms == null || ms < 0) return '—';
+  const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor(s%3600/60), ss = s%60;
+  if(h || withH) return h + ':' + pad(m) + ':' + pad(ss);
+  return m + ':' + pad(ss);
+}
+function durWords(ms){
+  if(ms == null) return '—';
+  const s = Math.round(ms/1000);
+  if(s < 90) return s + 's';
+  const m = Math.round(s/60);
+  if(m < 60) return m + ' min';
+  return Math.floor(m/60) + 'h ' + (m%60) + 'm';
+}
+const tf = new Intl.DateTimeFormat(undefined, { hour:'numeric', minute:'2-digit' });
+const tfs = new Intl.DateTimeFormat(undefined, { hour:'numeric', minute:'2-digit', second:'2-digit' });
+const df = new Intl.DateTimeFormat(undefined, { weekday:'short', month:'short', day:'numeric' });
+const t = ms => tf.format(new Date(ms));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+const INT = ['', 'Mild', 'Moderate', 'Strong'];
+
+// ---------- Contractions ----------
+function runningContraction(){ return byType('contraction').find(e => e.end == null); }
+$('cBtn').onclick = () => {
+  const r = runningContraction();
+  if(r){ r.end = Date.now(); put(r); askIntensity(r.id); }
+  else add('contraction', Date.now(), null);
+};
+
+function contractionStats(){
+  const now = Date.now();
+  const done = byType('contraction').filter(e => e.end != null); // newest first
+  const hour = done.filter(e => e.start >= now - 3600e3);
+  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+  const durs = hour.map(e => e.end - e.start);
+  const ints = [];
+  for(let i=0;i<hour.length-1;i++) ints.push(hour[i].start - hour[i+1].start);
+  return { done, hour, avgDur: avg(durs), avgInt: avg(ints) };
+}
+
+function askIntensity(id){
+  openSheet(`
+    <h3>How strong was it?</h3>
+    <div class="grid3">
+      <button class="tile" data-i="1">Mild</button>
+      <button class="tile" data-i="2">Moderate</button>
+      <button class="tile" data-i="3">Strong</button>
+    </div>
+    <div style="margin-top:12px"><button class="btn" id="skipI">Skip</button></div>`);
+  $('sheet').querySelectorAll('[data-i]').forEach(b => b.onclick = () => {
+    const ev = events[id]; ev.data.intensity = +b.dataset.i; put(ev); closeSheet();
+  });
+  $('skipI').onclick = closeSheet;
+}
+
+// ---------- Feeds ----------
+function runningFeed(){ return byType('feed').find(e => e.data.kind === 'breast' && e.end == null); }
+function breast(side){
+  const r = runningFeed(), now = Date.now();
+  if(r && r.data.side === side){ r.end = now; put(r); return; }
+  if(r){ r.end = now; put(r); }
+  add('feed', now, null, { kind:'breast', side });
+}
+$('bfL').onclick = () => breast('L');
+$('bfR').onclick = () => breast('R');
+
+document.querySelectorAll('[data-bottle]').forEach(b => b.onclick = () => {
+  const milk = b.dataset.bottle;
+  openSheet(`
+    <h3>Bottle · ${milk === 'formula' ? 'Formula' : 'Breast milk'}</h3>
+    <div class="field"><label>Amount (ml)</label>
+      <div class="chips" id="mlChips">${[10,20,30,45,60,90,120].map(v=>`<button class="chip" data-ml="${v}">${v}</button>`).join('')}</div>
+      <input type="number" inputmode="numeric" id="mlIn" placeholder="or type ml" style="margin-top:8px">
+    </div>
+    <div class="field"><label>Remark (optional)</label><input id="bNote" placeholder="e.g. spit up a little"></div>
+    <button class="btn primary" id="bSave">Save</button>`);
+  $('mlChips').querySelectorAll('[data-ml]').forEach(c => c.onclick = () => { $('mlIn').value = c.dataset.ml; });
+  $('bSave').onclick = () => {
+    const now = Date.now(), ml = parseFloat($('mlIn').value);
+    add('feed', now, now, { kind:'bottle', milk, ml: isNaN(ml) ? null : ml, note: $('bNote').value.trim() });
+    closeSheet();
+  };
+});
+
+// ---------- Diapers ----------
+document.querySelectorAll('[data-diaper]').forEach(b => b.onclick = () => {
+  const now = Date.now();
+  const ev = add('diaper', now, now, { kind: b.dataset.diaper });
+  toast('Diaper logged', () => { ev.deleted = true; put(ev); }, 'Undo', () => editEvent(ev.id), 'Add remark');
+});
+
+// ---------- Notes ----------
+document.querySelectorAll('[data-note]').forEach(b => b.onclick = () => noteSheet(b.dataset.note));
+document.querySelectorAll('[data-quick]').forEach(b => b.onclick = () => {
+  const now = Date.now();
+  const ev = add('note', now, now, { text: b.dataset.quick, ctx: 'labor' });
+  toast('Logged: ' + b.dataset.quick, () => { ev.deleted = true; put(ev); });
+});
+function noteSheet(ctx){
+  openSheet(`
+    <h3>Note · ${t(Date.now())}</h3>
+    <div class="field"><textarea id="nText" placeholder="What happened?"></textarea></div>
+    <button class="btn primary" id="nSave">Save note</button>`);
+  setTimeout(() => $('nText').focus(), 50);
+  $('nSave').onclick = () => {
+    const text = $('nText').value.trim(); if(!text) return closeSheet();
+    const now = Date.now(); add('note', now, now, { text, ctx }); closeSheet();
+  };
+}
+
+// ---------- Edit any event ----------
+function toLocalInput(ms){ const d = new Date(ms); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes()); }
+function fromLocalInput(v, keepSec){ if(!v) return null; const d = new Date(v); return d.getTime() + (keepSec||0); }
+function editEvent(id){
+  const ev = events[id]; if(!ev) return;
+  const hasEnd = ev.type === 'contraction' || (ev.type === 'feed' && ev.data.kind === 'breast');
+  const d = ev.data;
+  let extra = '';
+  if(ev.type === 'contraction') extra = `<div class="field"><label>Intensity</label><div class="chips" id="eInt">${[1,2,3].map(i=>`<button class="chip ${d.intensity===i?'on':''}" data-v="${i}">${INT[i]}</button>`).join('')}</div></div>`;
+  if(ev.type === 'feed' && d.kind === 'breast') extra = `<div class="field"><label>Side</label><div class="chips" id="eSide">${['L','R'].map(s=>`<button class="chip ${d.side===s?'on':''}" data-v="${s}">${s==='L'?'Left':'Right'}</button>`).join('')}</div></div>`;
+  if(ev.type === 'feed' && d.kind === 'bottle') extra = `<div class="field"><label>Amount (ml)</label><input type="number" inputmode="numeric" id="eMl" value="${d.ml ?? ''}"></div>
+    <div class="field"><label>Milk</label><div class="chips" id="eMilk">${['formula','breastmilk'].map(s=>`<button class="chip ${d.milk===s?'on':''}" data-v="${s}">${s==='formula'?'Formula':'Breast milk'}</button>`).join('')}</div></div>`;
+  if(ev.type === 'diaper') extra = `<div class="field"><label>Type</label><div class="chips" id="eDiaper">${['wet','dirty','both'].map(s=>`<button class="chip ${d.kind===s?'on':''}" data-v="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div></div>`;
+  openSheet(`
+    <h3>${esc(title(ev))}</h3>
+    <div class="field"><label>${hasEnd ? 'Started' : 'Time'}</label><input type="datetime-local" id="eStart" value="${toLocalInput(ev.start)}"></div>
+    ${hasEnd ? `<div class="field"><label>Ended ${ev.end==null?'(still running)':''}</label><input type="datetime-local" id="eEnd" value="${ev.end==null?'':toLocalInput(ev.end)}"></div>` : ''}
+    ${extra}
+    <div class="field"><label>${ev.type === 'note' ? 'Note' : 'Remark'}</label><textarea id="eNote">${esc(ev.type === 'note' ? d.text : d.note)}</textarea></div>
+    <div class="stack">
+      <button class="btn primary" id="eSave">Save</button>
+      <button class="btn danger" id="eDel">Delete</button>
+    </div>`);
+  const pick = (box, key) => { const el = $(box); if(!el) return; el.querySelectorAll('[data-v]').forEach(c => c.onclick = () => { el.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }); };
+  ['eInt','eSide','eMilk','eDiaper'].forEach(b => pick(b));
+  const sel = box => { const c = $(box) && $(box).querySelector('.chip.on'); return c ? c.dataset.v : undefined; };
+  $('eSave').onclick = () => {
+    // keep original seconds if the minute wasn't changed
+    const sVal = $('eStart').value;
+    if(sVal && sVal !== toLocalInput(ev.start)) ev.start = fromLocalInput(sVal);
+    if(hasEnd){
+      const eVal = $('eEnd').value;
+      if(eVal && eVal !== (ev.end==null?'':toLocalInput(ev.end))) ev.end = fromLocalInput(eVal);
+      if(ev.end != null && ev.end < ev.start){ alert('End is before start.'); return; }
+    } else ev.end = ev.start;
+    const note = $('eNote').value.trim();
+    if(ev.type === 'note') d.text = note; else d.note = note;
+    if(sel('eInt')) d.intensity = +sel('eInt');
+    if(sel('eSide')) d.side = sel('eSide');
+    if(sel('eMilk')) d.milk = sel('eMilk');
+    if(sel('eDiaper')) d.kind = sel('eDiaper');
+    if($('eMl')){ const v = parseFloat($('eMl').value); d.ml = isNaN(v) ? null : v; }
+    put(ev); closeSheet();
+  };
+  $('eDel').onclick = () => { closeSheet(); remove(id); };
+}
+
+// ---------- Rendering ----------
+function title(ev){
+  const d = ev.data;
+  if(ev.type === 'contraction') return 'Contraction';
+  if(ev.type === 'feed') return d.kind === 'breast' ? 'Breast · ' + (d.side === 'L' ? 'Left' : 'Right') : 'Bottle · ' + (d.milk === 'formula' ? 'Formula' : 'Breast milk');
+  if(ev.type === 'diaper') return 'Diaper · ' + ({wet:'Wet',dirty:'Dirty',both:'Wet + dirty'}[d.kind] || '');
+  return 'Note';
+}
+function icon(ev){
+  if(ev.type === 'contraction') return '⏱';
+  if(ev.type === 'feed') return ev.data.kind === 'breast' ? '🤱' : '🍼';
+  if(ev.type === 'diaper') return ev.data.kind === 'wet' ? '💧' : '💩';
+  return '✏️';
+}
+function rowHtml(ev, extraSide){
+  const d = ev.data; let sub = [], side = extraSide || '';
+  if(ev.type === 'contraction'){
+    if(d.intensity) sub.push(INT[d.intensity]);
+    if(!side) side = ev.end == null ? 'running' : dur(ev.end - ev.start);
+  }
+  if(ev.type === 'feed'){
+    if(d.kind === 'breast') side = ev.end == null ? 'running' : durWords(ev.end - ev.start);
+    else side = d.ml != null ? d.ml + ' ml' : '';
+  }
+  const note = ev.type === 'note' ? d.text : d.note;
+  if(note) sub.push(note);
+  return `<div class="row" data-id="${ev.id}">
+    <div class="ic">${icon(ev)}</div>
+    <div class="main"><div class="t1">${ev.type === 'note' ? esc(d.text) : esc(title(ev))}</div>
+      <div class="t2">${esc(t(ev.start))}${ev.type !== 'note' && sub.length ? ' · ' + esc(sub.join(' · ')) : ''}</div></div>
+    <div class="side">${side}</div></div>`;
+}
+function bindRows(el){ el.querySelectorAll('.row[data-id]').forEach(r => r.onclick = () => editEvent(r.dataset.id)); }
+
+let logFilter = 'all';
+function render(){
+  // contractions
+  const { done, hour, avgDur, avgInt } = contractionStats();
+  const all = byType('contraction');
+  $('sCount').textContent = hour.length;
+  $('sDur').textContent = avgDur ? durWords(avgDur) : '—';
+  $('sInt').textContent = avgInt ? durWords(avgInt) : '—';
+
+  // pattern hint (5-1-1 is a common guideline; nurse instruction overrides)
+  const now = Date.now();
+  const coversHour = hour.length && (now - hour[hour.length-1].start) >= 50*60e3;
+  let p = '';
+  if(coversHour && avgInt && avgInt <= 5.5*60e3 && avgDur >= 55e3)
+    p = `<div class="banner warn">⚠️ Last hour: about every ${durWords(avgInt)}, lasting ~${durWords(avgDur)}. This matches the common "5-1-1" pattern. Call your hospital / nurse.</div>`;
+  else if(done.length < 3)
+    p = `<div class="banner info">Tap START when a contraction begins and STOP when it ends. "Apart" is measured start-to-start, which is what nurses ask for. Tap any entry to fix a time or add a remark.</div>`;
+  $('pattern').innerHTML = p;
+
+  // list with interval (start-to-start)
+  const list = all.slice(0, 60);
+  $('cList').innerHTML = list.length ? list.map((e,i) => {
+    const prev = list[i+1];
+    const gap = prev ? 'every ' + durWords(e.start - prev.start) : '';
+    const len = e.end == null ? 'running' : dur(e.end - e.start);
+    return rowHtml(e, `<div style="color:var(--text);font-weight:600">${len}</div><div style="font-size:12px">${gap}</div>`);
+  }).join('') : '<div class="empty">No contractions yet</div>';
+  bindRows($('cList'));
+
+  // baby
+  const babyEvents = live().filter(e => e.type === 'feed' || e.type === 'diaper' || (e.type === 'note' && e.data.ctx !== 'labor')).sort((a,b)=>b.start-a.start);
+  $('babyList').innerHTML = babyEvents.slice(0, 15).map(e => rowHtml(e)).join('') || '<div class="empty">Nothing logged yet</div>';
+  bindRows($('babyList'));
+  const day = now - 24*3600e3;
+  const feeds = byType('feed'), diapers = byType('diaper');
+  // count a feeding session once: breast sides within 15 min of each other are one feed
+  let sessions = 0, lastS = null;
+  feeds.filter(f => f.start >= day).slice().reverse().forEach(f => { if(lastS == null || f.start - lastS > 15*60e3) sessions++; lastS = f.end || f.start; });
+  $('dFeeds').textContent = sessions;
+  $('dWet').textContent = diapers.filter(d => d.start >= day && (d.data.kind === 'wet' || d.data.kind === 'both')).length;
+  $('dDirty').textContent = diapers.filter(d => d.start >= day && (d.data.kind === 'dirty' || d.data.kind === 'both')).length;
+  $('lastDiaper').textContent = diapers[0] ? 'Last diaper ' + t(diapers[0].start) + ' (' + diapers[0].data.kind + ')' : '';
+
+  // log
+  let logEvents = live().sort((a,b)=>b.start-a.start);
+  if(logFilter !== 'all') logEvents = logEvents.filter(e => e.type === logFilter);
+  let html = '', lastDay = '';
+  logEvents.slice(0, 400).forEach(e => {
+    const dd = df.format(new Date(e.start));
+    if(dd !== lastDay){ html += `<div class="day">${dd}</div>`; lastDay = dd; }
+    html += rowHtml(e);
+  });
+  $('logList').innerHTML = html || '<div class="empty">Nothing logged yet</div>';
+  bindRows($('logList'));
+  tick();
+}
+
+function tick(){
+  const now = Date.now(), d = new Date(now);
+  $('clock').textContent = tfs.format(d);
+  $('date').textContent = df.format(d);
+
+  const r = runningContraction();
+  const cs = byType('contraction');
+  const btn = $('cBtn');
+  if(r){
+    btn.classList.add('running');
+    $('cBtnSub').textContent = 'CONTRACTION · TAP TO STOP';
+    $('cBtnTime').textContent = dur(now - r.start);
+  } else {
+    btn.classList.remove('running');
+    $('cBtnSub').textContent = 'TAP WHEN IT STARTS';
+    $('cBtnTime').textContent = 'START';
+  }
+  const lastStarted = r ? cs[1] : cs[0];
+  const lastDone = cs.find(e => e.end != null);
+  $('tSinceStart').textContent = cs[0] ? dur(now - cs[0].start) : '—';
+  $('tRest').textContent = r ? 'now' : (lastDone ? dur(now - lastDone.end) : '—');
+  $('rateLast').innerHTML = r && lastStarted ? `<div class="banner info" style="text-align:center">This one started ${durWords(r.start - lastStarted.start)} after the previous one</div>` : '';
+
+  // feeds
+  const f = runningFeed();
+  ['L','R'].forEach(s => {
+    const tile = $('bf'+s), on = f && f.data.side === s;
+    tile.classList.toggle('live', !!on);
+    $('bf'+s+'t').textContent = on ? dur(now - f.start) : (s === 'L' ? 'Left' : 'Right');
+    $('bf'+s+'s').textContent = on ? 'tap to stop' : (f ? 'tap to switch' : 'tap to start');
+  });
+  const feeds = byType('feed');
+  if(f){
+    $('lastFeedAgo').textContent = 'Feeding now';
+    $('lastFeedInfo').textContent = 'Started ' + t(f.start);
+  } else if(feeds[0]){
+    const lf = feeds[0];
+    $('lastFeedAgo').textContent = durWords(now - lf.start) + ' ago';
+    const lastBreast = feeds.find(x => x.data.kind === 'breast');
+    $('lastFeedInfo').textContent = 'Started ' + t(lf.start) + ' · ' + title(lf) +
+      (lastBreast ? ' · next side: ' + (lastBreast.data.side === 'L' ? 'Right' : 'Left') : '');
+  } else { $('lastFeedAgo').textContent = '—'; $('lastFeedInfo').textContent = 'No feeds logged yet'; }
+
+  // running entries in lists show live durations on next render; keep cheap here
+}
+
+// ---------- Tabs ----------
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === 'p-' + b.dataset.tab));
+  LS.set('lt_tab', b.dataset.tab); window.scrollTo(0,0);
+});
+{ const tab = LS.get('lt_tab', 'labor'); const b = document.querySelector(`nav [data-tab="${tab}"]`); if(b) b.click(); }
+$('logFilter').querySelectorAll('[data-f]').forEach(c => c.onclick = () => {
+  logFilter = c.dataset.f;
+  $('logFilter').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c));
+  render();
+});
+
+// ---------- Sheet / toast ----------
+function openSheet(html){ $('sheet').innerHTML = html; $('sheet').classList.add('on'); $('sheetBg').classList.add('on'); }
+function closeSheet(){ $('sheet').classList.remove('on'); $('sheetBg').classList.remove('on'); }
+$('sheetBg').onclick = closeSheet;
+let toastTimer;
+function toast(msg, undo, undoLabel, alt, altLabel){
+  $('toastMsg').textContent = msg;
+  const u = $('toastUndo');
+  u.textContent = undoLabel || 'Undo';
+  u.style.display = undo ? '' : 'none';
+  u.onclick = () => { $('toast').classList.remove('on'); undo && undo(); };
+  let a = $('toastAlt'); if(a) a.remove();
+  if(alt){ a = document.createElement('button'); a.id = 'toastAlt'; a.textContent = altLabel; a.onclick = () => { $('toast').classList.remove('on'); alt(); }; $('toast').appendChild(a); }
+  $('toast').classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('on'), 5000);
+}
+
+// ---------- Export ----------
+function rowsForExport(){
+  return live().sort((a,b)=>a.start-b.start).map(e => {
+    const d = e.data;
+    return {
+      date: new Date(e.start).toLocaleDateString(), start: tfs.format(new Date(e.start)),
+      end: e.end && e.end !== e.start ? tfs.format(new Date(e.end)) : '',
+      type: title(e),
+      duration: e.end && e.end !== e.start ? dur(e.end - e.start) : '',
+      detail: [d.intensity ? INT[d.intensity] : '', d.ml != null ? d.ml + ' ml' : ''].filter(Boolean).join(' '),
+      note: e.type === 'note' ? d.text : (d.note || '')
+    };
+  });
+}
+$('csvBtn').onclick = () => {
+  const rows = rowsForExport(), cols = ['date','start','end','type','duration','detail','note'];
+  const csv = [cols.join(',')].concat(rows.map(r => cols.map(c => '"' + String(r[c]).replace(/"/g,'""') + '"').join(','))).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const file = new File([blob], 'tracker-' + new Date().toISOString().slice(0,10) + '.csv', { type: 'text/csv' });
+  if(navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] }).catch(()=>{});
+  else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); }
+};
+$('shareBtn').onclick = () => {
+  const { hour, avgDur, avgInt } = contractionStats();
+  const lines = [];
+  if(byType('contraction').length){
+    lines.push(`Contractions, last hour: ${hour.length}, avg ${durWords(avgInt)} apart, lasting ~${durWords(avgDur)}`);
+    byType('contraction').slice(0, 12).forEach((e,i,a) => lines.push(`${t(e.start)}  ${e.end ? dur(e.end-e.start) : 'running'}${a[i+1] ? '  (' + durWords(e.start - a[i+1].start) + ' apart)' : ''}${e.data.intensity ? '  ' + INT[e.data.intensity] : ''}`));
+  }
+  byType('note').slice(0, 5).forEach(n => lines.push(`${t(n.start)}  ${n.data.text}`));
+  const text = lines.join('\n') || 'Nothing logged yet';
+  if(navigator.share) navigator.share({ text }).catch(()=>{});
+  else navigator.clipboard.writeText(text).then(() => toast('Copied'));
+};
+
+// ---------- Settings / sync ----------
+$('gearBtn').onclick = () => {
+  const link = syncKey ? location.origin + location.pathname + '#join=' + syncKey : '';
+  openSheet(`
+    <h3>Settings</h3>
+    <div class="h">Sync between phones</div>
+    ${syncKey ? `
+      <p class="muted">Sync is ON. Open this link on the other iPhone (in Safari) to share the same log:</p>
+      <div class="code" id="sLink">${esc(link)}</div>
+      <div class="grid2" style="margin-top:10px">
+        <button class="btn" id="sCopy">Copy link</button>
+        <button class="btn" id="sNow">Sync now</button>
+      </div>
+      <p class="muted" id="sStatus"></p>
+      <button class="btn danger" id="sOff">Turn off sync on this phone</button>
+    ` : `
+      <p class="muted">Data is saved on this phone only. Turn on sync to share one log between both iPhones. Anyone with the sync link can see the log, so share it only with each other.</p>
+      <button class="btn primary" id="sOn">Turn on sync</button>
+      <div class="field" style="margin-top:12px"><label>Or join with a code from the other phone</label><input id="sJoin" placeholder="paste code or link"></div>
+      <button class="btn" id="sJoinBtn">Join</button>
+    `}
+    <div class="h" style="margin-top:20px">Screen</div>
+    <button class="btn" id="wakeBtn">${settings.wake ? '✅ Keep screen awake: ON' : 'Keep screen awake: OFF'}</button>
+    <p class="muted">Tip: Safari → Share → "Add to Home Screen" to open it like an app.</p>
+  `);
+  const S = $('sStatus'); if(S) S.textContent = syncMsg;
+  if($('sCopy')) $('sCopy').onclick = () => navigator.clipboard.writeText(link).then(() => toast('Link copied'));
+  if($('sNow')) $('sNow').onclick = () => { lastPull = null; sync(); };
+  if($('sOff')) $('sOff').onclick = () => { if(confirm('Stop syncing on this phone? Data stays on this phone.')){ syncKey = null; LS.set('lt_key', null); setSync('local'); closeSheet(); } };
+  if($('sOn')) $('sOn').onclick = () => { setKey(randomKey()); closeSheet(); $('gearBtn').click(); };
+  if($('sJoinBtn')) $('sJoinBtn').onclick = () => {
+    let v = $('sJoin').value.trim(); const m = v.match(/join=([A-Za-z0-9]+)/); if(m) v = m[1];
+    if(v.length < 20){ alert('That code looks too short.'); return; }
+    setKey(v); closeSheet();
+  };
+  $('wakeBtn').onclick = () => { settings.wake = !settings.wake; LS.set('lt_settings', settings); wake(); $('gearBtn').click(); };
+};
+function randomKey(){ const a = new Uint8Array(18); crypto.getRandomValues(a); return Array.from(a, b => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 56]).join(''); }
+function setKey(k){
+  syncKey = k; LS.set('lt_key', k); lastPull = null; LS.set('lt_lastpull', null);
+  Object.keys(events).forEach(id => dirty.add(id)); save(); // push everything we already have
+  sync();
+}
+// join via link
+{ const m = location.hash.match(/join=([A-Za-z0-9]{20,})/); if(m){ if(m[1] !== syncKey) setKey(m[1]); history.replaceState(null, '', location.pathname); } }
+
+let syncMsg = '', syncing = false, syncTimer;
+function setSync(state, msg){
+  const el = $('syncState');
+  el.querySelector('.dot').className = 'dot ' + ({ok:'ok',busy:'busy',err:'err'}[state] || '');
+  el.querySelector('span:last-child').textContent = state === 'local' ? 'this phone' : state === 'ok' ? 'synced' : state === 'busy' ? 'syncing' : 'offline';
+  syncMsg = msg || '';
+}
+function scheduleSync(){ clearTimeout(syncTimer); syncTimer = setTimeout(sync, 400); }
+async function rpc(fn, body){
+  const res = await fetch(SB_URL + '/rest/v1/rpc/' + fn, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok) throw new Error(fn + ' ' + res.status + ' ' + (await res.text()).slice(0,200));
+  return res.json();
+}
+async function sync(){
+  if(!syncKey){ setSync('local'); return; }
+  if(syncing){ scheduleSync(); return; }
+  syncing = true; setSync('busy');
+  try{
+    const ids = [...dirty];
+    if(ids.length){
+      const payload = ids.map(id => events[id]).filter(Boolean).map(e => ({ id:e.id, type:e.type, start_ts:e.start, end_ts:e.end, data:e.data, deleted:e.deleted, updated:e.updated }));
+      await rpc('lt_push', { p_key: syncKey, p_events: payload });
+      // only clear ids that weren't changed again while pushing
+      ids.forEach(id => { const e = events[id]; if(e && payload.find(p => p.id === id && p.updated === e.updated)) dirty.delete(id); });
+      save();
+    }
+    const since = lastPull ? new Date(new Date(lastPull).getTime() - 120e3).toISOString() : null;
+    const rows = await rpc('lt_pull', { p_key: syncKey, p_since: since });
+    let changed = false, maxTs = lastPull;
+    rows.forEach(r => {
+      const l = events[r.id];
+      if(!l || (!dirty.has(r.id) && Number(r.updated) > (l.updated || 0))){
+        events[r.id] = { id:r.id, type:r.type, start:Number(r.start_ts), end:r.end_ts == null ? null : Number(r.end_ts), data:r.data || {}, deleted:r.deleted, updated:Number(r.updated) };
+        changed = true;
+      }
+      if(!maxTs || r.synced_at > maxTs) maxTs = r.synced_at;
+    });
+    lastPull = maxTs; LS.set('lt_lastpull', lastPull);
+    if(changed){ save(); render(); }
+    setSync('ok', 'Last synced ' + tfs.format(new Date()));
+  }catch(e){
+    setSync('err', 'Sync failed (data is safe on this phone): ' + e.message);
+  }finally{ syncing = false; }
+}
+setInterval(() => { if(document.visibilityState === 'visible') sync(); }, 8000);
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible'){ sync(); wake(); render(); } });
+window.addEventListener('online', sync);
+
+// ---------- Wake lock ----------
+let wl = null;
+async function wake(){
+  try{
+    if(settings.wake && 'wakeLock' in navigator && document.visibilityState === 'visible'){ if(!wl) { wl = await navigator.wakeLock.request('screen'); wl.addEventListener('release', () => wl = null); } }
+    else if(!settings.wake && wl){ await wl.release(); wl = null; }
+  }catch(e){}
+}
+document.addEventListener('click', wake, { once: true });
+
+// ---------- Boot ----------
+render(); sync(); wake();
+setInterval(tick, 250);
+setInterval(render, 15000); // refresh running rows / stats
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
