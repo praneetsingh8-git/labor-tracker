@@ -626,8 +626,8 @@ $('gearBtn').onclick = () => {
     <h3>Settings</h3>
     <div class="h">Sync between phones</div>
     ${syncKey ? `
-      <p class="muted">Sync is ON. Open this link on the other iPhone (in Safari) to share the same log:</p>
-      <div class="code" id="sLink">${esc(link)}</div>
+      <p class="muted">Sync is ON. Sync code for the other phone:</p>
+      <div class="code" id="sLink" style="font-size:20px;text-align:center">${esc(syncKey)}</div>
       <div class="grid2" style="margin-top:10px">
         <button class="btn" id="sCopy">Copy link</button>
         <button class="btn" id="sNow">Sync now</button>
@@ -637,9 +637,9 @@ $('gearBtn').onclick = () => {
     ` : `
       <p class="muted">Data is saved on this phone only. Turn on sync to share one log between both iPhones. Anyone with the sync link can see the log, so share it only with each other.</p>
       <button class="btn primary" id="sOn">Turn on sync</button>
-      <div class="field" style="margin-top:12px"><label>Or join with a code from the other phone</label><input id="sJoin" placeholder="paste code or link"></div>
-      <button class="btn" id="sJoinBtn">Join</button>
     `}
+    <div class="field" style="margin-top:16px"><label>${syncKey ? 'Switch to' : 'Or join'} the code from the other phone</label><input id="sJoin" placeholder="type or paste code" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+    <button class="btn" id="sJoinBtn">Join</button>
     <div class="h" style="margin-top:20px">Screen</div>
     <button class="btn" id="wakeBtn">${settings.wake ? '✅ Keep screen awake: ON' : 'Keep screen awake: OFF'}</button>
     <p class="muted">Tip: Safari → Share → "Add to Home Screen" to open it like an app.</p>
@@ -652,7 +652,8 @@ $('gearBtn').onclick = () => {
   if($('sJoinBtn')) $('sJoinBtn').onclick = () => {
     let v = $('sJoin').value.trim(); const m = v.match(/join=([A-Za-z0-9]+)/); if(m) v = m[1];
     if(v.length < 16){ alert('That code looks too short.'); return; }
-    setKey(v); closeSheet();
+    if(v === syncKey){ closeSheet(); return; }
+    setKey(v); closeSheet(); toast('Joined. Pulling history…');
   };
   $('wakeBtn').onclick = () => { settings.wake = !settings.wake; LS.set('lt_settings', settings); wake(); $('gearBtn').click(); };
 };
