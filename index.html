@@ -651,7 +651,7 @@ $('gearBtn').onclick = () => {
   if($('sOn')) $('sOn').onclick = () => { setKey(randomKey()); closeSheet(); $('gearBtn').click(); };
   if($('sJoinBtn')) $('sJoinBtn').onclick = () => {
     let v = $('sJoin').value.trim(); const m = v.match(/join=([A-Za-z0-9]+)/); if(m) v = m[1];
-    if(v.length < 20){ alert('That code looks too short.'); return; }
+    if(v.length < 16){ alert('That code looks too short.'); return; }
     setKey(v); closeSheet();
   };
   $('wakeBtn').onclick = () => { settings.wake = !settings.wake; LS.set('lt_settings', settings); wake(); $('gearBtn').click(); };
@@ -663,7 +663,7 @@ function setKey(k){
   sync();
 }
 // join via link
-{ const m = location.hash.match(/join=([A-Za-z0-9]{20,})/); if(m){ if(m[1] !== syncKey) setKey(m[1]); history.replaceState(null, '', location.pathname); } }
+{ const m = location.hash.match(/join=([A-Za-z0-9]{16,})/); if(m){ if(m[1] !== syncKey) setKey(m[1]); history.replaceState(null, '', location.pathname); } }
 
 let syncMsg = '', syncing = false, syncTimer;
 function setSync(state, msg){

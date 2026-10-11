@@ -12,7 +12,7 @@ revoke all on public.lt_events from anon, authenticated;
 create or replace function public.lt_push(p_key text, p_events jsonb)
 returns void language plpgsql security definer set search_path = public as $$
 begin
-  if p_key is null or length(p_key) < 20 then raise exception 'bad key'; end if;
+  if p_key is null or length(p_key) < 16 then raise exception 'bad key'; end if;
   insert into lt_events (household, id, type, start_ts, end_ts, data, deleted, updated, synced_at)
   select p_key, (e->>'id')::uuid, e->>'type', (e->>'start_ts')::bigint, nullif(e->>'end_ts','')::bigint,
          coalesce(e->'data','{}'::jsonb), coalesce((e->>'deleted')::boolean,false), (e->>'updated')::bigint, clock_timestamp()
@@ -26,7 +26,7 @@ end $$;
 create or replace function public.lt_pull(p_key text, p_since timestamptz)
 returns setof public.lt_events language sql security definer set search_path = public stable as $$
   select * from lt_events
-  where household = p_key and length(p_key) >= 20
+  where household = p_key and length(p_key) >= 16
     and synced_at > coalesce(p_since, 'epoch'::timestamptz)
   order by synced_at;
 $$;
