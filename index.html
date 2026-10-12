@@ -88,6 +88,9 @@ nav button.on{color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:10px 16px;border-radius:999px;font-size:14px;z-index:20;display:none;align-items:center;gap:12px;white-space:nowrap}
 .toast.on{display:flex}
 .toast button{color:var(--accent);font-weight:700}
+.pain .chip{padding:9px 0;width:calc((100% - 40px)/6);text-align:center}
+.medrow{display:flex;justify-content:space-between;gap:8px;font-size:14px;margin:4px 0}
+.ok{color:var(--go)}.wait{color:var(--warn)}.over{color:var(--bad)}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all;background:var(--card2);padding:10px;border-radius:10px;user-select:text;-webkit-user-select:text}
 </style>
 </head>
@@ -174,6 +177,12 @@ nav button.on{color:var(--accent)}
     </div>
 
     <div class="card">
+      <div class="h">Sleep</div>
+      <button class="tile" id="sleepBtn" style="width:100%"><div class="big" id="sleepT">😴 Fell asleep</div><small id="sleepS">tap when baby falls asleep</small></button>
+      <div class="muted" id="sleepInfo" style="margin-top:8px;text-align:center"></div>
+    </div>
+
+    <div class="card">
       <div class="h">Last 24 hours</div>
       <div class="stats">
         <div class="stat"><div class="v" id="dFeeds">0</div><div class="l">feeds</div></div>
@@ -191,6 +200,24 @@ nav button.on{color:var(--accent)}
     </div>
   </section>
 
+  <!-- MOM -->
+  <section class="page" id="p-mom">
+    <div class="card" id="medCards"></div>
+    <div class="grid2">
+      <button class="btn" id="otherMedBtn">💊 Other medicine</button>
+      <button class="btn" data-note="mom">✏️ Note</button>
+    </div>
+    <div class="card">
+      <div class="h">For the paper form (today)</div>
+      <div id="formView"></div>
+    </div>
+    <div class="card">
+      <div class="h">Recent</div>
+      <div id="momList"></div>
+    </div>
+    <p class="muted">Dose limits shown are copied from the hospital's self-administration form. Your nurse's instructions come first.</p>
+  </section>
+
   <!-- LOG -->
   <section class="page" id="p-log">
     <div class="chips" id="logFilter" style="margin:10px 0">
@@ -198,6 +225,8 @@ nav button.on{color:var(--accent)}
       <button class="chip" data-f="contraction">Contractions</button>
       <button class="chip" data-f="feed">Feeds</button>
       <button class="chip" data-f="diaper">Diapers</button>
+      <button class="chip" data-f="sleep">Sleep</button>
+      <button class="chip" data-f="med">Meds</button>
       <button class="chip" data-f="note">Notes</button>
     </div>
     <div class="card"><div id="logList"></div></div>
@@ -211,6 +240,7 @@ nav button.on{color:var(--accent)}
 <nav>
   <button class="on" data-tab="labor"><b>⏱</b>Labor</button>
   <button data-tab="baby"><b>👶</b>Baby</button>
+  <button data-tab="mom"><b>💊</b>Mom</button>
   <button data-tab="log"><b>📋</b>Log</button>
 </nav>
 
@@ -351,6 +381,60 @@ document.querySelectorAll('[data-diaper]').forEach(b => b.onclick = () => {
   toast('Diaper logged', () => { ev.deleted = true; put(ev); }, 'Undo', () => editEvent(ev.id), 'Add remark');
 });
 
+// ---------- Sleep ----------
+function runningSleep(){ return byType('sleep').find(e => e.end == null); }
+$('sleepBtn').onclick = () => {
+  const r = runningSleep(), now = Date.now();
+  if(r){ r.end = now; put(r); } else add('sleep', now, null, {});
+};
+
+// ---------- Mom meds (limits from the hospital SAM form) ----------
+const MEDS = {
+  acet: { name:'Acetaminophen', mg:500, tabs:[1,2], gapH:4, maxTabs:8, rule:'1 or 2 tablets every 4–6 h · max 8 tablets / 24 h' },
+  ibu:  { name:'Ibuprofen', mg:400, tabs:[1], gapH:4, maxTabs:6, rule:'1 tablet every 4–6 h · max 2400 mg (6 tablets) / 24 h' }
+};
+function medStatus(key){
+  const m = MEDS[key], now = Date.now();
+  const doses = byType('med').filter(e => e.data.med === key);
+  const last = doses[0];
+  const tabs24 = doses.filter(e => e.start > now - 24*3600e3).reduce((a,e) => a + (e.data.tablets||0), 0);
+  const nextAt = last ? last.start + m.gapH*3600e3 : null;
+  return { m, last, tabs24, nextAt };
+}
+function painChips(id, cur){
+  return `<div class="chips pain" id="${id}">${[0,1,2,3,4,5,6,7,8,9,10].map(i=>`<button class="chip ${cur===i?'on':''}" data-v="${i}">${i}</button>`).join('')}</div>`;
+}
+function medSheet(key){
+  const m = key === 'other' ? null : MEDS[key];
+  openSheet(`
+    <h3>${m ? esc(m.name) + ' ' + m.mg + ' mg' : 'Other medicine'}</h3>
+    ${m ? '' : `<div class="field"><label>Medicine and dose</label><input id="mName" placeholder="e.g. Stool softener 100 mg"></div>`}
+    <div class="field"><label>Time taken</label><input type="datetime-local" id="mTime" value="${toLocalInput(Date.now())}"></div>
+    ${m ? `<div class="field"><label># Tablets</label><div class="chips" id="mTabs">${m.tabs.map((n,i)=>`<button class="chip ${i===m.tabs.length-1?'on':''}" data-v="${n}">${n}</button>`).join('')}</div></div>` : ''}
+    <div class="field"><label>Pain score (0 = none, 10 = worst)</label>${painChips('mPain')}</div>
+    <div class="field"><label>Remark (optional)</label><input id="mNote"></div>
+    <button class="btn primary" id="mSave">Save</button>`);
+  ['mTabs','mPain'].forEach(b => { const el = $(b); if(el) el.querySelectorAll('[data-v]').forEach(c => c.onclick = () => { el.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }); });
+  $('mSave').onclick = () => {
+    const tv = $('mTime').value, at = tv && tv !== toLocalInput(Date.now()) ? fromLocalInput(tv) : Date.now();
+    const pc = $('mPain').querySelector('.chip.on');
+    const data = { med: key, pain: pc ? +pc.dataset.v : null, note: $('mNote').value.trim() };
+    if(m){
+      data.tablets = +$('mTabs').querySelector('.chip.on').dataset.v;
+      const st = medStatus(key);
+      const warn = [];
+      if(st.last && at - st.last.start < m.gapH*3600e3) warn.push('Only ' + durWords(at - st.last.start) + ' since the last dose (form says every 4–6 hours).');
+      if(st.tabs24 + data.tablets > m.maxTabs) warn.push('This makes ' + (st.tabs24 + data.tablets) + ' tablets in 24 h (form max is ' + m.maxTabs + ').');
+      if(warn.length && !confirm(warn.join('\n') + '\n\nLog it anyway? Check with the nurse if unsure.')) return;
+    } else {
+      data.name = $('mName').value.trim();
+      if(!data.name){ alert('Enter the medicine name.'); return; }
+    }
+    add('med', at, at, data); closeSheet();
+  };
+}
+$('otherMedBtn').onclick = () => medSheet('other');
+
 // ---------- Notes ----------
 document.querySelectorAll('[data-note]').forEach(b => b.onclick = () => noteSheet(b.dataset.note));
 document.querySelectorAll('[data-quick]').forEach(b => b.onclick = () => {
@@ -375,7 +459,7 @@ function toLocalInput(ms){ const d = new Date(ms); return d.getFullYear()+'-'+pa
 function fromLocalInput(v, keepSec){ if(!v) return null; const d = new Date(v); return d.getTime() + (keepSec||0); }
 function editEvent(id){
   const ev = events[id]; if(!ev) return;
-  const hasEnd = ev.type === 'contraction' || (ev.type === 'feed' && ev.data.kind === 'breast');
+  const hasEnd = ev.type === 'contraction' || ev.type === 'sleep' || (ev.type === 'feed' && ev.data.kind === 'breast');
   const d = ev.data;
   let extra = '';
   if(ev.type === 'contraction') extra = `<div class="field"><label>Intensity</label><div class="chips" id="eInt">${[1,2,3].map(i=>`<button class="chip ${d.intensity===i?'on':''}" data-v="${i}">${INT[i]}</button>`).join('')}</div></div>`;
@@ -383,6 +467,8 @@ function editEvent(id){
   if(ev.type === 'feed' && d.kind === 'bottle') extra = `<div class="field"><label>Amount (ml)</label><input type="number" inputmode="numeric" id="eMl" value="${d.ml ?? ''}"></div>
     <div class="field"><label>Milk</label><div class="chips" id="eMilk">${['formula','breastmilk'].map(s=>`<button class="chip ${d.milk===s?'on':''}" data-v="${s}">${s==='formula'?'Formula':'Breast milk'}</button>`).join('')}</div></div>`;
   if(ev.type === 'diaper') extra = `<div class="field"><label>Type</label><div class="chips" id="eDiaper">${['wet','dirty','both'].map(s=>`<button class="chip ${d.kind===s?'on':''}" data-v="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div></div>`;
+  if(ev.type === 'med') extra = (MEDS[d.med] ? `<div class="field"><label># Tablets</label><input type="number" inputmode="numeric" id="eTabs" value="${d.tablets ?? ''}"></div>` : `<div class="field"><label>Medicine and dose</label><input id="eName" value="${esc(d.name)}"></div>`)
+    + `<div class="field"><label>Pain score</label>${painChips('ePain', d.pain)}</div>`;
   openSheet(`
     <h3>${esc(title(ev))}</h3>
     <div class="field"><label>${hasEnd ? 'Started' : 'Time'}</label><input type="datetime-local" id="eStart" value="${toLocalInput(ev.start)}"></div>
@@ -394,7 +480,7 @@ function editEvent(id){
       <button class="btn danger" id="eDel">Delete</button>
     </div>`);
   const pick = (box, key) => { const el = $(box); if(!el) return; el.querySelectorAll('[data-v]').forEach(c => c.onclick = () => { el.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }); };
-  ['eInt','eSide','eMilk','eDiaper'].forEach(b => pick(b));
+  ['eInt','eSide','eMilk','eDiaper','ePain'].forEach(b => pick(b));
   const sel = box => { const c = $(box) && $(box).querySelector('.chip.on'); return c ? c.dataset.v : undefined; };
   $('eSave').onclick = () => {
     // keep original seconds if the minute wasn't changed
@@ -411,6 +497,9 @@ function editEvent(id){
     if(sel('eSide')) d.side = sel('eSide');
     if(sel('eMilk')) d.milk = sel('eMilk');
     if(sel('eDiaper')) d.kind = sel('eDiaper');
+    if(sel('ePain') !== undefined) d.pain = +sel('ePain');
+    if($('eTabs')){ const v = parseInt($('eTabs').value); d.tablets = isNaN(v) ? null : v; }
+    if($('eName')) d.name = $('eName').value.trim();
     if($('eMl')){ const v = parseFloat($('eMl').value); d.ml = isNaN(v) ? null : v; }
     put(ev); closeSheet();
   };
@@ -423,12 +512,16 @@ function title(ev){
   if(ev.type === 'contraction') return 'Contraction';
   if(ev.type === 'feed') return d.kind === 'breast' ? 'Breast · ' + (d.side === 'L' ? 'Left' : 'Right') : 'Bottle · ' + (d.milk === 'formula' ? 'Formula' : 'Breast milk');
   if(ev.type === 'diaper') return 'Diaper · ' + ({wet:'Wet',dirty:'Dirty',both:'Wet + dirty'}[d.kind] || '');
+  if(ev.type === 'sleep') return 'Sleep';
+  if(ev.type === 'med') return MEDS[d.med] ? MEDS[d.med].name + ' ' + MEDS[d.med].mg + ' mg' : (d.name || 'Medicine');
   return 'Note';
 }
 function icon(ev){
   if(ev.type === 'contraction') return '⏱';
   if(ev.type === 'feed') return ev.data.kind === 'breast' ? '🤱' : '🍼';
   if(ev.type === 'diaper') return ev.data.kind === 'wet' ? '💧' : '💩';
+  if(ev.type === 'sleep') return '😴';
+  if(ev.type === 'med') return '💊';
   return '✏️';
 }
 function rowHtml(ev, extraSide){
@@ -440,6 +533,11 @@ function rowHtml(ev, extraSide){
   if(ev.type === 'feed'){
     if(d.kind === 'breast') side = ev.end == null ? 'running' : durWords(ev.end - ev.start);
     else side = d.ml != null ? d.ml + ' ml' : '';
+  }
+  if(ev.type === 'sleep') side = ev.end == null ? 'asleep' : durWords(ev.end - ev.start);
+  if(ev.type === 'med'){
+    if(d.tablets) side = d.tablets + (d.tablets === 1 ? ' tab' : ' tabs');
+    if(d.pain != null) sub.push('pain ' + d.pain + '/10');
   }
   const note = ev.type === 'note' ? d.text : d.note;
   if(note) sub.push(note);
@@ -481,7 +579,7 @@ function render(){
   bindRows($('cList'));
 
   // baby
-  const babyEvents = live().filter(e => e.type === 'feed' || e.type === 'diaper' || (e.type === 'note' && e.data.ctx !== 'labor')).sort((a,b)=>b.start-a.start);
+  const babyEvents = live().filter(e => e.type === 'feed' || e.type === 'diaper' || e.type === 'sleep' || (e.type === 'note' && e.data.ctx === 'baby')).sort((a,b)=>b.start-a.start);
   $('babyList').innerHTML = babyEvents.slice(0, 15).map(e => rowHtml(e)).join('') || '<div class="empty">Nothing logged yet</div>';
   bindRows($('babyList'));
   const day = now - 24*3600e3;
@@ -493,6 +591,25 @@ function render(){
   $('dWet').textContent = diapers.filter(d => d.start >= day && (d.data.kind === 'wet' || d.data.kind === 'both')).length;
   $('dDirty').textContent = diapers.filter(d => d.start >= day && (d.data.kind === 'dirty' || d.data.kind === 'both')).length;
   $('lastDiaper').textContent = diapers[0] ? 'Last diaper ' + t(diapers[0].start) + ' (' + diapers[0].data.kind + ')' : '';
+
+  // sleep total in last 24h (clipped to the window)
+  const sleepMs = byType('sleep').reduce((a,e) => a + Math.max(0, (e.end ?? now) - Math.max(e.start, day)), 0);
+  $('sleepInfo').textContent = byType('sleep').length ? 'Slept ' + durWords(sleepMs) + ' in the last 24 h' : '';
+
+  // mom
+  renderMeds(now);
+  const momEvents = live().filter(e => e.type === 'med' || (e.type === 'note' && e.data.ctx === 'mom')).sort((a,b)=>b.start-a.start);
+  $('momList').innerHTML = momEvents.slice(0, 15).map(e => rowHtml(e)).join('') || '<div class="empty">Nothing logged yet</div>';
+  bindRows($('momList'));
+  const midnight = new Date(); midnight.setHours(0,0,0,0);
+  const todays = byType('med').filter(e => e.start >= midnight.getTime()).reverse();
+  const groups = {};
+  todays.forEach(e => { const k = title(e); (groups[k] = groups[k] || []).push(e); });
+  $('formView').innerHTML = Object.keys(groups).length ? Object.entries(groups).map(([k, list]) =>
+    `<div style="font-weight:700;margin:8px 0 2px">${esc(k)}</div>` +
+    `<div class="medrow muted"><span>Time</span><span># Tablets</span><span>Pain</span></div>` +
+    list.map(e => `<div class="medrow num"><span>${esc(t(e.start))}</span><span>${e.data.tablets ?? '—'}</span><span>${e.data.pain ?? '—'}</span></div>`).join('')
+  ).join('') : '<div class="empty">No medicine logged today</div>';
 
   // log
   let logEvents = live().sort((a,b)=>b.start-a.start);
@@ -531,6 +648,13 @@ function tick(){
   $('tRest').textContent = r ? 'now' : (lastDone ? dur(now - lastDone.end) : '—');
   $('rateLast').innerHTML = r && lastStarted ? `<div class="banner info" style="text-align:center">This one started ${durWords(r.start - lastStarted.start)} after the previous one</div>` : '';
 
+  // sleep
+  const sl = runningSleep();
+  $('sleepBtn').classList.toggle('live', !!sl);
+  $('sleepT').textContent = sl ? '😴 ' + dur(now - sl.start, now - sl.start >= 3600e3) : '😴 Fell asleep';
+  if(sl) $('sleepS').textContent = 'asleep since ' + t(sl.start) + ' · tap when awake';
+  else { const ls = byType('sleep')[0]; $('sleepS').textContent = ls && ls.end ? 'awake for ' + durWords(now - ls.end) + ' · tap when asleep' : 'tap when baby falls asleep'; }
+
   // feeds
   const f = runningFeed();
   ['L','R'].forEach(s => {
@@ -554,11 +678,31 @@ function tick(){
   // running entries in lists show live durations on next render; keep cheap here
 }
 
+function renderMeds(now){
+  $('medCards').innerHTML = '<div class="h">Pain medicine</div>' + Object.keys(MEDS).map(k => {
+    const { m, last, tabs24, nextAt } = medStatus(k);
+    let next;
+    if(!last) next = '<span class="ok">No doses logged</span>';
+    else if(tabs24 >= m.maxTabs) next = '<span class="over">24-hour max reached (' + tabs24 + '/' + m.maxTabs + ')</span>';
+    else if(now >= nextAt) next = '<span class="ok">Can take now (4 h passed)</span>';
+    else next = '<span class="wait">Next from ' + t(nextAt) + ' · in ' + durWords(nextAt - now) + '</span>';
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div><div class="t1" style="font-weight:700">${m.name} ${m.mg} mg</div><div class="muted">${m.rule}</div></div>
+        <button class="btn primary" style="width:auto;padding:10px 16px;white-space:nowrap;flex:none" data-med="${k}">Took it</button>
+      </div>
+      <div style="margin-top:6px;font-size:14px">${last ? 'Last: ' + t(last.start) + ' (' + last.data.tablets + ' tab) · ' + durWords(now - last.start) + ' ago<br>' : ''}${next} · ${tabs24}/${m.maxTabs} tablets in 24 h</div>
+    </div>`;
+  }).join('');
+  $('medCards').querySelectorAll('[data-med]').forEach(b => b.onclick = () => medSheet(b.dataset.med));
+}
+
 // ---------- Tabs ----------
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === 'p-' + b.dataset.tab));
   LS.set('lt_tab', b.dataset.tab); window.scrollTo(0,0);
+  if(b.dataset.tab === 'mom') renderMeds(Date.now());
 });
 { const tab = LS.get('lt_tab', 'labor'); const b = document.querySelector(`nav [data-tab="${tab}"]`); if(b) b.click(); }
 $('logFilter').querySelectorAll('[data-f]').forEach(c => c.onclick = () => {
@@ -593,7 +737,7 @@ function rowsForExport(){
       end: e.end && e.end !== e.start ? tfs.format(new Date(e.end)) : '',
       type: title(e),
       duration: e.end && e.end !== e.start ? dur(e.end - e.start) : '',
-      detail: [d.intensity ? INT[d.intensity] : '', d.ml != null ? d.ml + ' ml' : ''].filter(Boolean).join(' '),
+      detail: [d.intensity ? INT[d.intensity] : '', d.ml != null ? d.ml + ' ml' : '', d.tablets ? d.tablets + ' tab' : '', d.pain != null ? 'pain ' + d.pain + '/10' : ''].filter(Boolean).join(' '),
       note: e.type === 'note' ? d.text : (d.note || '')
     };
   });
