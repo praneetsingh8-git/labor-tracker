@@ -6,11 +6,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Labor">
+<meta name="apple-mobile-web-app-title" content="Aveer">
 <meta name="theme-color" content="#121014">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
-<title>Labor & Baby Tracker</title>
+<script src="content.js"></script>
+<title>Aveer & Navjot</title>
 <style>
 :root{
   --bg:#121014; --card:#1d1a21; --card2:#26222b; --line:#332e39;
@@ -91,6 +92,24 @@ nav button.on{color:var(--accent)}
 .pain .chip{padding:9px 0;width:calc((100% - 40px)/6);text-align:center}
 .medrow{display:flex;justify-content:space-between;gap:8px;font-size:14px;margin:4px 0}
 .ok{color:var(--go)}.wait{color:var(--warn)}.over{color:var(--bad)}
+.subhead{display:flex;align-items:center;gap:10px;margin:6px 0 4px}
+.subhead h2{margin:0;font-size:22px}
+.back{padding:8px 12px;border-radius:12px;background:var(--card);font-weight:700;color:var(--accent)}
+.links{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.links .tile{font-size:14px;min-height:64px;padding:12px 6px}
+.tip{font-size:15px;line-height:1.45}
+.tip + .tip{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.tip b{display:block;font-size:12px;color:var(--accent2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
+.check{width:30px;height:30px;border-radius:50%;border:2px solid var(--faint);display:grid;place-items:center;flex:none;font-size:16px}
+.check.on{background:var(--go);border-color:var(--go);color:#06281b}
+.prog{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;margin:6px 0 2px}
+.prog i{display:block;height:100%;background:var(--go)}
+.grp{font-size:13px;color:var(--accent2);font-weight:700;margin:14px 0 2px;text-transform:uppercase;letter-spacing:.6px}
+.fu{display:grid;grid-template-columns:1fr 130px 34px;gap:6px;margin-bottom:6px}
+.fu input{padding:10px}
+a.ext{color:var(--blue);font-weight:600;text-decoration:none}
+.daily{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.daily:last-child{border-bottom:0}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all;background:var(--card2);padding:10px;border-radius:10px;user-select:text;-webkit-user-select:text}
 </style>
 </head>
@@ -108,7 +127,8 @@ nav button.on{color:var(--accent)}
   </header>
 
   <!-- LABOR -->
-  <section class="page on" id="p-labor">
+  <section class="page" id="p-labor">
+    <div class="subhead"><button class="back" data-back>‹ Back</button><h2>Contractions</h2></div>
     <button class="bigbtn" id="cBtn">
       <span class="s" id="cBtnSub">TAP WHEN IT STARTS</span>
       <span class="t" id="cBtnTime">START</span>
@@ -143,7 +163,18 @@ nav button.on{color:var(--accent)}
   </section>
 
   <!-- BABY -->
-  <section class="page" id="p-baby">
+  <section class="page on" id="p-baby">
+    <div class="card">
+      <div class="h" id="dayTitle">Aveer</div>
+      <div class="tip" id="tipToday"></div>
+      <div class="tip" id="tipNext"></div>
+    </div>
+    <div id="fuBanner"></div>
+    <div class="links">
+      <button class="tile" data-go="docs">📄<small>Documents</small></button>
+      <button class="tile" data-go="health">🩺<small>Health</small></button>
+      <button class="tile" data-go="ms">⭐<small>Milestones</small></button>
+    </div>
     <div class="card">
       <div class="h">Last feed</div>
       <div class="ago num" id="lastFeedAgo">—</div>
@@ -183,13 +214,14 @@ nav button.on{color:var(--accent)}
     </div>
 
     <div class="card">
-      <div class="h">Last 24 hours</div>
+      <div class="h" id="dayStatsTitle">Today</div>
       <div class="stats">
         <div class="stat"><div class="v" id="dFeeds">0</div><div class="l">feeds</div></div>
         <div class="stat"><div class="v" id="dWet">0</div><div class="l">wet</div></div>
         <div class="stat"><div class="v" id="dDirty">0</div><div class="l">dirty</div></div>
       </div>
-      <div class="muted" id="lastDiaper" style="margin-top:10px;text-align:center"></div>
+      <div class="muted" id="dCompare" style="margin-top:10px;text-align:center"></div>
+      <div class="muted" id="lastDiaper" style="margin-top:4px;text-align:center"></div>
     </div>
 
     <button class="btn" data-note="baby">✏️ Add note</button>
@@ -202,20 +234,62 @@ nav button.on{color:var(--accent)}
 
   <!-- MOM -->
   <section class="page" id="p-mom">
+    <div id="stockBanner"></div>
+    <div class="card"><div class="h">Navjot · daily medicines</div><div id="dailyCards"></div></div>
     <div class="card" id="medCards"></div>
     <div class="grid2">
       <button class="btn" id="otherMedBtn">💊 Other medicine</button>
       <button class="btn" data-note="mom">✏️ Note</button>
     </div>
     <div class="card">
-      <div class="h">For the paper form (today)</div>
+      <div class="h">Today's doses</div>
       <div id="formView"></div>
     </div>
     <div class="card">
       <div class="h">Recent</div>
       <div id="momList"></div>
     </div>
-    <p class="muted">Dose limits shown are copied from the hospital's self-administration form. Your nurse's instructions come first.</p>
+    <p class="muted">Pain-medicine limits are copied from the hospital's self-administration form. The 4-hour Synthroid gap is a common pharmacist rule of thumb; confirm timing with your pharmacist.</p>
+  </section>
+
+  <!-- MORE -->
+  <section class="page" id="p-more">
+    <div class="card stack">
+      <button class="btn" data-go="docs">📄 Documents &amp; registrations</button>
+      <button class="btn" data-go="health">🩺 Health &amp; visits</button>
+      <button class="btn" data-go="ms">⭐ Milestones</button>
+      <button class="btn" data-go="labor">⏱ Contraction tracker</button>
+      <button class="btn" id="moreSettings">⚙︎ Settings &amp; sync</button>
+    </div>
+  </section>
+
+  <!-- DOCUMENTS -->
+  <section class="page" id="p-docs">
+    <div class="subhead"><button class="back" data-back>‹ Back</button><h2>Documents</h2></div>
+    <div class="card"><div id="docsProgress"></div></div>
+    <div class="card"><div id="docsList"></div></div>
+    <p class="muted">Ontario list for a baby born in Ontario to permanent-resident parents. Rules and timelines change; the linked government pages are the source of truth.</p>
+  </section>
+
+  <!-- HEALTH -->
+  <section class="page" id="p-health">
+    <div class="subhead"><button class="back" data-back>‹ Back</button><h2>Health</h2></div>
+    <div class="grid2" style="margin:10px 0">
+      <button class="btn primary" id="addVisit">+ Visit</button>
+      <button class="btn" id="addWeight">+ Weight</button>
+    </div>
+    <div class="card"><div class="h">Follow-ups</div><div id="fuList"></div></div>
+    <div class="card"><div class="h">Visits</div><div id="visitList"></div></div>
+    <div class="card"><div class="h">Weight</div><div id="growthList"></div></div>
+  </section>
+
+  <!-- MILESTONES -->
+  <section class="page" id="p-ms">
+    <div class="subhead"><button class="back" data-back>‹ Back</button><h2>Milestones</h2></div>
+    <div class="card"><div class="h" id="msNowTitle">Now</div><div class="tip" id="msNow"></div></div>
+    <button class="btn" id="addMoment">+ Add a special moment</button>
+    <div class="card"><div id="msList"></div></div>
+    <p class="muted" id="msNote"></p>
   </section>
 
   <!-- LOG -->
@@ -227,6 +301,8 @@ nav button.on{color:var(--accent)}
       <button class="chip" data-f="diaper">Diapers</button>
       <button class="chip" data-f="sleep">Sleep</button>
       <button class="chip" data-f="med">Meds</button>
+      <button class="chip" data-f="visit">Visits</button>
+      <button class="chip" data-f="milestone">Milestones</button>
       <button class="chip" data-f="note">Notes</button>
     </div>
     <div class="card"><div id="logList"></div></div>
@@ -238,10 +314,10 @@ nav button.on{color:var(--accent)}
 </div>
 
 <nav>
-  <button class="on" data-tab="labor"><b>⏱</b>Labor</button>
-  <button data-tab="baby"><b>👶</b>Baby</button>
-  <button data-tab="mom"><b>💊</b>Mom</button>
+  <button class="on" data-tab="baby"><b>👶</b>Aveer</button>
+  <button data-tab="mom"><b>💊</b>Navjot</button>
   <button data-tab="log"><b>📋</b>Log</button>
+  <button data-tab="more"><b>☰</b>More</button>
 </nav>
 
 <div class="sheet-bg" id="sheetBg"></div>
@@ -467,6 +543,8 @@ function editEvent(id){
   if(ev.type === 'feed' && d.kind === 'bottle') extra = `<div class="field"><label>Amount (ml)</label><input type="number" inputmode="numeric" id="eMl" value="${d.ml ?? ''}"></div>
     <div class="field"><label>Milk</label><div class="chips" id="eMilk">${['formula','breastmilk'].map(s=>`<button class="chip ${d.milk===s?'on':''}" data-v="${s}">${s==='formula'?'Formula':'Breast milk'}</button>`).join('')}</div></div>`;
   if(ev.type === 'diaper') extra = `<div class="field"><label>Type</label><div class="chips" id="eDiaper">${['wet','dirty','both'].map(s=>`<button class="chip ${d.kind===s?'on':''}" data-v="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div></div>`;
+  if(ev.type === 'growth') extra = `<div class="field"><label>Weight (kg)</label><input type="number" step="0.001" inputmode="decimal" id="eKg" value="${d.kg ?? ''}"></div>`;
+  if(ev.type === 'stock') extra = `<div class="field"><label>Pills counted</label><input type="number" inputmode="numeric" id="eCount" value="${d.count ?? ''}"></div>`;
   if(ev.type === 'med') extra = (MEDS[d.med] ? `<div class="field"><label># Tablets</label><input type="number" inputmode="numeric" id="eTabs" value="${d.tablets ?? ''}"></div>` : `<div class="field"><label>Medicine and dose</label><input id="eName" value="${esc(d.name)}"></div>`)
     + `<div class="field"><label>Pain score</label>${painChips('ePain', d.pain)}</div>`;
   openSheet(`
@@ -500,6 +578,8 @@ function editEvent(id){
     if(sel('ePain') !== undefined) d.pain = +sel('ePain');
     if($('eTabs')){ const v = parseInt($('eTabs').value); d.tablets = isNaN(v) ? null : v; }
     if($('eName')) d.name = $('eName').value.trim();
+    if($('eKg')){ const v = parseFloat($('eKg').value); if(!isNaN(v)) d.kg = v; }
+    if($('eCount')){ const v = parseInt($('eCount').value); if(!isNaN(v)) d.count = v; }
     if($('eMl')){ const v = parseFloat($('eMl').value); d.ml = isNaN(v) ? null : v; }
     put(ev); closeSheet();
   };
@@ -513,7 +593,12 @@ function title(ev){
   if(ev.type === 'feed') return d.kind === 'breast' ? 'Breast · ' + (d.side === 'L' ? 'Left' : 'Right') : 'Bottle · ' + (d.milk === 'formula' ? 'Formula' : 'Breast milk');
   if(ev.type === 'diaper') return 'Diaper · ' + ({wet:'Wet',dirty:'Dirty',both:'Wet + dirty'}[d.kind] || '');
   if(ev.type === 'sleep') return 'Sleep';
-  if(ev.type === 'med') return MEDS[d.med] ? MEDS[d.med].name + ' ' + MEDS[d.med].mg + ' mg' : (d.name || 'Medicine');
+  if(ev.type === 'med') return MEDS[d.med] ? MEDS[d.med].name + ' ' + MEDS[d.med].mg + ' mg' : DAILY[d.med] ? DAILY[d.med].name + (d.med === 'synthroid' && d.dose ? ' ' + d.dose : '') : (d.name || 'Medicine');
+  if(ev.type === 'stock') return 'Synthroid pill count: ' + d.count + (d.dose ? ' (' + d.dose + ')' : '');
+  if(ev.type === 'visit') return 'Visit · ' + (d.kind || 'Appointment');
+  if(ev.type === 'growth') return 'Weight · ' + fmtKg(d.kg);
+  if(ev.type === 'task'){ const r = REGS.find(x => x.key === d.key); return (d.done ? '✓ ' : '') + (r ? r.title : d.key); }
+  if(ev.type === 'milestone') return d.title || (MS_ITEMS[d.key] || {}).title || 'Milestone';
   return 'Note';
 }
 function icon(ev){
@@ -522,6 +607,11 @@ function icon(ev){
   if(ev.type === 'diaper') return ev.data.kind === 'wet' ? '💧' : '💩';
   if(ev.type === 'sleep') return '😴';
   if(ev.type === 'med') return '💊';
+  if(ev.type === 'stock') return '📦';
+  if(ev.type === 'visit') return '🩺';
+  if(ev.type === 'growth') return '⚖️';
+  if(ev.type === 'task') return '📄';
+  if(ev.type === 'milestone') return '⭐';
   return '✏️';
 }
 function rowHtml(ev, extraSide){
@@ -539,6 +629,7 @@ function rowHtml(ev, extraSide){
     if(d.tablets) side = d.tablets + (d.tablets === 1 ? ' tab' : ' tabs');
     if(d.pain != null) sub.push('pain ' + d.pain + '/10');
   }
+  if(ev.type === 'visit'){ side = esc(d.provider || ''); if(d.weightKg) sub.push(fmtKg(d.weightKg)); }
   const note = ev.type === 'note' ? d.text : d.note;
   if(note) sub.push(note);
   return `<div class="row" data-id="${ev.id}">
@@ -547,7 +638,14 @@ function rowHtml(ev, extraSide){
       <div class="t2">${esc(t(ev.start))}${ev.type !== 'note' && sub.length ? ' · ' + esc(sub.join(' · ')) : ''}</div></div>
     <div class="side">${side}</div></div>`;
 }
-function bindRows(el){ el.querySelectorAll('.row[data-id]').forEach(r => r.onclick = () => editEvent(r.dataset.id)); }
+function openEditor(id){
+  const ev = events[id]; if(!ev) return;
+  if(ev.type === 'visit') return visitSheet(id);
+  if(ev.type === 'task') return regSheet(ev.data.key);
+  if(ev.type === 'milestone') return msSheet(ev.data.key, id);
+  editEvent(id);
+}
+function bindRows(el){ el.querySelectorAll('.row[data-id]').forEach(r => r.onclick = () => openEditor(r.dataset.id)); }
 
 let logFilter = 'all';
 function render(){
@@ -583,14 +681,20 @@ function render(){
   $('babyList').innerHTML = babyEvents.slice(0, 15).map(e => rowHtml(e)).join('') || '<div class="empty">Nothing logged yet</div>';
   bindRows($('babyList'));
   const day = now - 24*3600e3;
-  const feeds = byType('feed'), diapers = byType('diaper');
-  // count a feeding session once: breast sides within 15 min of each other are one feed
-  let sessions = 0, lastS = null;
-  feeds.filter(f => f.start >= day).slice().reverse().forEach(f => { if(lastS == null || f.start - lastS > 15*60e3) sessions++; lastS = f.end || f.start; });
-  $('dFeeds').textContent = sessions;
-  $('dWet').textContent = diapers.filter(d => d.start >= day && (d.data.kind === 'wet' || d.data.kind === 'both')).length;
-  $('dDirty').textContent = diapers.filter(d => d.start >= day && (d.data.kind === 'dirty' || d.data.kind === 'both')).length;
+  const diapers = byType('diaper');
+  // day-of-life totals (each day runs from the birth time, 4:24 AM)
+  const dn = dayOf(now), cur = dayStats(dn);
+  $('dayStatsTitle').textContent = 'Day ' + dn + ' so far · since ' + t(dayStart(dn));
+  $('dFeeds').textContent = cur.feeds; $('dWet').textContent = cur.wet; $('dDirty').textContent = cur.dirty;
+  let cmp = '';
+  if(dn > 1){ const pv = dayStats(dn - 1); cmp = `Day ${dn-1}: ${pv.feeds} feeds · ${pv.wet} wet · ${pv.dirty} dirty · slept ${durWords(pv.sleepMs)}`; }
+  cmp += (cmp ? '<br>' : '') + `Typical for day ${dn}: ${CONTENT.feedsMin}+ feeds, ${wetMin(dn)}+ wet diapers`;
+  $('dCompare').innerHTML = cmp;
   $('lastDiaper').textContent = diapers[0] ? 'Last diaper ' + t(diapers[0].start) + ' (' + diapers[0].data.kind + ')' : '';
+  const tip = tipFor(dn);
+  $('dayTitle').textContent = `${CONTENT.baby} · Day ${dn} · ${ageText(now)}`;
+  $('tipToday').innerHTML = '<b>Today</b>' + esc(tip.today);
+  $('tipNext').innerHTML = '<b>Coming up · be ready</b>' + esc(tip.next);
 
   // sleep total in last 24h (clipped to the window)
   const sleepMs = byType('sleep').reduce((a,e) => a + Math.max(0, (e.end ?? now) - Math.max(e.start, day)), 0);
@@ -598,7 +702,9 @@ function render(){
 
   // mom
   renderMeds(now);
-  const momEvents = live().filter(e => e.type === 'med' || (e.type === 'note' && e.data.ctx === 'mom')).sort((a,b)=>b.start-a.start);
+  renderDaily(now);
+  renderDocs(); renderHealth(); renderMs(now);
+  const momEvents = live().filter(e => e.type === 'med' || e.type === 'stock' || (e.type === 'note' && e.data.ctx === 'mom')).sort((a,b)=>b.start-a.start);
   $('momList').innerHTML = momEvents.slice(0, 15).map(e => rowHtml(e)).join('') || '<div class="empty">Nothing logged yet</div>';
   bindRows($('momList'));
   const midnight = new Date(); midnight.setHours(0,0,0,0);
@@ -628,7 +734,7 @@ function render(){
 function tick(){
   const now = Date.now(), d = new Date(now);
   $('clock').textContent = tfs.format(d);
-  $('date').textContent = df.format(d);
+  $('date').textContent = df.format(d) + ' · ' + CONTENT.baby + ' is ' + ageText(now);
 
   const r = runningContraction();
   const cs = byType('contraction');
@@ -697,14 +803,304 @@ function renderMeds(now){
   $('medCards').querySelectorAll('[data-med]').forEach(b => b.onclick = () => medSheet(b.dataset.med));
 }
 
+// ---------- Aveer: day of life ----------
+const BIRTH = new Date(CONTENT.birth).getTime();   // parsed as local time
+const B = new Date(BIRTH);
+function dayStart(n){ return new Date(B.getFullYear(), B.getMonth(), B.getDate() + n - 1, B.getHours(), B.getMinutes()).getTime(); }
+function dayOf(ts){ let n = Math.floor((ts - BIRTH) / 864e5) + 1; while(n > 1 && ts < dayStart(n)) n--; while(ts >= dayStart(n + 1)) n++; return Math.max(1, n); }
+function ageText(now){
+  const ms = now - BIRTH; if(ms < 0) return 'not born yet';
+  const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5);
+  if(d < 60) return (d ? d + 'd ' : '') + h + 'h old';
+  const wk = Math.floor(d / 7); return wk < 26 ? wk + ' weeks old' : Math.floor(d / 30.44) + ' months old';
+}
+const wetMin = n => CONTENT.wetMin[n] || 6;
+function tipFor(n){ let tip = CONTENT.tips[0]; CONTENT.tips.forEach(x => { if(x.from <= n) tip = x; }); return tip; }
+function feedSessions(list){ let n = 0, last = null; list.slice().sort((a,b)=>a.start-b.start).forEach(f => { if(last == null || f.start - last > 15*60e3) n++; last = f.end || f.start; }); return n; }
+function dayStats(n){
+  const a = dayStart(n), b = Math.min(dayStart(n + 1), Date.now()), inDay = e => e.start >= a && e.start < dayStart(n + 1);
+  const feeds = byType('feed').filter(inDay), dia = byType('diaper').filter(inDay);
+  const sleepMs = byType('sleep').reduce((s,e) => s + Math.max(0, Math.min(e.end ?? Date.now(), b) - Math.max(e.start, a)), 0);
+  return { feeds: feedSessions(feeds), wet: dia.filter(d => d.data.kind !== 'dirty').length, dirty: dia.filter(d => d.data.kind !== 'wet').length,
+           ml: feeds.reduce((s,f) => s + (f.data.ml || 0), 0), sleepMs };
+}
+function fmtKg(kg){ if(kg == null) return '—'; const lb = kg * 2.20462, l = Math.floor(lb), oz = Math.round((lb - l) * 16); return kg.toFixed(2) + ' kg (' + (oz === 16 ? (l + 1) + ' lb 0' : l + ' lb ' + oz) + ' oz)'; }
+
+// deterministic ids so a checklist item is one synced record
+function keyId(str){
+  let out = '';
+  for(let seed = 1; out.length < 32; seed++){
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for(let i = 0; i < str.length; i++){ const c = str.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    out += (h1 >>> 0).toString(16).padStart(8, '0');
+  }
+  const h = out.slice(0, 32).split('');
+  h[12] = '4'; h[16] = '89ab'[parseInt(h[16], 16) & 3];
+  return h.slice(0,8).join('') + '-' + h.slice(8,12).join('') + '-' + h.slice(12,16).join('') + '-' + h.slice(16,20).join('') + '-' + h.slice(20).join('');
+}
+function upsertKeyed(id, type, data, start){
+  const ev = events[id] || { id, type, start: start || Date.now(), end: null, data: {}, deleted: false };
+  ev.deleted = false; Object.assign(ev.data, data); if(start) ev.start = start; ev.end = ev.start;
+  put(ev); return ev;
+}
+
+// ---------- Navjot: daily medicines ----------
+const DAILY = {
+  synthroid: { name:'Synthroid', slot:'Morning · empty stomach' },
+  pregpink:  { name:'Pregvit pink', slot:'Morning' },
+  pregblue:  { name:'Pregvit blue', slot:'Evening' },
+  iron:      { name:'Iron (Heme Boost)', slot:'Evening' }
+};
+const AFTER_SYNTH = ['pregpink','pregblue','iron'];  // contain iron/calcium
+function todayMidnight(){ const m = new Date(); m.setHours(0,0,0,0); return m.getTime(); }
+function synthStock(){
+  const st = byType('stock').find(e => e.data.med === 'synthroid');
+  if(!st) return null;
+  const used = byType('med').filter(e => e.data.med === 'synthroid' && e.start > st.start).reduce((a,e) => a + (e.data.tablets || 1), 0);
+  return { left: st.data.count - used, dose: st.data.dose || '', counted: st.start };
+}
+function renderDaily(now){
+  const mid = todayMidnight();
+  const synthToday = byType('med').find(e => e.data.med === 'synthroid' && e.start >= mid);
+  const okAfter = synthToday ? synthToday.start + 4 * 3600e3 : null;
+  const stock = synthStock();
+  $('dailyCards').innerHTML = Object.entries(DAILY).map(([k, m]) => {
+    const dose = byType('med').find(e => e.data.med === k && e.start >= mid);
+    let hint = esc(m.slot);
+    if(k === 'synthroid') hint += stock ? ` · ${stock.left} pills left${stock.dose ? ' · ' + esc(stock.dose) : ''}` : ' · <a class="ext" data-stock>set pill count</a>';
+    if(!dose && okAfter && AFTER_SYNTH.includes(k) && now < okAfter) hint += `<br><span class="wait">Synthroid at ${t(synthToday.start)} → from ${t(okAfter)}</span>`;
+    return `<div class="daily">
+      <div class="check ${dose ? 'on' : ''}">${dose ? '✓' : ''}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:700">${esc(m.name)}</div><div class="muted">${hint}</div></div>
+      ${dose ? `<button class="chip" data-edit="${dose.id}">${t(dose.start)}</button>` : `<button class="btn primary" style="width:auto;padding:10px 16px" data-take="${k}">Take</button>`}
+    </div>`;
+  }).join('') + `<div style="margin-top:10px"><button class="btn" data-stock>📦 Update Synthroid pill count</button></div>`;
+  $('dailyCards').querySelectorAll('[data-take]').forEach(b => b.onclick = () => takeDaily(b.dataset.take));
+  $('dailyCards').querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editEvent(b.dataset.edit));
+  $('dailyCards').querySelectorAll('[data-stock]').forEach(b => b.onclick = stockSheet);
+  let banner = '';
+  if(stock && stock.left <= 7) banner = `<div class="banner warn">📦 Synthroid: ${Math.max(0, stock.left)} pills left (about ${Math.max(0, stock.left)} days). Request a refill now; renewals can need the doctor.</div>`;
+  $('stockBanner').innerHTML = banner;
+}
+function takeDaily(k){
+  const now = Date.now(), mid = todayMidnight();
+  const synthToday = byType('med').find(e => e.data.med === 'synthroid' && e.start >= mid);
+  if(AFTER_SYNTH.includes(k) && synthToday && now - synthToday.start < 4 * 3600e3 &&
+     !confirm(`Synthroid was taken at ${t(synthToday.start)}. Iron and calcium are usually kept about 4 hours apart from it (from ${t(synthToday.start + 4*3600e3)}).\n\nLog ${DAILY[k].name} now anyway?`)) return;
+  const st = synthStock();
+  const ev = add('med', now, now, { med: k, tablets: 1, dose: k === 'synthroid' && st ? st.dose : undefined });
+  toast(DAILY[k].name + ' logged', () => { ev.deleted = true; put(ev); }, 'Undo', () => editEvent(ev.id), 'Change time');
+}
+function stockSheet(){
+  const st = synthStock();
+  openSheet(`<h3>Synthroid pills on hand</h3>
+    <div class="field"><label>Pills in the bottle right now</label><input type="number" inputmode="numeric" id="stCount" value="${st ? Math.max(0, st.left) : ''}"></div>
+    <div class="field"><label>Dose (as on the label)</label><input id="stDose" placeholder="e.g. 75 mcg" value="${esc(st ? st.dose : '')}"></div>
+    <p class="muted">Each logged Synthroid dose counts down from here. You'll get a warning in the app and in the daily email at 7 days left.</p>
+    <button class="btn primary" id="stSave">Save</button>`);
+  $('stSave').onclick = () => {
+    const c = parseInt($('stCount').value); if(isNaN(c)){ alert('Enter the number of pills.'); return; }
+    const now = Date.now(); add('stock', now, now, { med:'synthroid', count:c, dose:$('stDose').value.trim() }); closeSheet();
+  };
+}
+
+// ---------- Documents & registrations ----------
+const REGS = CONTENT.regs;
+const regEv = key => events[keyId('reg:' + key)];
+function renderDocs(){
+  const groups = ['Required','Recommended','Good to have'];
+  const req = REGS.filter(r => r.group === 'Required'), reqDone = req.filter(r => (regEv(r.key) || {data:{}}).data.done).length;
+  const allDone = REGS.filter(r => (regEv(r.key) || {data:{}}).data.done).length;
+  $('docsProgress').innerHTML = `<div style="font-weight:700">${reqDone} of ${req.length} required done</div><div class="prog"><i style="width:${Math.round(reqDone/req.length*100)}%"></i></div><div class="muted">${allDone} of ${REGS.length} items overall</div>`;
+  $('docsList').innerHTML = groups.map(g => `<div class="grp">${g}</div>` + REGS.filter(r => r.group === g).map(r => {
+    const ev = regEv(r.key), done = ev && ev.data.done;
+    let due = '';
+    if(done) due = '<span class="ok">Done ' + df.format(new Date(ev.data.doneAt || ev.start)) + '</span>';
+    else if(r.due_days != null){ const dt = dayStart(1) + r.due_days * 864e5, left = Math.ceil((dt - Date.now()) / 864e5);
+      due = `<span class="${left < 0 ? 'over' : left <= 7 ? 'wait' : ''}">Due ${df.format(new Date(dt))} · ${left < 0 ? Math.abs(left) + ' days overdue' : left + ' days left'}</span>`; }
+    const note = ev && ev.data.note ? '<br>📝 ' + esc(ev.data.note) : '';
+    return `<div class="row"><button class="check ${done ? 'on' : ''}" data-tog="${r.key}">${done ? '✓' : ''}</button>
+      <div class="main" data-reg="${r.key}"><div class="t1">${esc(r.title)}</div><div class="t2" style="white-space:normal">${due}${note}</div></div></div>`;
+  }).join('')).join('');
+  $('docsList').querySelectorAll('[data-tog]').forEach(b => b.onclick = () => toggleReg(b.dataset.tog));
+  $('docsList').querySelectorAll('[data-reg]').forEach(b => b.onclick = () => regSheet(b.dataset.reg));
+}
+function toggleReg(key){ const ev = regEv(key), done = !(ev && ev.data.done); upsertKeyed(keyId('reg:' + key), 'task', { kind:'reg', key, done, doneAt: done ? Date.now() : null }, Date.now()); }
+function regSheet(key){
+  const r = REGS.find(x => x.key === key), ev = regEv(key), d = ev ? ev.data : {};
+  openSheet(`<h3>${esc(r.title)}</h3>
+    <p class="muted" style="font-size:15px;color:var(--text)">${esc(r.what)}</p>
+    ${r.link ? `<p><a class="ext" href="${r.link}" target="_blank" rel="noopener">Open official page ↗</a></p>` : ''}
+    <div class="field"><label>Notes (reference numbers, dates, who called…)</label><textarea id="rNote">${esc(d.note)}</textarea></div>
+    <div class="stack"><button class="btn primary" id="rSave">${d.done ? 'Save' : 'Save'}</button>
+    <button class="btn" id="rTog">${d.done ? 'Mark as not done' : '✓ Mark as done'}</button></div>`);
+  $('rSave').onclick = () => { upsertKeyed(keyId('reg:' + key), 'task', { kind:'reg', key, note: $('rNote').value.trim() }); closeSheet(); };
+  $('rTog').onclick = () => { const done = !d.done; upsertKeyed(keyId('reg:' + key), 'task', { kind:'reg', key, note: $('rNote').value.trim(), done, doneAt: done ? Date.now() : null }, Date.now()); closeSheet(); };
+}
+
+// ---------- Health: visits, voice memos, follow-ups, weight ----------
+const VISIT_KINDS = ['Pediatrician','Family doctor','Hospital','Public health nurse','Midwife','Lactation','Emergency','Other'];
+function openFollowups(){
+  const out = [];
+  byType('visit').forEach(v => (v.data.followups || []).forEach(f => { if(!f.done) out.push({ ...f, visit: v }); }));
+  return out.sort((a,b) => (a.due || '9') < (b.due || '9') ? -1 : 1);
+}
+function renderHealth(){
+  const fus = openFollowups();
+  $('fuList').innerHTML = fus.length ? fus.map(f => `<div class="row"><button class="check" data-fu="${f.visit.id}|${f.id}"></button>
+    <div class="main" data-v="${f.visit.id}"><div class="t1" style="white-space:normal">${esc(f.text)}</div><div class="t2">${f.due ? 'Due ' + esc(f.due) + ' · ' : ''}from ${esc(f.visit.data.kind || 'visit')} ${df.format(new Date(f.visit.start))}</div></div></div>`).join('')
+    : '<div class="empty">No open follow-ups</div>';
+  $('fuList').querySelectorAll('[data-fu]').forEach(b => b.onclick = () => {
+    const [vid, fid] = b.dataset.fu.split('|'), v = events[vid], f = v.data.followups.find(x => x.id === fid);
+    f.done = true; put(v); toast('Follow-up done', () => { f.done = false; put(v); });
+  });
+  $('fuList').querySelectorAll('[data-v]').forEach(b => b.onclick = () => visitSheet(b.dataset.v));
+  $('fuBanner').innerHTML = fus.length ? `<div class="banner warn" data-go="health">🩺 ${fus.length} open follow-up${fus.length > 1 ? 's' : ''}: ${esc(fus[0].text)}${fus[0].due ? ' (due ' + esc(fus[0].due) + ')' : ''}</div>` : '';
+  const vb = $('fuBanner').querySelector('[data-go]'); if(vb) vb.onclick = () => go('health');
+  const visits = byType('visit');
+  $('visitList').innerHTML = visits.map(v => rowHtml(v)).join('') || '<div class="empty">No visits yet. Tap + Visit after an appointment.</div>';
+  bindRows($('visitList'));
+  const growth = live().filter(e => e.type === 'growth' || (e.type === 'visit' && e.data.weightKg)).sort((a,b)=>b.start-a.start);
+  const kgOf = e => e.type === 'growth' ? e.data.kg : e.data.weightKg;
+  $('growthList').innerHTML = growth.length ? growth.map((g,i) => {
+    const prev = growth[i+1], diff = prev ? Math.round((kgOf(g) - kgOf(prev)) * 1000) : null;
+    return `<div class="row" data-id="${g.id}"><div class="ic">⚖️</div><div class="main"><div class="t1">${fmtKg(kgOf(g))}</div><div class="t2">${df.format(new Date(g.start))}${g.data.note ? ' · ' + esc(g.data.note) : ''}</div></div><div class="side">${diff == null ? '' : (diff >= 0 ? '+' : '') + diff + ' g'}</div></div>`;
+  }).join('') : '<div class="empty">No weights yet. Add his birth weight first.</div>';
+  bindRows($('growthList'));
+}
+function weightInputs(kg){
+  return `<div class="field"><label>Weight</label><div class="grid2"><input type="number" step="0.01" inputmode="decimal" id="wVal" value="${kg != null ? kg.toFixed(3) : ''}" placeholder="e.g. 3.45">
+    <div class="chips" id="wUnit"><button class="chip on" data-v="kg">kg</button><button class="chip" data-v="lb">lb</button></div></div>
+    <div class="muted">For lb, use decimals (7 lb 8 oz = 7.5)</div></div>`;
+}
+function readWeight(){
+  const v = parseFloat($('wVal').value); if(isNaN(v)) return null;
+  const u = $('wUnit').querySelector('.chip.on').dataset.v; return u === 'lb' ? v / 2.20462 : v;
+}
+function bindChips(id){ const el = $(id); if(el) el.querySelectorAll('[data-v]').forEach(c => c.onclick = () => { el.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }); }
+$('addWeight').onclick = () => {
+  openSheet(`<h3>Add weight</h3>
+    <div class="field"><label>Date</label><input type="datetime-local" id="wTime" value="${toLocalInput(Date.now())}"></div>
+    ${weightInputs()}
+    <div class="field"><label>Note</label><input id="wNote" placeholder="e.g. birth weight, home scale, clinic"></div>
+    <button class="btn primary" id="wSave">Save</button>`);
+  bindChips('wUnit');
+  $('wSave').onclick = () => { const kg = readWeight(); if(kg == null){ alert('Enter a weight.'); return; }
+    const at = fromLocalInput($('wTime').value) || Date.now(); add('growth', at, at, { kg, note: $('wNote').value.trim() }); closeSheet(); };
+};
+$('addVisit').onclick = () => visitSheet(null);
+
+const mediaUrl = path => SB_URL + '/storage/v1/object/public/lt-media/' + path;
+async function uploadMedia(file){
+  if(!syncKey) throw new Error('Turn on sync first (⚙︎) so recordings are stored in the cloud.');
+  const ext = (file.name.split('.').pop() || 'm4a').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const path = syncKey + '/' + uid() + '.' + ext;
+  const res = await fetch(SB_URL + '/storage/v1/object/lt-media/' + path, {
+    method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': file.type || 'audio/mp4', 'x-upsert': 'false' }, body: file });
+  if(!res.ok) throw new Error('Upload failed (' + res.status + '): ' + (await res.text()).slice(0, 120));
+  return { path, name: file.name, size: file.size, at: Date.now() };
+}
+function visitSheet(id){
+  const ev = id ? events[id] : null, d = ev ? JSON.parse(JSON.stringify(ev.data)) : { kind: 'Pediatrician', followups: [], audio: [] };
+  d.followups = d.followups || []; d.audio = d.audio || [];
+  const fuRow = f => `<div class="fu" data-fid="${f.id}"><input value="${esc(f.text)}" placeholder="What to do"><input type="date" value="${esc(f.due || '')}"><button class="chip" data-rm>✕</button></div>`;
+  openSheet(`<h3>${ev ? 'Visit' : 'New visit'}</h3>
+    <div class="field"><label>Date & time</label><input type="datetime-local" id="vTime" value="${toLocalInput(ev ? ev.start : Date.now())}"></div>
+    <div class="field"><label>Type</label><div class="chips" id="vKind">${VISIT_KINDS.map(k => `<button class="chip ${d.kind === k ? 'on' : ''}" data-v="${k}">${k}</button>`).join('')}</div></div>
+    <div class="field"><label>Doctor / place</label><input id="vProv" value="${esc(d.provider)}" placeholder="e.g. Dr. X, SHN Birchmount"></div>
+    ${weightInputs(d.weightKg)}
+    <div class="field"><label>Notes from the visit</label><textarea id="vNotes" placeholder="What did they check, say, prescribe?">${esc(d.notes)}</textarea></div>
+    <div class="field"><label>Voice memo</label>
+      <div id="vAudio">${d.audio.map(a => `<div style="margin-bottom:6px"><audio controls preload="none" src="${mediaUrl(a.path)}" style="width:100%"></audio><div class="muted">${esc(a.name)}</div></div>`).join('')}</div>
+      <input type="file" id="vFile" accept="audio/*,.m4a">
+      <div class="muted" id="vUp">In Voice Memos: tap the recording → ••• → Save to Files, then pick it here.</div></div>
+    <div class="field"><label>Transcript (paste from Voice Memos)</label><textarea id="vTrans" placeholder="In Voice Memos tap the transcript icon, select all, copy, paste here">${esc(d.transcript)}</textarea>
+      <div class="muted">The daily report turns transcripts into a short summary and follow-ups, shown below after the next report.</div></div>
+    ${d.ai_summary ? `<div class="field"><label>Summary (AI, check against the recording)</label><div class="banner info" style="white-space:pre-wrap;color:var(--text)">${esc(d.ai_summary)}</div></div>` : ''}
+    <div class="field"><label>Follow-ups</label><div id="vFu">${d.followups.map(fuRow).join('')}</div><button class="chip" id="vFuAdd">+ Add follow-up</button></div>
+    <div class="stack"><button class="btn primary" id="vSave">Save visit</button>${ev ? '<button class="btn danger" id="vDel">Delete visit</button>' : ''}</div>`);
+  bindChips('vKind');
+  const bindRm = () => $('vFu').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => b.parentElement.remove());
+  bindRm();
+  $('vFuAdd').onclick = () => { $('vFu').insertAdjacentHTML('beforeend', fuRow({ id: uid(), text: '', due: '' })); bindRm(); };
+  $('vFile').onchange = async () => {
+    const f = $('vFile').files[0]; if(!f) return;
+    $('vUp').textContent = 'Uploading ' + f.name + '…';
+    try{ const a = await uploadMedia(f); d.audio.push(a); $('vAudio').insertAdjacentHTML('beforeend', `<div class="muted">✓ ${esc(a.name)} uploaded</div>`); $('vUp').textContent = 'Uploaded. Remember to Save the visit.'; }
+    catch(e){ $('vUp').textContent = e.message; }
+  };
+  $('vSave').onclick = () => {
+    const at = fromLocalInput($('vTime').value) || Date.now();
+    const old = Object.fromEntries((d.followups || []).map(f => [f.id, f]));
+    const data = Object.assign(d, {
+      kind: $('vKind').querySelector('.chip.on').dataset.v, provider: $('vProv').value.trim(),
+      weightKg: readWeight(), notes: $('vNotes').value.trim(), transcript: $('vTrans').value.trim(),
+      followups: [...$('vFu').querySelectorAll('.fu')].map(r => { const [tx, du] = r.querySelectorAll('input'); const id = r.dataset.fid;
+        return { id, text: tx.value.trim(), due: du.value, done: old[id] ? old[id].done : false }; }).filter(f => f.text)
+    });
+    if(ev){ ev.start = at; ev.end = at; ev.data = data; put(ev); } else add('visit', at, at, data);
+    closeSheet();
+  };
+  if(ev) $('vDel').onclick = () => { closeSheet(); remove(id); };
+}
+
+// ---------- Milestones ----------
+const MS_ITEMS = {};
+CONTENT.milestones.forEach(b => b.items.forEach(([key, title]) => MS_ITEMS[key] = { key, title, band: b.band }));
+function renderMs(now){
+  const months = (now - BIRTH) / (30.44 * 864e5);
+  const bands = CONTENT.milestones.filter(b => b.months > 0);
+  const curBand = bands.find(b => months <= b.months) || bands[bands.length - 1];
+  $('msNowTitle').textContent = 'Coming up · ' + curBand.band;
+  $('msNow').textContent = curBand.learn;
+  $('msNote').textContent = CONTENT.milestoneNote;
+  const custom = byType('milestone').filter(e => e.data.custom);
+  $('msList').innerHTML = CONTENT.milestones.map(b => {
+    const items = b.items.map(([key, title]) => {
+      const ev = events[keyId('ms:' + key)], got = ev && !ev.deleted;
+      return `<div class="row" data-ms="${key}"><div class="check ${got ? 'on' : ''}">${got ? '⭐' : ''}</div>
+        <div class="main"><div class="t1" style="white-space:normal;font-weight:${got ? 700 : 500}">${esc(title)}</div><div class="t2">${got ? df.format(new Date(ev.start)) + (ev.data.note ? ' · ' + esc(ev.data.note) : '') : ''}</div></div></div>`;
+    }).join('');
+    const extra = b.band === 'Firsts' ? custom.map(e => `<div class="row" data-id="${e.id}"><div class="check on">⭐</div><div class="main"><div class="t1">${esc(e.data.title)}</div><div class="t2">${df.format(new Date(e.start))}${e.data.note ? ' · ' + esc(e.data.note) : ''}</div></div></div>`).join('') : '';
+    return `<div class="grp">${b.band}${b === curBand ? ' · now' : ''}</div>` + items + extra;
+  }).join('');
+  $('msList').querySelectorAll('[data-ms]').forEach(r => r.onclick = () => msSheet(r.dataset.ms));
+  bindRows($('msList'));
+}
+function msSheet(key, customId){
+  const id = customId || keyId('ms:' + key), ev = events[id], got = ev && !ev.deleted;
+  const title = ev && ev.data.title || (MS_ITEMS[key] || {}).title || '';
+  openSheet(`<h3>${key ? esc(title) : 'Special moment'}</h3>
+    ${key ? '' : `<div class="field"><label>What happened?</label><input id="msTitle" value="${esc(title)}" placeholder="e.g. First time meeting Nani"></div>`}
+    <div class="field"><label>When</label><input type="datetime-local" id="msTime" value="${toLocalInput(got ? ev.start : Date.now())}"></div>
+    <div class="field"><label>Note</label><textarea id="msNoteIn">${esc(got ? ev.data.note : '')}</textarea></div>
+    <div class="stack"><button class="btn primary" id="msSave">⭐ ${got ? 'Save' : 'Mark achieved'}</button>${got ? '<button class="btn danger" id="msUn">Remove</button>' : ''}</div>`);
+  $('msSave').onclick = () => {
+    const at = fromLocalInput($('msTime').value) || Date.now(), note = $('msNoteIn').value.trim();
+    if(key) upsertKeyed(id, 'milestone', { key, note, title: MS_ITEMS[key].title }, at);
+    else { const tt = $('msTitle').value.trim(); if(!tt){ alert('Add a title.'); return; }
+      if(ev){ ev.start = ev.end = at; Object.assign(ev.data, { title: tt, note }); put(ev); } else add('milestone', at, at, { custom: true, title: tt, note }); }
+    closeSheet();
+  };
+  if(got) $('msUn').onclick = () => { closeSheet(); remove(id); };
+}
+$('addMoment').onclick = () => msSheet(null);
+
 // ---------- Tabs ----------
+let curTab = 'baby';
+function showPage(id){ document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === 'p-' + id)); window.scrollTo(0,0); }
+function go(id){ showPage(id); render(); }
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
-  document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === 'p-' + b.dataset.tab));
-  LS.set('lt_tab', b.dataset.tab); window.scrollTo(0,0);
-  if(b.dataset.tab === 'mom') renderMeds(Date.now());
+  curTab = b.dataset.tab; showPage(curTab); LS.set('lt_tab', curTab);
+  if(curTab === 'mom') renderMeds(Date.now());
 });
-{ const tab = LS.get('lt_tab', 'labor'); const b = document.querySelector(`nav [data-tab="${tab}"]`); if(b) b.click(); }
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => showPage(curTab));
+$('moreSettings').onclick = () => $('gearBtn').click();
+{ let tab = LS.get('lt_tab', 'baby'); if(!['baby','mom','log','more'].includes(tab)) tab = 'baby';
+  const b = document.querySelector(`nav [data-tab="${tab}"]`); if(b) b.click(); }
 $('logFilter').querySelectorAll('[data-f]').forEach(c => c.onclick = () => {
   logFilter = c.dataset.f;
   $('logFilter').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c));
@@ -737,7 +1133,7 @@ function rowsForExport(){
       end: e.end && e.end !== e.start ? tfs.format(new Date(e.end)) : '',
       type: title(e),
       duration: e.end && e.end !== e.start ? dur(e.end - e.start) : '',
-      detail: [d.intensity ? INT[d.intensity] : '', d.ml != null ? d.ml + ' ml' : '', d.tablets ? d.tablets + ' tab' : '', d.pain != null ? 'pain ' + d.pain + '/10' : ''].filter(Boolean).join(' '),
+      detail: [d.intensity ? INT[d.intensity] : '', d.ml != null ? d.ml + ' ml' : '', d.tablets ? d.tablets + ' tab' : '', d.pain != null ? 'pain ' + d.pain + '/10' : '', d.kg ? fmtKg(d.kg) : '', d.weightKg ? fmtKg(d.weightKg) : ''].filter(Boolean).join(' '),
       note: e.type === 'note' ? d.text : (d.note || '')
     };
   });

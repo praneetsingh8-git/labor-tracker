@@ -35,3 +35,11 @@ revoke all on function public.lt_push(text, jsonb) from public;
 revoke all on function public.lt_pull(text, timestamptz) from public;
 grant execute on function public.lt_push(text, jsonb) to anon;
 grant execute on function public.lt_pull(text, timestamptz) to anon;
+
+-- Voice memo storage (unlisted links): readable only by exact path (sync code + random uuid); no listing.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('lt-media', 'lt-media', true, 104857600, array['audio/*','video/mp4','application/octet-stream'])
+on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+drop policy if exists "lt_media_insert" on storage.objects;
+create policy "lt_media_insert" on storage.objects for insert to anon
+  with check (bucket_id = 'lt-media' and length(split_part(name, '/', 1)) >= 16);
