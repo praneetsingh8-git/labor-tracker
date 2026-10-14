@@ -91,7 +91,8 @@ class Data:
                 "wet": sum(1 for d in dia if d["data"].get("kind") in ("wet", "both")),
                 "dirty": sum(1 for d in dia if d["data"].get("kind") in ("dirty", "both")),
                 "sleep_h": round(sleep_h, 1), "meds": meds,
-                "logged": bool(feeds or dia)}
+                "logged": bool(feeds or dia),
+                "sparse": sessions < 4 and len(dia) < 2}
 
 
 def trend(vals, unit=""):
@@ -111,13 +112,32 @@ def build(rows, now, out):
     p_from, p_to = days[0]["a"], days[-1]["b"]
     period = f"{md(days[0]['a'])} to {md(days[-1]['a'])}"
 
+    # ---- labor & birth (only when the report starts at day 1)
+    labor = []
+    if days[0]["n"] == 1:
+        cs = [e for e in D.of("contraction") if e["start"] < BIRTH and e["end"]]
+        if cs:
+            durs = [x for x in ((e["end"] - e["start"]).total_seconds() for e in cs) if x <= 240] or [0]
+            last_hr = [e for e in cs if e["start"] >= cs[-1]["start"] - dt.timedelta(hours=1)]
+            gaps = [(b["start"] - a["start"]).total_seconds() / 60 for a, b in zip(last_hr, last_hr[1:])]
+            labor.append(f"{len(cs)} contractions timed from {cs[0]['start'].strftime('%a %b %-d, %-I:%M %p')} to {cs[-1]['start'].strftime('%-I:%M %p')}; average length {sum(durs) / len(durs):.0f} s.")
+            if gaps: labor.append(f"Last tracked hour: {len(last_hr)} contractions, about {sum(gaps) / len(gaps):.1f} min apart.")
+        for n in [e for e in D.of("note") if e["start"] <= BIRTH + dt.timedelta(minutes=1)]:
+            labor.append(f"{n['start'].strftime('%a %-I:%M %p')}: {n['data'].get('text', '')}")
+        if not any("deliver" in (n["data"].get("text") or "").lower() or "born" in (n["data"].get("text") or "").lower() for n in D.of("note")):
+            labor.append(f"{BABY} was born {BIRTH.strftime('%A %b %-d at %-I:%M %p')}.")
+        first = min([e["start"] for e in D.of("contraction", "note") if e["start"] < BIRTH] or [BIRTH])
+        period = f"{md(first)} to {md(days[-1]['a'])}"
+
     # ---- status
-    logged = [d for d in days if d["logged"]]
+    logged = [d for d in days if d["logged"] and not d["sparse"]]
     latest = days[-1]
-    below = lambda d: d["logged"] and (d["wet"] < wet_min(d["n"]) or d["feeds"] < C["feedsMin"])
+    below = lambda d: d["logged"] and not d["sparse"] and (d["wet"] < wet_min(d["n"]) or d["feeds"] < C["feedsMin"])
     flags = []
-    if not latest["logged"]: flags.append(f"Nothing was logged on day {latest['n']}, so this report can't judge it.")
-    elif below(latest):
+    for d in days:
+        if not d["logged"] or d["sparse"]:
+            flags.append(f"Day {d['n']} looks incompletely logged ({d['feeds']} feed{'s' if d['feeds'] != 1 else ''}, {d['wet'] + d['dirty']} diaper{'s' if d['wet'] + d['dirty'] != 1 else ''} recorded), so its numbers aren't reliable.")
+    if below(latest):
         flags.append(f"Day {latest['n']} was below the typical range ({latest['feeds']} feeds, {latest['wet']} wet diapers vs {C['feedsMin']}+ feeds and {wet_min(latest['n'])}+ wet). "
                      "If this wasn't just missed logging, call your doctor or Health811 (dial 811).")
     for d in days:
@@ -143,6 +163,8 @@ def build(rows, now, out):
     if any(d["bottle_ml"] for d in days): changes.append(f"Bottle volume: {trend([d['bottle_ml'] for d in days], ' ml')}.")
     weights = sorted([(e["start"], e["data"].get("kg") or e["data"].get("weightKg")) for e in D.of("growth", "visit")
                       if (e["data"].get("kg") or e["data"].get("weightKg"))], key=lambda x: x[0])
+    if any(d["sparse"] or not d["logged"] for d in days):
+        changes.insert(0, "Some days were incompletely logged, so drops below may reflect missed entries rather than real changes.")
     if weights:
         w_txt = f"Latest weight {fmt_kg(weights[-1][1])} on {md(weights[-1][0])}"
         if len(weights) > 1: w_txt += f" ({(weights[-1][1] - weights[0][1]) * 1000:+.0f} g since {md(weights[0][0])})"
@@ -151,7 +173,7 @@ def build(rows, now, out):
     # ---- mom
     mom_rows = [["", *[f"Day {d['n']}" for d in days]]]
     for k, name in DAILY.items():
-        mom_rows.append([name, *[", ".join(hm(m["start"]) for m in d["meds"] if m["data"].get("med") == k) or "missed" for d in days]])
+        mom_rows.append([name, *[", ".join(hm(m["start"]) for m in d["meds"] if m["data"].get("med") == k) or "not logged" for d in days]])
     for k, (name, mx) in PRN.items():
         mom_rows.append([name, *[f"{sum(m['data'].get('tablets') or 0 for m in d['meds'] if m['data'].get('med') == k)} tabs" for d in days]])
     pains = [m["data"]["pain"] for d in days for m in d["meds"] if m["data"].get("pain") is not None]
@@ -201,9 +223,9 @@ def build(rows, now, out):
             "pdf": "report.pdf", "need_summary_visit_ids": need_summary, "flags": flags}
 
     out.mkdir(parents=True, exist_ok=True)
-    make_pdf(out / "report.pdf", period, days, status_text, smiley, flags, changes, mom_rows, mom_notes,
+    make_pdf(out / "report.pdf", period, labor, days, status_text, smiley, flags, changes, mom_rows, mom_notes,
              visits, open_fu, docs_due, req_done, len(req), ms_hits, nxt, prep, upcoming)
-    (out / "email.html").write_text(make_html(period, days, status_text, flags, changes, mom_rows, mom_notes,
+    (out / "email.html").write_text(make_html(period, labor, days, status_text, flags, changes, mom_rows, mom_notes,
                                               open_fu, docs_due, ms_hits, nxt, prep, upcoming))
     (out / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1))
     return meta
@@ -247,7 +269,7 @@ def bar_chart(title, labels, series, names, unit=""):
     return d
 
 
-def make_pdf(path, period, days, status_text, smiley, flags, changes, mom_rows, mom_notes,
+def make_pdf(path, period, labor, days, status_text, smiley, flags, changes, mom_rows, mom_notes,
              visits, open_fu, docs_due, req_done, req_total, ms_hits, nxt, prep, upcoming):
     S = styles()
     doc = SimpleDocTemplate(str(path), pagesize=letter, leftMargin=0.7 * inch, rightMargin=0.7 * inch, topMargin=0.6 * inch, bottomMargin=0.6 * inch,
@@ -272,6 +294,9 @@ def make_pdf(path, period, days, status_text, smiley, flags, changes, mom_rows, 
             ["Breastfeeding", *[f"{d['breast_min']} min" for d in days]],
             ["Bottle", *[f"{d['bottle_ml']} ml" for d in days]],
             ["Sleep logged", *[f"{d['sleep_h']:g} h" for d in days]]]
+    if labor:
+        f.append(Paragraph("Labor & birth", S["h2"]))
+        for x in labor: f.append(Paragraph(esc(x), S["li"], bulletText="\u2022"))
     f.append(Paragraph(f"{BABY} at a glance", S["h2"]))
     f.append(Table(rows, colWidths=[1.6 * inch] + [5.5 * inch / len(days)] * len(days), style=table_style()))
     labels = [f"Day {d['n']}" for d in days]
@@ -330,7 +355,7 @@ def esc(s): return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">"
 
 
 # ---------------- Email HTML (inline styles for Gmail) ----------------
-def make_html(period, days, status_text, flags, changes, mom_rows, mom_notes, open_fu, docs_due, ms_hits, nxt, prep, upcoming):
+def make_html(period, labor, days, status_text, flags, changes, mom_rows, mom_notes, open_fu, docs_due, ms_hits, nxt, prep, upcoming):
     td = 'style="padding:6px 8px;border-bottom:1px solid #eee;text-align:center"'
     tl = 'style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:bold"'
     h2 = 'style="color:#e8684a;font-size:16px;margin:18px 0 6px"'
@@ -342,6 +367,7 @@ def make_html(period, days, status_text, flags, changes, mom_rows, mom_notes, op
 <div style="color:#6f6774;font-size:13px">{period} &middot; days {days[0]['n']}-{days[-1]['n']} of life</div>
 <div style="background:#f6eee9;border-radius:10px;padding:12px 14px;margin:14px 0;font-weight:bold">{esc(status_text)}</div>
 {li(flags)}
+{f'<h2 {h2}>Labor &amp; birth</h2>' + li(labor) if labor else ''}
 <table style="border-collapse:collapse;width:100%;font-size:14px"><tr><th {tl}></th>{head}</tr>
 {row("Feeds", [d["feeds"] for d in days])}{row("Wet diapers", [f"{d['wet']} <span style='color:#888'>(typ {wet_min(d['n'])}+)</span>" for d in days])}
 {row("Dirty diapers", [d["dirty"] for d in days])}{row("Breastfeeding", [f"{d['breast_min']} min" for d in days])}
