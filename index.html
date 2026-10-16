@@ -110,6 +110,7 @@ nav button.on{color:var(--accent)}
 a.ext{color:var(--blue);font-weight:600;text-decoration:none}
 .daily{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
 .daily:last-child{border-bottom:0}
+input[type=datetime-local],input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;text-align:left}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all;background:var(--card2);padding:10px;border-radius:10px;user-select:text;-webkit-user-select:text}
 </style>
 </head>
@@ -188,6 +189,7 @@ a.ext{color:var(--blue);font-weight:600;text-decoration:none}
         <button class="tile" id="bfR"><div class="big" id="bfRt">Right</div><small id="bfRs">tap to start</small></button>
       </div>
       <div class="muted" style="margin-top:8px">Tap the other side to switch. Tap the running side to stop.</div>
+      <button class="btn" id="pastFeed" style="margin-top:10px">＋ Log a past feed (enter start time)</button>
     </div>
 
     <div class="card">
@@ -383,6 +385,8 @@ const tf = new Intl.DateTimeFormat(undefined, { hour:'numeric', minute:'2-digit'
 const tfs = new Intl.DateTimeFormat(undefined, { hour:'numeric', minute:'2-digit', second:'2-digit' });
 const df = new Intl.DateTimeFormat(undefined, { weekday:'short', month:'short', day:'numeric' });
 const t = ms => tf.format(new Date(ms));
+const mdf = new Intl.DateTimeFormat(undefined, { month:'short', day:'numeric' });
+const dt = ms => mdf.format(new Date(ms)) + ' · ' + tf.format(new Date(ms));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $ = id => document.getElementById(id);
 const INT = ['', 'Mild', 'Moderate', 'Strong'];
@@ -432,20 +436,49 @@ function breast(side){
 $('bfL').onclick = () => breast('L');
 $('bfR').onclick = () => breast('R');
 
+function timeFields(startDefault){
+  return `<div class="field"><label>Start time</label><input type="datetime-local" id="ftStart" value="${toLocalInput(startDefault)}"></div>
+    <div class="field"><label>How long (minutes)</label>
+      <div class="chips" id="ftMinChips">${[5,10,15,20,30,45].map(v=>`<button class="chip" data-min="${v}">${v}</button>`).join('')}</div>
+      <input type="number" inputmode="numeric" id="ftMin" placeholder="or type minutes" style="margin-top:8px"></div>`;
+}
+function bindTimeFields(){ $('ftMinChips').querySelectorAll('[data-min]').forEach(c => c.onclick = () => { $('ftMin').value = c.dataset.min; $('ftMinChips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); }); }
+function readTimeFields(){
+  const v = $('ftStart').value, start = v && v !== toLocalInput(Date.now()) ? fromLocalInput(v) : Date.now();
+  const m = parseFloat($('ftMin').value);
+  return { start, end: isNaN(m) ? start : start + m * 60e3 };
+}
+$('pastFeed').onclick = () => {
+  openSheet(`<h3>Log a past breastfeed</h3>
+    <div class="field"><label>Side</label><div class="chips" id="pfSide"><button class="chip on" data-v="L">Left</button><button class="chip" data-v="R">Right</button></div></div>
+    ${timeFields(Date.now() - 20 * 60e3)}
+    <div class="field"><label>Remark (optional)</label><input id="pfNote"></div>
+    <button class="btn primary" id="pfSave">Save</button>`);
+  bindChips('pfSide'); bindTimeFields();
+  $('pfSave').onclick = () => {
+    const { start, end } = readTimeFields();
+    if(end <= start){ alert('Enter how long the feed lasted.'); return; }
+    if(start > Date.now()){ alert('Start time is in the future.'); return; }
+    add('feed', start, end, { kind:'breast', side: $('pfSide').querySelector('.chip.on').dataset.v, note: $('pfNote').value.trim() });
+    closeSheet();
+  };
+};
 document.querySelectorAll('[data-bottle]').forEach(b => b.onclick = () => {
   const milk = b.dataset.bottle;
   openSheet(`
     <h3>Bottle · ${milk === 'formula' ? 'Formula' : 'Breast milk'}</h3>
-    <div class="field"><label>Amount (ml)</label>
+    ${timeFields(Date.now())}
+    <div class="field"><label>Amount (ml, optional)</label>
       <div class="chips" id="mlChips">${[10,20,30,45,60,90,120].map(v=>`<button class="chip" data-ml="${v}">${v}</button>`).join('')}</div>
       <input type="number" inputmode="numeric" id="mlIn" placeholder="or type ml" style="margin-top:8px">
     </div>
     <div class="field"><label>Remark (optional)</label><input id="bNote" placeholder="e.g. spit up a little"></div>
     <button class="btn primary" id="bSave">Save</button>`);
   $('mlChips').querySelectorAll('[data-ml]').forEach(c => c.onclick = () => { $('mlIn').value = c.dataset.ml; });
+  bindTimeFields();
   $('bSave').onclick = () => {
-    const now = Date.now(), ml = parseFloat($('mlIn').value);
-    add('feed', now, now, { kind:'bottle', milk, ml: isNaN(ml) ? null : ml, note: $('bNote').value.trim() });
+    const { start, end } = readTimeFields(), ml = parseFloat($('mlIn').value);
+    add('feed', start, end, { kind:'bottle', milk, ml: isNaN(ml) ? null : ml, note: $('bNote').value.trim() });
     closeSheet();
   };
 });
@@ -535,7 +568,7 @@ function toLocalInput(ms){ const d = new Date(ms); return d.getFullYear()+'-'+pa
 function fromLocalInput(v, keepSec){ if(!v) return null; const d = new Date(v); return d.getTime() + (keepSec||0); }
 function editEvent(id){
   const ev = events[id]; if(!ev) return;
-  const hasEnd = ev.type === 'contraction' || ev.type === 'sleep' || (ev.type === 'feed' && ev.data.kind === 'breast');
+  const hasEnd = ev.type === 'contraction' || ev.type === 'sleep' || ev.type === 'feed';
   const d = ev.data;
   let extra = '';
   if(ev.type === 'contraction') extra = `<div class="field"><label>Intensity</label><div class="chips" id="eInt">${[1,2,3].map(i=>`<button class="chip ${d.intensity===i?'on':''}" data-v="${i}">${INT[i]}</button>`).join('')}</div></div>`;
@@ -590,7 +623,7 @@ function editEvent(id){
 function title(ev){
   const d = ev.data;
   if(ev.type === 'contraction') return 'Contraction';
-  if(ev.type === 'feed') return d.kind === 'breast' ? 'Breast · ' + (d.side === 'L' ? 'Left' : 'Right') : 'Bottle · ' + (d.milk === 'formula' ? 'Formula' : 'Breast milk');
+  if(ev.type === 'feed') return d.kind === 'breast' ? 'Breastfeed · ' + (d.side === 'L' ? 'Left' : 'Right') : 'Bottle · ' + (d.milk === 'formula' ? 'Formula' : 'Breast milk');
   if(ev.type === 'diaper') return 'Diaper · ' + ({wet:'Wet',dirty:'Dirty',both:'Wet + dirty'}[d.kind] || '');
   if(ev.type === 'sleep') return 'Sleep';
   if(ev.type === 'med') return MEDS[d.med] ? MEDS[d.med].name + ' ' + MEDS[d.med].mg + ' mg' : DAILY[d.med] ? DAILY[d.med].name + (d.med === 'synthroid' && d.dose ? ' ' + d.dose : '') : (d.name || 'Medicine');
@@ -622,7 +655,7 @@ function rowHtml(ev, extraSide){
   }
   if(ev.type === 'feed'){
     if(d.kind === 'breast') side = ev.end == null ? 'running' : durWords(ev.end - ev.start);
-    else side = d.ml != null ? d.ml + ' ml' : '';
+    else side = [d.ml != null ? d.ml + ' ml' : '', ev.end && ev.end > ev.start ? durWords(ev.end - ev.start) : ''].filter(Boolean).join(' · ');
   }
   if(ev.type === 'sleep') side = ev.end == null ? 'asleep' : durWords(ev.end - ev.start);
   if(ev.type === 'med'){
@@ -635,7 +668,7 @@ function rowHtml(ev, extraSide){
   return `<div class="row" data-id="${ev.id}">
     <div class="ic">${icon(ev)}</div>
     <div class="main"><div class="t1">${ev.type === 'note' ? esc(d.text) : esc(title(ev))}</div>
-      <div class="t2">${esc(t(ev.start))}${ev.type !== 'note' && sub.length ? ' · ' + esc(sub.join(' · ')) : ''}</div></div>
+      <div class="t2">${esc(dt(ev.start))}${ev.type !== 'note' && sub.length ? ' · ' + esc(sub.join(' · ')) : ''}</div></div>
     <div class="side">${side}</div></div>`;
 }
 function openEditor(id){
@@ -759,7 +792,7 @@ function tick(){
   $('sleepBtn').classList.toggle('live', !!sl);
   $('sleepT').textContent = sl ? '😴 ' + dur(now - sl.start, now - sl.start >= 3600e3) : '😴 Fell asleep';
   if(sl) $('sleepS').textContent = 'asleep since ' + t(sl.start) + ' · tap when awake';
-  else { const ls = byType('sleep')[0]; $('sleepS').textContent = ls && ls.end ? 'awake for ' + durWords(now - ls.end) + ' · tap when asleep' : 'tap when baby falls asleep'; }
+  else { const ls = byType('sleep')[0]; $('sleepS').textContent = ls && ls.end && now - ls.end < 12 * 3600e3 ? 'awake for ' + durWords(now - ls.end) + ' · tap when asleep' : 'tap when baby falls asleep'; }
 
   // feeds
   const f = runningFeed();
