@@ -1,0 +1,251 @@
+<title>Aveer Daily Scorecard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap">
+<style>
+/* Layout: a gallery of five phone-sized mockups that wrap into columns; page chrome follows the viewer theme, phones show the app's dark UI. */
+:root{
+  --page:#f5f2f4; --ink:#1f1b24; --ink2:#5d5563; --line:#e3dde2; --tag:#ffe3d6; --tagInk:#8a3214;
+  /* the app (dark-only, matches index.html) */
+  --app:#121014; --card:#1d1a21; --card2:#26222b; --aline:#332e39; --atext:#f1ece6; --adim:#a39aa8; --afaint:#6f6774;
+  --accent:#ff8a65; --good:#5fd3a4; --warn:#ffcf5c;
+  /* feeds: breast / formula / breast-milk bottle (validated, dark surface) */
+  --breast:#3987e5; --formula:#d95926; --bmilk:#199e70;
+  /* diapers: wet / wet+dirty / dirty (validated, dark surface) */
+  --wet:#9085e9; --both:#c98500; --dirty:#d55181;
+  --display:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --ui:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --page:#0d0b0f; --ink:#f1ece6; --ink2:#a39aa8; --line:#2a2530; --tag:#3a2219; --tagInk:#ffb38f; color-scheme:dark } }
+:root[data-theme="dark"]{ --page:#0d0b0f; --ink:#f1ece6; --ink2:#a39aa8; --line:#2a2530; --tag:#3a2219; --tagInk:#ffb38f; color-scheme:dark }
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font:15px/1.45 var(--ui)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 48px}
+h1{font:700 clamp(28px,5vw,40px)/1.1 var(--display);margin:0 0 8px;text-wrap:balance}
+.lede{color:var(--ink2);max-width:62ch;margin:0}
+.lede b{color:var(--ink)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:28px 22px;margin-top:28px}
+.mock{display:flex;flex-direction:column;gap:10px;min-width:0}
+.mhead{display:flex;align-items:baseline;gap:10px}
+.letter{font:700 13px var(--display);background:var(--tag);color:var(--tagInk);border-radius:6px;padding:2px 8px;letter-spacing:.5px}
+.mhead h2{font:700 19px var(--display);margin:0}
+.why{color:var(--ink2);font-size:13.5px;margin:0}
+.phone{background:var(--app);color:var(--atext);border-radius:30px;padding:16px 14px 18px;border:1px solid var(--line);font-family:var(--ui);display:flex;flex-direction:column;gap:12px;max-width:390px;width:100%}
+.ph-top{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px}
+.ph-top b{font-size:17px}
+.ph-top span{color:var(--adim);font-size:12px}
+.c{background:var(--card);border-radius:18px;padding:14px}
+.h{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--adim);font-weight:600;margin:0 0 10px}
+.num{font-variant-numeric:tabular-nums}
+.big{font-size:30px;font-weight:700;line-height:1}
+.dim{color:var(--adim);font-size:12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:baseline}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--adim)}
+.chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.chip.ok{background:rgba(95,211,164,.16);color:var(--good)}
+.chip.low{background:rgba(255,207,92,.16);color:var(--warn)}
+svg text{font-family:var(--ui)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tile .k{font-size:12px;color:var(--adim);font-weight:600}
+.tile .v{font-size:26px;font-weight:700;line-height:1.05}
+.tile .s{font-size:12px;color:var(--adim)}
+.tile.wide{grid-column:1 / -1}
+.bar{display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;background:var(--card2)}
+.bar i{display:block;height:100%}
+.rc{display:grid;grid-template-columns:1fr auto auto;gap:10px 10px;align-items:center;font-size:14px}
+.rc .t{color:var(--adim);font-size:12px;text-align:right}
+.rc .sub{grid-column:1 / -1;margin-top:-6px;color:var(--adim);font-size:12px;padding-bottom:8px;border-bottom:1px solid var(--aline)}
+.rc .sub:last-child{border-bottom:0;padding-bottom:0}
+.tip{position:fixed;pointer-events:none;background:var(--card2);color:var(--atext);border:1px solid var(--aline);border-radius:10px;padding:6px 9px;font:12px var(--ui);z-index:5}
+.note{margin-top:32px;color:var(--ink2);font-size:13.5px;max-width:70ch}
+@media (prefers-reduced-motion:no-preference){ .ring-arc{transition:stroke-dashoffset .6s ease} }
+</style>
+
+<div class="wrap">
+  <h1>Aveer's daily scorecard</h1>
+  <p class="lede">Five ways to show one day of feeds and diapers. Every mockup uses the <b>same example day</b> (Day 6, 4:24 AM to now), not Aveer's real data, so you can compare layouts directly. Pick a letter, or mix parts.</p>
+
+  <div class="gallery" id="gallery"></div>
+
+  <p class="note">The example day: 10 feeds (6 breastfeeds totalling 2 h 50 min, 2 formula bottles of 95 mL, 2 breast milk bottles of 75 mL) and 8 diapers (5 wet only, 2 wet + dirty, 1 dirty only). Targets shown are the typical guides from day 5 on: 8+ feeds, 6+ wet, 3+ dirty. Hover or tap a bar segment or block to see its details.</p>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+// ---------- example day (Day 6 starts 4:24 AM) ----------
+const DAY_START = 4 * 60 + 24; // minutes after midnight
+const feeds = [
+  { at:'4:50 AM',  m:290,  type:'breast',  min:30, L:18, R:12 },
+  { at:'7:40 AM',  m:460,  type:'breast',  min:25, R:25 },
+  { at:'9:55 AM',  m:595,  type:'bmilk',   min:10, ml:40 },
+  { at:'11:30 AM', m:690,  type:'breast',  min:34, L:20, R:14 },
+  { at:'1:45 PM',  m:825,  type:'formula', min:12, ml:45 },
+  { at:'3:20 PM',  m:920,  type:'breast',  min:22, R:22 },
+  { at:'5:10 PM',  m:1030, type:'bmilk',   min:9,  ml:35 },
+  { at:'6:55 PM',  m:1135, type:'breast',  min:28, L:28 },
+  { at:'9:05 PM',  m:1265, type:'formula', min:14, ml:50 },
+  { at:'11:20 PM', m:1400, type:'breast',  min:31, L:16, R:15 },
+];
+const diapers = [
+  { at:'6:10 AM', m:370, k:'wet' }, { at:'8:30 AM', m:510, k:'both' }, { at:'10:40 AM', m:640, k:'wet' },
+  { at:'1:00 PM', m:780, k:'wet' }, { at:'3:50 PM', m:950, k:'both' }, { at:'6:20 PM', m:1100, k:'dirty' },
+  { at:'8:30 PM', m:1230, k:'wet' }, { at:'11:00 PM', m:1380, k:'wet' },
+];
+const NOW_M = 1430; // 11:50 PM
+const TARGET = { feeds:8, wet:6, dirty:3 };
+const NAMES = { breast:'Breastfeed', formula:'Formula bottle', bmilk:'Breast milk bottle', wet:'Wet only', both:'Wet + dirty', dirty:'Dirty only' };
+const COL = k => `var(--${k})`;
+
+const by = t => feeds.filter(f => f.type === t);
+const sum = (a, k) => a.reduce((s, x) => s + (x[k] || 0), 0);
+const S = {
+  feeds: feeds.length,
+  breast: by('breast').length, breastMin: sum(by('breast'), 'min'), L: sum(feeds, 'L'), R: sum(feeds, 'R'),
+  formula: by('formula').length, formulaMl: sum(by('formula'), 'ml'),
+  bmilk: by('bmilk').length, bmilkMl: sum(by('bmilk'), 'ml'),
+  diapers: diapers.length,
+  wetOnly: diapers.filter(d => d.k === 'wet').length, both: diapers.filter(d => d.k === 'both').length, dirtyOnly: diapers.filter(d => d.k === 'dirty').length,
+};
+S.wet = S.wetOnly + S.both; S.dirty = S.dirtyOnly + S.both; S.ml = S.formulaMl + S.bmilkMl;
+const hm = min => (min >= 60 ? Math.floor(min / 60) + ' h ' : '') + (min % 60) + ' min';
+const status = (v, t) => v >= t ? '<span class="chip ok">On track</span>' : '<span class="chip low">Below ' + t + '</span>';
+const phone = (inner, sub) => `<div class="phone"><div class="ph-top"><b>Today · Day 6</b><span>${sub || 'since 4:24 AM'}</span></div>${inner}</div>`;
+const legend = keys => `<div class="legend">${keys.map(k => `<span><i class="dot" style="background:${COL(k)}"></i>${NAMES[k]}</span>`).join('')}</div>`;
+const seg = (k, v, total, tip) => `<i style="width:${v / total * 100}%;background:${COL(k)}" data-tip="${tip}"></i>`;
+
+// ---------- A: rings ----------
+function ring(label, v, target, color, sub){
+  const r = 34, c = 2 * Math.PI * r, frac = Math.min(1, v / target);
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0">
+    <svg viewBox="0 0 84 84" width="84" height="84" role="img" aria-label="${label}: ${v} of ${target}">
+      <circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--card2)" stroke-width="8"/>
+      <circle class="ring-arc" cx="42" cy="42" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"
+        stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - frac)}" transform="rotate(-90 42 42)"/>
+      <text x="42" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="var(--atext)">${v}</text>
+      <text x="42" y="55" text-anchor="middle" font-size="10" fill="var(--adim)">of ${target}+</text>
+    </svg>
+    <div style="font-size:13px;font-weight:600">${label}</div><div class="dim">${sub}</div></div>`;
+}
+const A = phone(`
+  <div class="c"><div class="h">Daily targets</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+      ${ring('Feeds', S.feeds, TARGET.feeds, 'var(--accent)', 'all types')}
+      ${ring('Wet', S.wet, TARGET.wet, 'var(--wet)', 'incl. wet+dirty')}
+      ${ring('Dirty', S.dirty, TARGET.dirty, 'var(--dirty)', 'incl. wet+dirty')}
+    </div></div>
+  <div class="c"><div class="h">How he fed</div>
+    <div style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+      <div class="row"><span><i class="dot" style="background:var(--breast)"></i>Breastfeed ×${S.breast}</span><b class="num">${hm(S.breastMin)}</b></div>
+      <div class="row"><span><i class="dot" style="background:var(--formula)"></i>Formula ×${S.formula}</span><b class="num">${S.formulaMl} mL</b></div>
+      <div class="row"><span><i class="dot" style="background:var(--bmilk)"></i>Breast milk bottle ×${S.bmilk}</span><b class="num">${S.bmilkMl} mL</b></div>
+      <div class="dim">Left ${hm(S.L)} · Right ${hm(S.R)} · Bottles ${S.ml} mL total</div>
+    </div></div>
+  <div class="c"><div class="h">Diapers · ${S.diapers}</div>
+    <div class="row" style="font-size:14px"><span><i class="dot" style="background:var(--wet)"></i>Wet ${S.wetOnly}</span><span><i class="dot" style="background:var(--both)"></i>Wet+dirty ${S.both}</span><span><i class="dot" style="background:var(--dirty)"></i>Dirty ${S.dirtyOnly}</span></div></div>`);
+
+// ---------- B: stacked bars ----------
+const B = phone(`
+  <div class="c"><div class="row"><div class="h" style="margin:0">Feeds</div>${status(S.feeds, TARGET.feeds)}</div>
+    <div class="big num" style="margin:8px 0 10px">${S.feeds}<span class="dim" style="font-size:14px;font-weight:500"> feeds</span></div>
+    <div class="bar" style="height:22px;border-radius:8px">
+      ${seg('breast', S.breast, S.feeds, `Breastfeed: ${S.breast} feeds, ${hm(S.breastMin)}`)}
+      ${seg('formula', S.formula, S.feeds, `Formula: ${S.formula} bottles, ${S.formulaMl} mL`)}
+      ${seg('bmilk', S.bmilk, S.feeds, `Breast milk bottle: ${S.bmilk} bottles, ${S.bmilkMl} mL`)}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px">
+      <div><div class="dim"><i class="dot" style="background:var(--breast)"></i>Breast</div><b class="num">${S.breast}</b> <span class="dim">· ${hm(S.breastMin)}</span></div>
+      <div><div class="dim"><i class="dot" style="background:var(--formula)"></i>Formula</div><b class="num">${S.formula}</b> <span class="dim">· ${S.formulaMl} mL</span></div>
+      <div><div class="dim"><i class="dot" style="background:var(--bmilk)"></i>BM bottle</div><b class="num">${S.bmilk}</b> <span class="dim">· ${S.bmilkMl} mL</span></div>
+    </div></div>
+  <div class="c"><div class="h">Breast time by side</div>
+    <div class="bar" style="height:14px">${seg('breast', S.L, S.L + S.R, `Left ${hm(S.L)}`)}<i style="width:${S.R / (S.L + S.R) * 100}%;background:var(--breast);opacity:.55" data-tip="Right ${hm(S.R)}"></i></div>
+    <div class="row dim" style="margin-top:6px"><span>Left ${hm(S.L)}</span><span>Right ${hm(S.R)}</span></div></div>
+  <div class="c"><div class="row"><div class="h" style="margin:0">Diapers</div>${status(S.wet, TARGET.wet)}</div>
+    <div class="big num" style="margin:8px 0 10px">${S.diapers}<span class="dim" style="font-size:14px;font-weight:500"> changes</span></div>
+    <div class="bar" style="height:22px;border-radius:8px">
+      ${seg('wet', S.wetOnly, S.diapers, `Wet only: ${S.wetOnly}`)}${seg('both', S.both, S.diapers, `Wet + dirty: ${S.both}`)}${seg('dirty', S.dirtyOnly, S.diapers, `Dirty only: ${S.dirtyOnly}`)}
+    </div>
+    <div style="margin-top:10px">${legend(['wet','both','dirty'])}</div>
+    <div class="dim" style="margin-top:6px">Wet total ${S.wet} (target 6+) · Dirty total ${S.dirty} (target 3+)</div></div>`);
+
+// ---------- C: tile grid ----------
+const C = `<div class="phone"><div class="ph-top"><b>Today · Day 6</b><span>since 4:24 AM</span></div>
+  <div class="tiles">
+    <div class="tile wide"><div class="row"><span class="k">Total feeds</span>${status(S.feeds, TARGET.feeds)}</div><div class="v num">${S.feeds}</div><div class="s">Last fed 11:20 PM · 30 min ago</div></div>
+    <div class="tile"><span class="k"><i class="dot" style="background:var(--breast)"></i>Breastfeeds</span><div class="v num">${S.breast}</div><div class="s">${hm(S.breastMin)}<br>L ${S.L} · R ${S.R} min</div></div>
+    <div class="tile"><span class="k">Bottle total</span><div class="v num">${S.ml}<span style="font-size:15px"> mL</span></div><div class="s">${S.formula + S.bmilk} bottles</div></div>
+    <div class="tile"><span class="k"><i class="dot" style="background:var(--formula)"></i>Formula</span><div class="v num">${S.formula}</div><div class="s">${S.formulaMl} mL</div></div>
+    <div class="tile"><span class="k"><i class="dot" style="background:var(--bmilk)"></i>Breast milk bottle</span><div class="v num">${S.bmilk}</div><div class="s">${S.bmilkMl} mL</div></div>
+    <div class="tile wide"><div class="row"><span class="k">Diapers</span><span class="dim">${S.diapers} changes</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div><div class="v num" style="color:var(--atext)">${S.wetOnly}</div><div class="s"><i class="dot" style="background:var(--wet)"></i>Wet</div></div>
+        <div><div class="v num">${S.both}</div><div class="s"><i class="dot" style="background:var(--both)"></i>Wet+dirty</div></div>
+        <div><div class="v num">${S.dirtyOnly}</div><div class="s"><i class="dot" style="background:var(--dirty)"></i>Dirty</div></div>
+      </div></div>
+  </div></div>`;
+
+// longest start-to-start gap
+const GAP = feeds.slice(1).reduce((g, f, i) => { const d = f.m - feeds[i].m; return d > g.d ? { d, txt: hm(d) + ' (' + feeds[i].at + ' to ' + f.at + ')' } : g; }, { d: 0, txt: '' });
+// ---------- D: 24-hour timeline ----------
+function timeline(){
+  const W = 330, padL = 6, padR = 6, x0 = padL, x1 = W - padR, span = 24 * 60;
+  const X = m => x0 + (m - DAY_START) / span * (x1 - x0);
+  const ticks = [{ m:DAY_START, l:'4:24a' }, { m:600, l:'10a' }, { m:900, l:'3p' }, { m:1200, l:'8p' }, { m:DAY_START + span, l:'4:24a' }];
+  const rows = [{ k:'breast', y:18 }, { k:'formula', y:46 }, { k:'bmilk', y:74 }];
+  let g = '';
+  ticks.forEach(t => { g += `<line x1="${X(t.m)}" x2="${X(t.m)}" y1="8" y2="150" stroke="var(--aline)" stroke-width="1"/>`;
+    g += `<text x="${Math.min(Math.max(X(t.m), 14), W - 14)}" y="168" text-anchor="middle" font-size="10" fill="var(--adim)">${t.l}</text>`; });
+  g += `<rect x="${X(NOW_M)}" y="8" width="${x1 - X(NOW_M)}" height="142" fill="var(--card2)" opacity=".5"/>`;
+  rows.forEach(r => g += `<line x1="${x0}" x2="${x1}" y1="${r.y + 9}" y2="${r.y + 9}" stroke="var(--card2)" stroke-width="18" stroke-linecap="round"/>`);
+  feeds.forEach(f => { const r = rows.find(z => z.k === f.type), w = Math.max(5, X(f.m + f.min) - X(f.m));
+    const tip = `${NAMES[f.type]} ${f.at} · ${f.min} min${f.ml ? ' · ' + f.ml + ' mL' : ''}`;
+    g += `<rect x="${X(f.m)}" y="${r.y}" width="${w}" height="18" rx="4" fill="${COL(f.type)}" data-tip="${tip}"><title>${tip}</title></rect>`; });
+  diapers.forEach(d => { const tip = `${NAMES[d.k]} ${d.at}`;
+    g += `<circle cx="${X(d.m)}" cy="122" r="6" fill="${COL(d.k)}" stroke="var(--card)" stroke-width="2" data-tip="${tip}"><title>${tip}</title></circle>`; });
+  g += `<text x="${x0 + 2}" y="104" font-size="10" fill="var(--adim)">Diapers</text>`;
+  g += `<line x1="${X(NOW_M)}" x2="${X(NOW_M)}" y1="8" y2="150" stroke="var(--accent)" stroke-width="2"/>`;
+  return `<svg viewBox="0 0 ${W} 176" width="100%" role="img" aria-label="Feeds and diapers across Day 6">${g}</svg>`;
+}
+const D = phone(`
+  <div class="c"><div class="h">Day 6 timeline · 4:24 AM to 4:24 AM</div>${timeline()}
+    <div style="margin-top:8px">${legend(['breast','formula','bmilk'])}</div>
+    <div style="margin-top:6px">${legend(['wet','both','dirty'])}</div></div>
+  <div class="c"><div class="row" style="font-size:14px"><span>${S.feeds} feeds · ${hm(S.breastMin)} at breast · ${S.ml} mL bottles</span></div>
+    <div class="dim" style="margin-top:4px">Longest gap between feeds: ${GAP.txt}</div>
+    <div class="row" style="margin-top:10px;font-size:14px"><span>${S.diapers} diapers · ${S.wet} wet · ${S.dirty} dirty</span>${status(S.wet, TARGET.wet)}</div></div>`, 'now 11:50 PM');
+
+// ---------- E: report card ----------
+const E = phone(`
+  <div class="c">
+    <div class="row" style="margin-bottom:12px"><div><div class="h" style="margin:0">Score</div><div class="big">3 / 3</div></div>
+      <div class="dim" style="text-align:right">feeds, wet and dirty<br>all at or above target</div></div>
+    <div class="rc">
+      <b>Feeds</b><span class="t num">${S.feeds} / 8+</span>${status(S.feeds, 8)}
+      <div class="sub">Breast ${S.breast} (${hm(S.breastMin)}) · Formula ${S.formula} (${S.formulaMl} mL) · Breast milk ${S.bmilk} (${S.bmilkMl} mL)</div>
+      <b>Wet diapers</b><span class="t num">${S.wet} / 6+</span>${status(S.wet, 6)}
+      <div class="sub">${S.wetOnly} wet only + ${S.both} wet & dirty</div>
+      <b>Dirty diapers</b><span class="t num">${S.dirty} / 3+</span>${status(S.dirty, 3)}
+      <div class="sub">${S.dirtyOnly} dirty only + ${S.both} wet & dirty</div>
+      <b>Bottle volume</b><span class="t num">${S.ml} mL</span><span class="dim">info</span>
+      <div class="sub">Avg ${Math.round(S.ml / (S.formula + S.bmilk))} mL per bottle · typical 30 to 60 mL now</div>
+      <b>Breast time</b><span class="t num">${hm(S.breastMin)}</span><span class="dim">info</span>
+      <div class="sub">Left ${hm(S.L)} · Right ${hm(S.R)} · avg ${Math.round(S.breastMin / S.breast)} min per feed</div>
+    </div></div>`);
+
+const mocks = [
+  ['A', 'Target rings', 'Answers "is he getting enough today?" at a glance, with the breakdown underneath.', A],
+  ['B', 'Stacked bars', 'Shows the mix of breast vs formula vs breast milk, and wet vs dirty, as proportions.', B],
+  ['C', 'Scoreboard tiles', 'Big numbers you can read at 3 AM. Every count gets its own tile.', C],
+  ['D', '24-hour timeline', 'Shows when he fed and how long the gaps were. Best for spotting a long stretch without a feed.', D],
+  ['E', 'Report card', 'Each target with actual vs goal and a status chip. Closest to what a nurse asks.', E],
+];
+document.getElementById('gallery').innerHTML = mocks.map(([l, t, w, html]) =>
+  `<section class="mock"><div class="mhead"><span class="letter">${l}</span><h2>${t}</h2></div><p class="why">${w}</p>${html}</section>`).join('');
+
+// hover / tap details
+const tip = document.getElementById('tip');
+document.addEventListener('pointerover', e => { const t = e.target.closest('[data-tip]'); if(!t){ tip.hidden = true; return; } tip.textContent = t.dataset.tip; tip.hidden = false; });
+document.addEventListener('pointermove', e => { if(!tip.hidden){ tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = (e.clientY + 14) + 'px'; } });
+</script>
