@@ -95,7 +95,9 @@ class Data:
                 "dirty": sum(1 for d in dia if d["data"].get("kind") in ("dirty", "both")),
                 "sleep_h": round(sleep_h, 1), "meds": meds,
                 "logged": bool(feeds or dia),
-                "sparse": sessions < 4 and len(dia) < 2}
+                # incompletely logged: very few entries, or entries only cover a short part of the day
+                "sparse": (sessions < 4 and len(dia) < 2) or (bool(feeds or dia) and
+                           (max(e["start"] for e in feeds + dia) - min(e["start"] for e in feeds + dia)).total_seconds() < 12 * 3600)}
 
 
 def trend(vals, unit=""):
@@ -139,7 +141,7 @@ def build(rows, now, out):
     flags = []
     for d in days:
         if not d["logged"] or d["sparse"]:
-            flags.append(f"Day {d['n']} looks incompletely logged ({d['feeds']} feed{'s' if d['feeds'] != 1 else ''}, {d['wet'] + d['dirty']} diaper{'s' if d['wet'] + d['dirty'] != 1 else ''} recorded), so its numbers aren't reliable.")
+            flags.append(f"{d['a'].strftime('%b %-d')} looks incompletely logged ({d['feeds']} feed{'s' if d['feeds'] != 1 else ''}, {d['wet'] + d['dirty']} diaper{'s' if d['wet'] + d['dirty'] != 1 else ''} recorded), so its numbers aren't reliable.")
     if below(latest):
         flags.append(f"Day {latest['n']} was below the typical range ({latest['feeds']} feeds, {latest['wet']} wet diapers vs {C['feedsMin']}+ feeds and {wet_min(latest['n'])}+ wet). "
                      "If this wasn't just missed logging, call your doctor or Health811 (dial 811).")
