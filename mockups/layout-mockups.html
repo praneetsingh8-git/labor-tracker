@@ -1,0 +1,228 @@
+<title>Aveer Tab Layouts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap">
+<style>
+/* Layout: a gallery of five phone-sized comparison mockups that wrap into columns; page chrome follows the viewer theme, phones show the app's dark UI. */
+:root{
+  --page:#f5f2f4; --ink:#1f1b24; --ink2:#5d5563; --line:#e3dde2; --tag:#ffe3d6; --tagInk:#8a3214;
+  /* the app (dark-only, matches index.html) */
+  --app:#121014; --card:#1d1a21; --card2:#26222b; --aline:#332e39; --atext:#f1ece6; --adim:#a39aa8; --afaint:#6f6774;
+  --accent:#ff8a65; --good:#5fd3a4; --warn:#ffcf5c;
+  /* feeds: breast / formula / breast-milk bottle (validated, dark surface) */
+  --breast:#3987e5; --formula:#d95926; --bmilk:#199e70;
+  /* diapers: wet / wet+dirty / dirty (validated, dark surface) */
+  --wet:#9085e9; --both:#c98500; --dirty:#d55181;
+  --today:#ff8a65; --yday:#8c8494;
+  --display:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --ui:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --page:#0d0b0f; --ink:#f1ece6; --ink2:#a39aa8; --line:#2a2530; --tag:#3a2219; --tagInk:#ffb38f; color-scheme:dark } }
+:root[data-theme="dark"]{ --page:#0d0b0f; --ink:#f1ece6; --ink2:#a39aa8; --line:#2a2530; --tag:#3a2219; --tagInk:#ffb38f; color-scheme:dark }
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font:15px/1.45 var(--ui)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 48px}
+h1{font:700 clamp(28px,5vw,40px)/1.1 var(--display);margin:0 0 8px;text-wrap:balance}
+.lede{color:var(--ink2);max-width:62ch;margin:0}
+.lede b{color:var(--ink)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:28px 22px;margin-top:28px}
+.mock{display:flex;flex-direction:column;gap:10px;min-width:0}
+.mhead{display:flex;align-items:baseline;gap:10px}
+.letter{font:700 13px var(--display);background:var(--tag);color:var(--tagInk);border-radius:6px;padding:2px 8px;letter-spacing:.5px}
+.mhead h2{font:700 19px var(--display);margin:0}
+.why{color:var(--ink2);font-size:13.5px;margin:0}
+.phone{background:var(--app);color:var(--atext);border-radius:30px;padding:16px 14px 18px;border:1px solid var(--line);font-family:var(--ui);display:flex;flex-direction:column;gap:12px;max-width:390px;width:100%}
+.ph-top{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px}
+.ph-top b{font-size:17px}
+.ph-top span{color:var(--adim);font-size:12px}
+.c{background:var(--card);border-radius:18px;padding:14px}
+.h{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--adim);font-weight:600;margin:0 0 10px}
+.num{font-variant-numeric:tabular-nums}
+.big{font-size:30px;font-weight:700;line-height:1}
+.dim{color:var(--adim);font-size:12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:baseline}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--adim)}
+.chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.chip.ok{background:rgba(95,211,164,.16);color:var(--good)}
+.chip.low{background:rgba(255,207,92,.16);color:var(--warn)}
+svg text{font-family:var(--ui)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tile .k{font-size:12px;color:var(--adim);font-weight:600}
+.tile .v{font-size:26px;font-weight:700;line-height:1.05}
+.tile .s{font-size:12px;color:var(--adim)}
+.tile.wide{grid-column:1 / -1}
+.bar{display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;background:var(--card2)}
+.bar i{display:block;height:100%}
+.rc{display:grid;grid-template-columns:1fr auto auto;gap:10px 10px;align-items:center;font-size:14px}
+.rc .t{color:var(--adim);font-size:12px;text-align:right}
+.rc .sub{grid-column:1 / -1;margin-top:-6px;color:var(--adim);font-size:12px;padding-bottom:8px;border-bottom:1px solid var(--aline)}
+.rc .sub:last-child{border-bottom:0;padding-bottom:0}
+.tip{position:fixed;pointer-events:none;background:var(--card2);color:var(--atext);border:1px solid var(--aline);border-radius:10px;padding:6px 9px;font:12px var(--ui);z-index:5}
+.note{margin-top:32px;color:var(--ink2);font-size:13.5px;max-width:70ch}
+@media (prefers-reduced-motion:no-preference){ .ring-arc{transition:stroke-dashoffset .6s ease} }
+
+.cmp{display:grid;grid-template-columns:1fr auto auto auto;gap:8px 10px;align-items:center;font-size:14px}
+.cmp .hd{font-size:11px;color:var(--adim);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.cmp .n{text-align:right;font-variant-numeric:tabular-nums}
+.delta{font-size:12px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--card2);color:var(--atext);white-space:nowrap;text-align:center}
+.pb{display:flex;flex-direction:column;gap:4px}
+.pb .track{position:relative;height:12px;background:var(--card2);border-radius:6px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+.pb .yd{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--atext);border-radius:1px}
+.pb .full{position:absolute;top:-3px;bottom:-3px;width:0;border-left:2px dotted var(--adim)}
+.head{font-size:17px;font-weight:700;line-height:1.3}
+
+.phone.tall{gap:10px;position:relative;padding-bottom:84px}
+.qbar{position:absolute;left:10px;right:10px;bottom:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:rgba(38,34,43,.96);border:1px solid var(--aline);border-radius:20px;padding:8px}
+.qbar button{background:none;border:0;color:var(--atext);font:600 11px var(--ui);display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;border-radius:12px}
+.qbar button b{font-size:20px}
+.qbar button.live{background:rgba(95,211,164,.16);color:var(--good)}
+.fab{position:absolute;right:16px;bottom:18px;width:56px;height:56px;border-radius:50%;background:var(--accent);color:#2a0f0a;font:700 30px/56px var(--ui);text-align:center;box-shadow:0 8px 20px rgba(255,111,97,.35)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--card);border-radius:12px;padding:3px;gap:3px;font-size:13px;font-weight:600;text-align:center}
+.seg span{padding:7px 0;border-radius:9px;color:var(--adim)}
+.seg span.on{background:var(--card2);color:var(--atext)}
+.qgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.qgrid div{background:var(--card2);border:1px solid var(--aline);border-radius:14px;padding:12px 4px;text-align:center;font-size:12px;font-weight:600}
+.qgrid div b{display:block;font-size:20px;margin-bottom:2px}
+.qgrid div.live{border-color:var(--good);color:var(--good);background:rgba(95,211,164,.12)}
+.tl{display:flex;flex-direction:column}
+.tl .it{display:grid;grid-template-columns:62px 12px 1fr auto;gap:8px;align-items:center;font-size:13px;padding:6px 0}
+.tl .it .tm{white-space:nowrap;color:var(--adim);font-variant-numeric:tabular-nums;text-align:right;font-size:12px}
+.tl .it .pt{width:10px;height:10px;border-radius:50%}
+.tl .gap{font-size:11px;color:var(--warn);padding:2px 0 2px 82px}
+.acc{background:var(--card);border-radius:18px;padding:12px 14px}
+.acc .ah{display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.acc .ah span{font-weight:500;color:var(--adim);font-size:12px}
+.mini{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.mini span{background:var(--card2);border:1px solid var(--aline);border-radius:99px;padding:7px 12px;font-size:12px;font-weight:600}
+.mini span.p{background:var(--accent);color:#2a0f0a;border-color:var(--accent)}
+.sheet{background:var(--card);border-radius:22px 22px 0 0;margin:6px -14px -84px;padding:14px 16px 18px;border-top:1px solid var(--aline);box-shadow:0 -12px 30px rgba(0,0,0,.5)}
+.sheet .grab{width:38px;height:4px;border-radius:2px;background:var(--aline);margin:0 auto 10px}
+.fld{font-size:11px;color:var(--adim);margin:8px 0 4px}
+.inp{background:var(--card2);border:1px solid var(--aline);border-radius:10px;padding:9px 10px;font-size:13px}
+.ux{font-size:13px;color:var(--ink2);margin:0;padding-left:18px}
+.ux li{margin:3px 0}
+.ux b{color:var(--ink)}
+.gallery{grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr))}
+</style>
+
+<div class="wrap">
+  <h1>Aveer tab layouts</h1>
+  <p class="lede">Five full-page layouts for the Aveer tab. Every one keeps the <b>rings with the yesterday tick (option A) at the top</b> and the <b>charts at the bottom</b>; they differ in how you log entries and where details live. Days run midnight to midnight. All numbers are example data, not Aveer's.</p>
+  <div class="gallery" id="gallery"></div>
+  <p class="note">Every layout keeps editing the same way: tap any entry to change its time, side, amount or remark, and swipe or tap Delete to remove it. "Log a past feed" stays in every version for feeds you forgot to start.</p>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const NOW_H = 14.5, NOW_TXT = '2:30 PM';
+const T = { feeds:[0.67,3.17,5.75,8.33,11.08,13.67], wet:[2,6.5,9,12.5] };
+const Y = { feeds:[1.33,4,7.25,10.5,13,15.75,18.5,21.17,23.5], wet:[2.5,7,12,16,19.5,21,23] };
+const by = (a, h) => a.filter(x => x <= h).length;
+const delta = d => `<span class="delta">${d > 0 ? '▲' : d < 0 ? '▼' : '='} ${Math.abs(d) || 'same'}</span>`;
+
+function ring(label, v, target, yn, color){
+  const r = 30, c = 2 * Math.PI * r, f = Math.min(1, v / target), a = Math.min(1, yn / target) * 2 * Math.PI - Math.PI / 2;
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0">
+   <svg viewBox="0 0 76 76" width="74" height="74"><circle cx="38" cy="38" r="${r}" fill="none" stroke="var(--card2)" stroke-width="7"/>
+   <circle cx="38" cy="38" r="${r}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - f)}" transform="rotate(-90 38 38)"/>
+   <line x1="${38 + 24 * Math.cos(a)}" y1="${38 + 24 * Math.sin(a)}" x2="${38 + 36 * Math.cos(a)}" y2="${38 + 36 * Math.sin(a)}" stroke="var(--atext)" stroke-width="3" stroke-linecap="round" data-tip="Yesterday by ${NOW_TXT}: ${yn}"/>
+   <text x="38" y="37" text-anchor="middle" font-size="18" font-weight="700" fill="var(--atext)">${v}</text>
+   <text x="38" y="50" text-anchor="middle" font-size="9" fill="var(--adim)">of ${target}+</text></svg>
+   <div style="font-size:12px;font-weight:600">${label} ${delta(v - yn)}</div></div>`;
+}
+const rings = (compact) => `<div class="c"><div class="row"><div class="h" style="margin:0">Today · Sat Oct 17</div><span class="dim">tick = yesterday by now</span></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:8px">${ring('Feeds', 6, 8, 5, 'var(--accent)')}${ring('Wet', 4, 6, 3, 'var(--wet)')}${ring('Dirty', 2, 3, 1, 'var(--dirty)')}</div>
+  ${compact ? '' : `<div class="dim" style="text-align:center;margin-top:6px">Last feed 1:40 PM (50 min ago) · next side: Left</div>`}</div>`;
+const fed = () => `<div class="c"><div class="h">How he fed · vs yesterday by now</div><div style="display:flex;flex-direction:column;gap:8px;font-size:13.5px">
+  <div class="row"><span><i class="dot" style="background:var(--breast)"></i>Breastfeed ×4</span><span><b class="num">1 h 42 m</b> <span class="delta">▲ 22 min</span></span></div>
+  <div class="row"><span><i class="dot" style="background:var(--formula)"></i>Formula ×1</span><span><b class="num">45 mL</b> <span class="delta">▲ 15 mL</span></span></div>
+  <div class="row"><span><i class="dot" style="background:var(--bmilk)"></i>Breast milk bottle ×1</span><span><b class="num">40 mL</b> <span class="delta">▼ 20 mL</span></span></div>
+  <div class="row"><span><i class="dot" style="background:var(--wet)"></i>Wet 3 · <i class="dot" style="background:var(--both)"></i>Both 1 · <i class="dot" style="background:var(--dirty)"></i>Dirty 1</span><span class="dim">5 diapers</span></div></div></div>`;
+const tip = () => `<div class="c"><div class="h">Today's tip · Day 6</div><div style="font-size:13.5px">6+ wet diapers a day from now on is the sign of good intake.</div><div class="dim" style="margin-top:6px">Coming up: ask about vitamin D drops at the next visit.</div></div>`;
+function pace(title, tArr, yArr, color){
+  const W = 300, H = 120, L = 22, R = 8, Tp = 8, Bt = 20, maxY = Math.max(tArr.length, yArr.length) + 1;
+  const X = h => L + h / 24 * (W - L - R), Yp = v => Tp + (1 - v / maxY) * (H - Tp - Bt);
+  const st = (arr, end) => { let d = `M${X(0)},${Yp(0)}`, n = 0; arr.filter(h => h <= end).forEach(h => { d += ` H${X(h)} V${Yp(++n)}`; }); return d + ` H${X(end)}`; };
+  let g = '';
+  for(let v = 0; v <= maxY; v += Math.max(1, Math.round(maxY / 3))) g += `<line x1="${L}" x2="${W - R}" y1="${Yp(v)}" y2="${Yp(v)}" stroke="var(--aline)"/><text x="${L - 5}" y="${Yp(v) + 3}" text-anchor="end" font-size="9" fill="var(--adim)">${v}</text>`;
+  [[0,'12a'],[12,'12p'],[24,'12a']].forEach(([h, l]) => g += `<text x="${X(h)}" y="${H - 6}" text-anchor="middle" font-size="9" fill="var(--adim)">${l}</text>`);
+  g += `<path d="${st(yArr, 24)}" fill="none" stroke="var(--yday)" stroke-width="2" stroke-dasharray="4 3"/><path d="${st(tArr, NOW_H)}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+  g += `<circle cx="${X(NOW_H)}" cy="${Yp(by(tArr, NOW_H))}" r="4" fill="${color}" stroke="var(--card)" stroke-width="2"/>`;
+  return `<div class="row" style="font-size:13px"><b>${title}</b><span class="dim">today ${by(tArr, NOW_H)} · yday ${by(yArr, NOW_H)} by now</span></div><svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`;
+}
+const charts = () => `<div class="c"><div class="h">Trends · today vs yesterday (dashed)</div>${pace('Feeds', T.feeds, Y.feeds, 'var(--accent)')}${pace('Wet diapers', T.wet, Y.wet, 'var(--wet)')}</div>`;
+const timeline = () => `<div class="c"><div class="h">Today's log</div><div class="tl">
+  ${[['1:40 PM','var(--breast)','Breastfeed · Right','18 min'],['12:30 PM','var(--wet)','Diaper · Wet',''],['11:05 AM','var(--formula)','Formula bottle','45 mL · 10 min'],['9:00 AM','var(--dirty)','Diaper · Wet + dirty',''],['8:20 AM','var(--breast)','Breastfeed · Left','24 min']]
+   .map(([tm, c, t, s], i) => `<div class="it"><span class="tm">${tm}</span><i class="pt" style="background:${c}"></i><span>${t}</span><span class="dim">${s}</span></div>${i === 2 ? '<div class="gap">2 h 45 min gap</div>' : ''}`).join('')}
+  <div class="dim" style="padding-left:82px">+ 4 earlier · tap any entry to edit</div></div></div>`;
+const qbar = live => `<div class="qbar"><button class="${live ? 'live' : ''}"><b>🤱</b>${live ? 'Left 6:12' : 'Breast'}</button><button><b>🍼</b>Bottle</button><button><b>💧</b>Diaper</button><button><b>😴</b>Sleep</button></div>`;
+const phone = (inner, cls) => `<div class="phone ${cls || 'tall'}">${inner}</div>`;
+
+// 1. Dashboard + sticky quick bar
+const P1 = phone(rings() + fed() + tip() + charts() + qbar(true));
+
+// 2. Log-first
+const P2 = phone(`<div class="c"><div class="h">Quick log</div><div class="qgrid">
+  <div class="live"><b>Left</b>6:12 · tap to stop</div><div><b>Right</b>start</div><div><b>🍼</b>Bottle</div>
+  <div><b>💧</b>Wet</div><div><b>💧💩</b>Both</div><div><b>💩</b>Dirty</div></div>
+  <div class="mini"><span>＋ Past feed</span><span>😴 Sleep</span><span>✏️ Note</span></div></div>` + rings(true) + fed() + charts() + tip(), 'tall" style="padding-bottom:18px');
+
+// 3. Segmented Today | Log | Trends + FAB with action sheet open
+const P3 = phone(`<div class="seg"><span class="on">Today</span><span>Log</span><span>Trends</span></div>` + rings() + fed() + `
+  <div class="c" style="opacity:.55"><div class="h">Charts live in the Trends tab</div><div class="dim">Feeds and diapers vs yesterday, weekly view</div></div>
+  <div class="sheet"><div class="grab"></div><div style="font-weight:700;margin-bottom:8px">Log for Aveer</div>
+  <div class="qgrid"><div><b>🤱</b>Breastfeed</div><div><b>🍼</b>Bottle</div><div><b>💧</b>Diaper</div><div><b>😴</b>Sleep</div><div><b>⚖️</b>Weight</div><div><b>✏️</b>Note</div></div></div>`);
+
+// 4. Timeline-centred with bottom composer
+const P4 = phone(rings() + timeline() + charts() + `<div class="qbar" style="grid-template-columns:1fr auto"><div class="inp" style="color:var(--adim)">Log something… breast, bottle, diaper</div><button style="background:var(--accent);color:#2a0f0a;border-radius:12px;padding:0 14px;font-size:18px">＋</button></div>`);
+
+// 5. Domain cards with entry inside each + bottle sheet open
+const P5 = phone(rings(true) + `
+  <div class="acc"><div class="ah">🤱 Feeding <span>6 today · 1 h 42 m · 85 mL</span></div>
+    <div class="mini"><span class="p">Left · 6:12</span><span>Right</span><span>Bottle</span><span>＋ Past feed</span></div></div>
+  <div class="acc"><div class="ah">💧 Diapers <span>5 today · 4 wet · 2 dirty</span></div>
+    <div class="mini"><span>Wet</span><span>Wet + dirty</span><span>Dirty</span></div></div>
+  <div class="acc"><div class="ah">😴 Sleep <span>6 h 20 m today</span></div><div class="mini"><span>Fell asleep</span></div></div>
+  <div class="acc"><div class="ah">📈 Trends <span>tap to open</span></div></div>
+  <div class="sheet"><div class="grab"></div><div style="font-weight:700">Bottle</div>
+    <div class="fld">Type</div><div class="mini" style="margin:0"><span class="p">Breast milk</span><span>Formula</span></div>
+    <div class="fld">Start time</div><div class="inp">Today · 2:25 PM</div>
+    <div class="fld">Amount (mL)</div><div class="mini" style="margin:0"><span>30</span><span class="p">45</span><span>60</span><span>90</span></div>
+    <div class="fld">Minutes</div><div class="mini" style="margin:0"><span>5</span><span class="p">10</span><span>15</span></div></div>`);
+
+const mocks = [
+  ['1', 'Dashboard + quick bar', P1, [
+    '<b>Logging:</b> a bar pinned to the bottom with Breast, Bottle, Diaper, Sleep, one tap away from anywhere on the page. A running feed shows its timer in the bar.',
+    '<b>Details:</b> rings, then how he fed, tip, charts.',
+    '<b>Best for:</b> both glancing and logging, with no scrolling to reach the buttons.',
+    '<b>Trade-off:</b> the bar covers a strip of the screen.']],
+  ['2', 'Log-first', P2, [
+    '<b>Logging:</b> a big button grid at the very top: Left, Right, Bottle, and each diaper type as a one-tap button.',
+    '<b>Details:</b> a compact rings strip and the breakdown below.',
+    '<b>Best for:</b> 3 AM, half asleep, one hand.',
+    '<b>Trade-off:</b> the scorecard is no longer the first thing you see.']],
+  ['3', 'Today / Log / Trends tabs', P3, [
+    '<b>Logging:</b> a floating + button opens a sheet with six choices.',
+    '<b>Details:</b> Today holds the rings and breakdown, Log the full list, Trends the charts.',
+    '<b>Best for:</b> a clean, uncluttered screen as features grow.',
+    '<b>Trade-off:</b> every log is 2 taps, and the charts are a tab away.']],
+  ['4', 'Timeline', P4, [
+    '<b>Logging:</b> a composer at the bottom, like a messaging app.',
+    '<b>Details:</b> today\'s entries in time order, with gaps over 2.5 h flagged in yellow.',
+    '<b>Best for:</b> seeing the rhythm of the day and spotting long gaps.',
+    '<b>Trade-off:</b> typing-style entry is slower than buttons.']],
+  ['5', 'Cards by activity', P5, [
+    '<b>Logging:</b> each card (Feeding, Diapers, Sleep) has its own buttons; bottles open a sheet with type, start time, mL and minutes.',
+    '<b>Details:</b> each card shows its own totals for today.',
+    '<b>Best for:</b> everything about feeding in one place, easy to add sections later.',
+    '<b>Trade-off:</b> a longer page; charts sit in a collapsed card.']],
+];
+document.getElementById('gallery').innerHTML = mocks.map(([l, t, html, ux]) =>
+  `<section class="mock"><div class="mhead"><span class="letter">${l}</span><h2>${t}</h2></div><ul class="ux">${ux.map(x => '<li>' + x + '</li>').join('')}</ul>${html}</section>`).join('');
+const tp = document.getElementById('tip');
+document.addEventListener('pointerover', e => { const t = e.target.closest('[data-tip]'); if(!t){ tp.hidden = true; return; } tp.textContent = t.dataset.tip; tp.hidden = false; });
+document.addEventListener('pointermove', e => { if(!tp.hidden){ tp.style.left = Math.min(e.clientX + 12, innerWidth - tp.offsetWidth - 8) + 'px'; tp.style.top = (e.clientY + 14) + 'px'; } });
+</script>
