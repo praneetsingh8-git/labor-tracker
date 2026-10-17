@@ -27,9 +27,9 @@ INK, MUTED, ACCENT, GOOD, WARN, BAD = (colors.HexColor(x) for x in ("#1f1b24", "
 SERIES = [colors.HexColor("#e8684a"), colors.HexColor("#4f8fd6"), colors.HexColor("#8a6d3b")]
 
 
-def day_start(n):  # calendar-aware so DST doesn't shift the 4:24 boundary
+def day_start(n):  # calendar day n of life, midnight to midnight
     d = BIRTH.date() + dt.timedelta(days=n - 1)
-    return dt.datetime(d.year, d.month, d.day, BIRTH.hour, BIRTH.minute, tzinfo=TZ)
+    return dt.datetime(d.year, d.month, d.day, 0, 0, tzinfo=TZ)  # calendar days, midnight to midnight
 
 
 def day_of(t):
@@ -276,7 +276,7 @@ def make_pdf(path, period, labor, days, status_text, smiley, flags, changes, mom
                             title=f"{BABY} {SURNAME} report {period}", author="Aveer tracker", compress=1)
     f = []
     f.append(Paragraph(f"{BABY} {SURNAME} &middot; 3-day report", S["h1"]))
-    f.append(Paragraph(f"{period} &middot; days {days[0]['n']}-{days[-1]['n']} of life (each day starts at {BIRTH.strftime('%-I:%M %p')}) &middot; generated {dt.datetime.now(TZ).strftime('%b %-d, %-I:%M %p')}", S["small"]))
+    f.append(Paragraph(f"{period} &middot; days {days[0]['n']}-{days[-1]['n']} of life (midnight to midnight) &middot; generated {dt.datetime.now(TZ).strftime('%b %-d, %-I:%M %p')}", S["small"]))
     f.append(Spacer(1, 8))
     col = {"\U0001F60A": GOOD, "\U0001F642": WARN, "\U0001F610": BAD}[smiley]
     box = Table([[Paragraph(f"<b>{status_text}</b>", ParagraphStyle("st", parent=S["p"], textColor=colors.white, fontSize=11, leading=15))]],
