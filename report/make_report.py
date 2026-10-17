@@ -68,6 +68,8 @@ class Data:
             self.ev.append({"id": r["id"], "type": r["type"], "start": ms(int(r["start_ts"])),
                             "end": ms(int(r["end_ts"])) if r.get("end_ts") not in (None, "") else None, "data": d})
         self.ev.sort(key=lambda e: e["start"])
+        st = [e for e in self.ev if e["type"] == "settings" and e["data"].get("mergeMin") is not None]
+        self.merge_s = float(st[-1]["data"]["mergeMin"]) * 60 if st else 45 * 60
 
     def of(self, *types): return [e for e in self.ev if e["type"] in types]
 
@@ -76,9 +78,10 @@ class Data:
         inside = [e for e in self.ev if a <= e["start"] < b]
         feeds = [e for e in inside if e["type"] == "feed"]
         sessions, last = 0, None
-        for f in feeds:
-            if last is None or (f["start"] - last).total_seconds() > 15 * 60: sessions += 1
-            last = f["end"] or f["start"]
+        for f in feeds:  # same rule as the app: explicit flag, else resumed within merge window
+            c = f["data"].get("cont")
+            if last is None or c is False or (c is not True and (f["start"] - last).total_seconds() > self.merge_s): sessions += 1
+            last = max(last, f["end"] or f["start"]) if last and c is not False else (f["end"] or f["start"])
         dia = [e for e in inside if e["type"] == "diaper"]
         breast_min = sum(((f["end"] - f["start"]).total_seconds() / 60) for f in feeds if f["data"].get("kind") == "breast" and f["end"])
         sleep_h = 0.0

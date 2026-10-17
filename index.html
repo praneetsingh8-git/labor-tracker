@@ -518,14 +518,15 @@ $('pastFeed').onclick = () => {
   openSheet(`<h3>Log a past breastfeed</h3>
     <div class="field"><label>Side</label><div class="chips" id="pfSide"><button class="chip on" data-v="L">Left</button><button class="chip" data-v="R">Right</button></div></div>
     ${timeFields(Date.now() - 20 * 60e3)}
+    ${contField(Date.now() - 20 * 60e3)}
     <div class="field"><label>Remark (optional)</label><input id="pfNote"></div>
     <button class="btn primary" id="pfSave">Save</button>`);
-  bindChips('pfSide'); bindTimeFields();
+  bindChips('pfSide'); bindChips('fCont'); bindTimeFields();
   $('pfSave').onclick = () => {
     const { start, end } = readTimeFields();
     if(end <= start){ alert('Enter how long the feed lasted.'); return; }
     if(start > Date.now()){ alert('Start time is in the future.'); return; }
-    add('feed', start, end, { kind:'breast', side: $('pfSide').querySelector('.chip.on').dataset.v, note: $('pfNote').value.trim() });
+    add('feed', start, end, { kind:'breast', side: $('pfSide').querySelector('.chip.on').dataset.v, note: $('pfNote').value.trim(), cont: readCont() });
     closeSheet();
   };
 };
@@ -534,6 +535,7 @@ document.querySelectorAll('[data-bottle]').forEach(b => b.onclick = () => {
   openSheet(`
     <h3>Bottle · ${milk === 'formula' ? 'Formula' : 'Breast milk'}</h3>
     ${timeFields(Date.now())}
+    ${contField(Date.now())}
     <div class="field"><label>Amount (ml, optional)</label>
       <div class="chips" id="mlChips">${[10,20,30,45,60,90,120].map(v=>`<button class="chip" data-ml="${v}">${v}</button>`).join('')}</div>
       <input type="number" inputmode="numeric" id="mlIn" placeholder="or type ml" style="margin-top:8px">
@@ -541,10 +543,10 @@ document.querySelectorAll('[data-bottle]').forEach(b => b.onclick = () => {
     <div class="field"><label>Remark (optional)</label><input id="bNote" placeholder="e.g. spit up a little"></div>
     <button class="btn primary" id="bSave">Save</button>`);
   $('mlChips').querySelectorAll('[data-ml]').forEach(c => c.onclick = () => { $('mlIn').value = c.dataset.ml; });
-  bindTimeFields();
+  bindTimeFields(); bindChips('fCont');
   $('bSave').onclick = () => {
     const { start, end } = readTimeFields(), ml = parseFloat($('mlIn').value);
-    add('feed', start, end, { kind:'bottle', milk, ml: isNaN(ml) ? null : ml, note: $('bNote').value.trim() });
+    add('feed', start, end, { kind:'bottle', milk, ml: isNaN(ml) ? null : ml, note: $('bNote').value.trim(), cont: readCont() });
     closeSheet();
   };
 });
@@ -641,6 +643,7 @@ function editEvent(id){
   if(ev.type === 'feed' && d.kind === 'breast') extra = `<div class="field"><label>Side</label><div class="chips" id="eSide">${['L','R'].map(s=>`<button class="chip ${d.side===s?'on':''}" data-v="${s}">${s==='L'?'Left':'Right'}</button>`).join('')}</div></div>`;
   if(ev.type === 'feed' && d.kind === 'bottle') extra = `<div class="field"><label>Amount (ml)</label><input type="number" inputmode="numeric" id="eMl" value="${d.ml ?? ''}"></div>
     <div class="field"><label>Milk</label><div class="chips" id="eMilk">${['formula','breastmilk'].map(s=>`<button class="chip ${d.milk===s?'on':''}" data-v="${s}">${s==='formula'?'Formula':'Breast milk'}</button>`).join('')}</div></div>`;
+  if(ev.type === 'feed') extra += contField(ev.start, ev.id, d.cont);
   if(ev.type === 'diaper') extra = `<div class="field"><label>Type</label><div class="chips" id="eDiaper">${['wet','dirty','both'].map(s=>`<button class="chip ${d.kind===s?'on':''}" data-v="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div></div>`;
   if(ev.type === 'growth') extra = `<div class="field"><label>Weight (kg)</label><input type="number" step="0.001" inputmode="decimal" id="eKg" value="${d.kg ?? ''}"></div>`;
   if(ev.type === 'stock') extra = `<div class="field"><label>Pills counted</label><input type="number" inputmode="numeric" id="eCount" value="${d.count ?? ''}"></div>`;
@@ -657,7 +660,7 @@ function editEvent(id){
       <button class="btn danger" id="eDel">Delete</button>
     </div>`);
   const pick = (box, key) => { const el = $(box); if(!el) return; el.querySelectorAll('[data-v]').forEach(c => c.onclick = () => { el.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }); };
-  ['eInt','eSide','eMilk','eDiaper','ePain'].forEach(b => pick(b));
+  ['eInt','eSide','eMilk','eDiaper','ePain','fCont'].forEach(b => pick(b));
   const sel = box => { const c = $(box) && $(box).querySelector('.chip.on'); return c ? c.dataset.v : undefined; };
   $('eSave').onclick = () => {
     // keep original seconds if the minute wasn't changed
@@ -675,6 +678,7 @@ function editEvent(id){
     if(sel('eMilk')) d.milk = sel('eMilk');
     if(sel('eDiaper')) d.kind = sel('eDiaper');
     if(sel('ePain') !== undefined) d.pain = +sel('ePain');
+    if(ev.type === 'feed' && $('fCont')) d.cont = readCont();
     if($('eTabs')){ const v = parseInt($('eTabs').value); d.tablets = isNaN(v) ? null : v; }
     if($('eName')) d.name = $('eName').value.trim();
     if($('eKg')){ const v = parseFloat($('eKg').value); if(!isNaN(v)) d.kg = v; }
@@ -728,6 +732,7 @@ function rowHtml(ev, extraSide){
     if(d.tablets) side = d.tablets + (d.tablets === 1 ? ' tab' : ' tabs');
     if(d.pain != null) sub.push('pain ' + d.pain + '/10');
   }
+  if(ev.type === 'feed' && CONT[ev.id]) sub.push('part of ' + t(CONT[ev.id]) + ' feed');
   if(ev.type === 'visit'){ side = esc(d.provider || ''); if(d.weightKg) sub.push(fmtKg(d.weightKg)); }
   const note = ev.type === 'note' ? d.text : d.note;
   if(note) sub.push(note);
@@ -746,8 +751,9 @@ function openEditor(id){
 }
 function bindRows(el){ el.querySelectorAll('.row[data-id]').forEach(r => r.onclick = () => openEditor(r.dataset.id)); }
 
-let logFilter = 'all';
+let logFilter = 'all', CONT = {};
 function render(){
+  CONT = {}; sessionsOf(byType('feed').filter(f => f.start > Date.now() - 14 * 864e5)).forEach(x => x.items.slice(1).forEach(f => CONT[f.id] = x.start));
   // contractions
   const { done, hour, avgDur, avgInt } = contractionStats();
   const all = byType('contraction');
@@ -902,8 +908,25 @@ function tipFor(n){ let tip = CONTENT.tips[0]; CONTENT.tips.forEach(x => { if(x.
 // ---------- calendar days (midnight to midnight) ----------
 function midnightOf(ts){ const d = new Date(ts); d.setHours(0,0,0,0); return d.getTime(); }
 function minusDay(ts){ const d = new Date(ts); d.setDate(d.getDate() - 1); return d.getTime(); }
+function mergeMs(){ const sv = events[TARGET_ID] && !events[TARGET_ID].deleted ? events[TARGET_ID].data : {}; return (sv.mergeMin != null && sv.mergeMin !== '' ? +sv.mergeMin : 45) * 60e3; }
+// which earlier feed a new entry at `start` would continue (null if none within 90 min)
+function prevSessionFor(start, excludeId){
+  const before = byType('feed').filter(f => f.id !== excludeId && f.start < start);
+  if(!before.length) return null;
+  const ss = sessionsOf(before), l = ss[ss.length - 1], gap = start - l.last;
+  return gap <= 90 * 60e3 ? { start: l.start, gap, auto: gap <= mergeMs() } : null;
+}
+function contField(start, excludeId, current){
+  const p = prevSessionFor(start, excludeId); if(!p) return '';
+  const part = current === true || (current !== false && p.auto);
+  return `<div class="field"><label>Part of the ${t(p.start)} feed? <span class="muted">(${durWords(p.gap)} after it)</span></label>
+    <div class="chips" id="fCont"><button class="chip ${part ? 'on' : ''}" data-v="yes">Yes, same feed (after a break)</button><button class="chip ${part ? '' : 'on'}" data-v="no">No, a new feed</button></div>
+    <div class="muted">Same feed: the next-feed timer counts from ${t(p.start)} and amounts add up.</div></div>`;
+}
+function readCont(){ const c = $('fCont') && $('fCont').querySelector('.chip.on'); return c ? c.dataset.v === 'yes' : undefined; }
 function sessionsOf(list){ const out = []; list.slice().sort((a,b)=>a.start-b.start).forEach(f => { const l = out[out.length - 1];
-  if(l && f.start - l.last <= 15*60e3){ l.items.push(f); l.last = Math.max(l.last, f.end || f.start); } else out.push({ start: f.start, last: f.end || f.start, items: [f] }); }); return out; }
+  const join = f.data.cont === true ? !!l : f.data.cont === false ? false : (l && f.start - l.last <= mergeMs());
+  if(join){ l.items.push(f); l.last = Math.max(l.last, f.end || f.start); } else out.push({ start: f.start, last: f.end || f.start, items: [f] }); }); return out; }
 function rangeStats(a, b){
   const now = Date.now(), inR = e => e.start >= a && e.start < b;
   const feeds = byType('feed').filter(inR), dia = byType('diaper').filter(inR);
@@ -930,7 +953,7 @@ function targets(){
   const v = k => sv[k] != null && sv[k] !== '' ? +sv[k] : null;
   return { feeds: v('feeds') ?? CONTENT.feedsMin, wet: v('wet') ?? wetMin(dn), dirty: v('dirty') ?? (dn >= 5 ? 3 : 1),
     gapMin: v('gapMin') ?? 2, gapMax: v('gapMax') ?? 3, maxGap: v('maxGap') ?? 4,
-    mlMin: v('mlMin') ?? age[1], mlMax: v('mlMax') ?? age[2], custom: sv, dn };
+    mlMin: v('mlMin') ?? age[1], mlMax: v('mlMax') ?? age[2], mergeMin: v('mergeMin') ?? 45, custom: sv, dn };
 }
 $('editTargets').onclick = () => {
   const c = targets().custom || {}, T = targets(), f = (id, label, ph, hint) => `<div class="field"><label>${label}</label><input type="number" inputmode="decimal" id="${id}" value="${c[id] ?? ''}" placeholder="${ph}">${hint ? `<div class="muted">${hint}</div>` : ''}</div>`;
@@ -938,8 +961,9 @@ $('editTargets').onclick = () => {
     ${f('feeds', 'Feeds per day', T.feeds)}${f('wet', 'Wet diapers per day', wetMin(T.dn), 'Automatic: rises from 1 on day 1 to 6+ from day 5')}${f('dirty', 'Dirty diapers per day', T.dn >= 5 ? 3 : 1)}
     <div class="grid2">${f('gapMin', 'Feed every, from (h)', 2)}${f('gapMax', 'to (h)', 3)}</div>${f('maxGap', 'Longest gap allowed (h)', 4, 'Usually 4 h until back to birth weight, or what his doctor says')}
     <div class="grid2">${f('mlMin', 'Bottle from (mL)', AGE_ML.filter(r => r[0] <= T.dn).pop()[1])}${f('mlMax', 'to (mL)', AGE_ML.filter(r => r[0] <= T.dn).pop()[2])}</div>
+    ${f('mergeMin', 'Count as one feed if resumed within (min)', 45, 'A break for burping, a nap or a top-up within this time is the same feed')}
     <div class="stack"><button class="btn primary" id="tgSave">Save targets</button><button class="btn" id="tgReset">Use automatic values</button></div>`);
-  const keys = ['feeds','wet','dirty','gapMin','gapMax','maxGap','mlMin','mlMax'];
+  const keys = ['feeds','wet','dirty','gapMin','gapMax','maxGap','mlMin','mlMax','mergeMin'];
   $('tgSave').onclick = () => { const data = {}; keys.forEach(k => { const v = $(k).value.trim(); data[k] = v === '' ? null : +v; }); upsertKeyed(TARGET_ID, 'settings', data); closeSheet(); toast('Targets saved'); };
   $('tgReset').onclick = () => { const data = {}; keys.forEach(k => data[k] = null); upsertKeyed(TARGET_ID, 'settings', data); closeSheet(); toast('Using automatic targets'); };
 };
@@ -988,14 +1012,17 @@ function renderNextFeed(now){
   else if(now <= latest) status = `<span class="pill low">Due · ${durWords(now - last.start)} since last</span>`;
   else status = `<span class="pill low">Over ${T.maxGap} h since last feed</span>`;
   const span = latest - last.start + 0.35 * H, pos = ts => Math.min(100, Math.max(0, (ts - last.start) / span * 100)).toFixed(1) + '%';
-  const lastItem = last.items[last.items.length - 1], lastDesc = last.items.map(f => f.data.kind === 'breast' ? (f.data.side === 'L' ? 'Left' : 'Right') + ' ' + minTxt(((f.end ?? now) - f.start) / 60e3) : (f.data.milk === 'formula' ? 'Formula' : 'Breast milk') + (f.data.ml ? ' ' + f.data.ml + ' mL' : '')).join(' + ');
+  const parts = {}; last.items.forEach(f => { const k = f.data.kind === 'breast' ? (f.data.side === 'L' ? 'Left' : 'Right') : (f.data.milk === 'formula' ? 'Formula' : 'Breast milk');
+    parts[k] = parts[k] || { min: 0, ml: [] }; if(f.data.kind === 'breast') parts[k].min += ((f.end ?? now) - f.start) / 60e3; else if(f.data.ml) parts[k].ml.push(f.data.ml); });
+  const lastDesc = Object.entries(parts).map(([k, v]) => v.ml.length ? `${k} ${v.ml.join(' + ')}${v.ml.length > 1 ? ' = ' + v.ml.reduce((a, b) => a + b, 0) : ''} mL` : v.min ? `${k} ${minTxt(v.min)}` : k).join(' · ');
+  const sessMl = last.items.reduce((a, f) => a + (f.data.kind === 'bottle' ? f.data.ml || 0 : 0), 0);
   const lastBreast = feeds.find(f => f.data.kind === 'breast'), lastBottle = feeds.find(f => f.data.kind === 'bottle' && f.data.ml);
   const wt = latestWeight(), byWt = wt && T.dn >= 5 ? Math.round(wt.kg * 150 / T.feeds / 5) * 5 : null;
   $('nextFeed').innerHTML = `<div class="ctitle"><div class="h" style="margin:0">Next feed</div><span class="muted">last: ${t(last.start)} · ${esc(lastDesc)}</span></div>
     <div class="sc-row" style="align-items:baseline"><b style="font-size:24px">${t(from)} – ${t(to)}</b>${status}</div>
     <div class="win"><div class="band" style="left:${pos(from)};width:calc(${pos(to)} - ${pos(from)})"></div><div class="lim" style="left:${pos(latest)}"></div><div class="now" style="left:${pos(now)}"></div></div>
     <div class="scale"><span style="left:0;transform:none">${t(last.start)}</span><span style="left:${pos(latest)};transform:translateX(-100%);padding-right:4px;color:var(--warn)">by ${t(latest)}</span></div>
-    <div class="est"><div><span class="muted">If bottle</span><b>${T.mlMin} – ${T.mlMax} mL</b><span class="muted">${byWt ? '≈ ' + byWt + ' mL by weight' : 'typical for day ' + T.dn}${lastBottle ? ' · last ' + lastBottle.data.ml + ' mL' : ''}</span></div>
+    <div class="est"><div><span class="muted">If bottle</span><b>${T.mlMin} – ${T.mlMax} mL</b><span class="muted">${byWt ? '≈ ' + byWt + ' mL by weight' : 'typical for day ' + T.dn}${sessMl ? ' · last feed ' + sessMl + ' mL' : lastBottle ? ' · last bottle ' + lastBottle.data.ml + ' mL' : ''}</span></div>
       <div><span class="muted">If breast</span><b>Start ${lastBreast && lastBreast.data.side === 'L' ? 'Right' : 'Left'}</b><span class="muted">${lastBreast ? 'last breast: ' + (lastBreast.data.side === 'L' ? 'Left' : 'Right') : 'no breastfeed yet'}</span></div></div>
     <div class="muted" style="margin-top:10px">${personal ? `Based on his last 24 h: a feed every ${durWords(med)} on average.` : `Using the ${T.gapMin}–${T.gapMax} h guide until there's a day of history.`} Feed earlier if he shows hunger cues; don't push him to finish a bottle.</div>`;
 }
@@ -1050,6 +1077,7 @@ function renderTrends(now){
   $('tgtTable').innerHTML = `<tr><th></th><th>Target</th><th>Today</th><th></th><th>Yday</th><th></th></tr>` + tr.map(([l, tt, v, y, n]) =>
     `<tr><td>${l}</td><td class="y">${tt}</td><td><b>${v}</b></td><td>${st(v, n)}</td><td class="y">${y}</td><td>${yst(y, n)}</td></tr>`).join('')
     + `<tr><td>Feed gap</td><td class="y">${T.gapMin}–${T.gapMax} h</td><td colspan="4" class="y">max gap ${T.maxGap} h</td></tr>`
+    + `<tr><td>Same feed</td><td class="y">≤ ${T.mergeMin} min</td><td colspan="4" class="y">resumed after a break</td></tr>`
     + `<tr><td>Bottle</td><td class="y">${T.mlMin}–${T.mlMax} mL</td><td colspan="4" class="y">${T.custom && T.custom.mlMin != null ? 'your setting' : 'automatic for his age'}</td></tr>`;
 }
 
@@ -1075,7 +1103,8 @@ $('themeBtn').onclick = () => { themeMode = { auto:'light', light:'dark', dark:'
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
 applyTheme();
 
-function feedSessions(list){ let n = 0, last = null; list.slice().sort((a,b)=>a.start-b.start).forEach(f => { if(last == null || f.start - last > 15*60e3) n++; last = f.end || f.start; }); return n; }
+function feedSessions(list){ return sessionsOf(list).length; }
+function feedSessionsOld(list){ let n = 0, last = null; list.slice().sort((a,b)=>a.start-b.start).forEach(f => { if(last == null || f.start - last > 15*60e3) n++; last = f.end || f.start; }); return n; }
 function dayStats(n){
   const a = dayStart(n), b = Math.min(dayStart(n + 1), Date.now()), inDay = e => e.start >= a && e.start < dayStart(n + 1);
   const feeds = byType('feed').filter(inDay), dia = byType('diaper').filter(inDay);
