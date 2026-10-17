@@ -1,0 +1,171 @@
+<title>Aveer Day Comparison</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap">
+<style>
+/* Layout: a gallery of five phone-sized comparison mockups that wrap into columns; page chrome follows the viewer theme, phones show the app's dark UI. */
+:root{
+  --page:#f5f2f4; --ink:#1f1b24; --ink2:#5d5563; --line:#e3dde2; --tag:#ffe3d6; --tagInk:#8a3214;
+  /* the app (dark-only, matches index.html) */
+  --app:#121014; --card:#1d1a21; --card2:#26222b; --aline:#332e39; --atext:#f1ece6; --adim:#a39aa8; --afaint:#6f6774;
+  --accent:#ff8a65; --good:#5fd3a4; --warn:#ffcf5c;
+  /* feeds: breast / formula / breast-milk bottle (validated, dark surface) */
+  --breast:#3987e5; --formula:#d95926; --bmilk:#199e70;
+  /* diapers: wet / wet+dirty / dirty (validated, dark surface) */
+  --wet:#9085e9; --both:#c98500; --dirty:#d55181;
+  --today:#ff8a65; --yday:#8c8494;
+  --display:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --ui:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --page:#0d0b0f; --ink:#f1ece6; --ink2:#a39aa8; --line:#2a2530; --tag:#3a2219; --tagInk:#ffb38f; color-scheme:dark } }
+:root[data-theme="dark"]{ --page:#0d0b0f; --ink:#f1ece6; --ink2:#a39aa8; --line:#2a2530; --tag:#3a2219; --tagInk:#ffb38f; color-scheme:dark }
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font:15px/1.45 var(--ui)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 48px}
+h1{font:700 clamp(28px,5vw,40px)/1.1 var(--display);margin:0 0 8px;text-wrap:balance}
+.lede{color:var(--ink2);max-width:62ch;margin:0}
+.lede b{color:var(--ink)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));gap:28px 22px;margin-top:28px}
+.mock{display:flex;flex-direction:column;gap:10px;min-width:0}
+.mhead{display:flex;align-items:baseline;gap:10px}
+.letter{font:700 13px var(--display);background:var(--tag);color:var(--tagInk);border-radius:6px;padding:2px 8px;letter-spacing:.5px}
+.mhead h2{font:700 19px var(--display);margin:0}
+.why{color:var(--ink2);font-size:13.5px;margin:0}
+.phone{background:var(--app);color:var(--atext);border-radius:30px;padding:16px 14px 18px;border:1px solid var(--line);font-family:var(--ui);display:flex;flex-direction:column;gap:12px;max-width:390px;width:100%}
+.ph-top{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px}
+.ph-top b{font-size:17px}
+.ph-top span{color:var(--adim);font-size:12px}
+.c{background:var(--card);border-radius:18px;padding:14px}
+.h{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--adim);font-weight:600;margin:0 0 10px}
+.num{font-variant-numeric:tabular-nums}
+.big{font-size:30px;font-weight:700;line-height:1}
+.dim{color:var(--adim);font-size:12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:baseline}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--adim)}
+.chip{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.chip.ok{background:rgba(95,211,164,.16);color:var(--good)}
+.chip.low{background:rgba(255,207,92,.16);color:var(--warn)}
+svg text{font-family:var(--ui)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.tile .k{font-size:12px;color:var(--adim);font-weight:600}
+.tile .v{font-size:26px;font-weight:700;line-height:1.05}
+.tile .s{font-size:12px;color:var(--adim)}
+.tile.wide{grid-column:1 / -1}
+.bar{display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;background:var(--card2)}
+.bar i{display:block;height:100%}
+.rc{display:grid;grid-template-columns:1fr auto auto;gap:10px 10px;align-items:center;font-size:14px}
+.rc .t{color:var(--adim);font-size:12px;text-align:right}
+.rc .sub{grid-column:1 / -1;margin-top:-6px;color:var(--adim);font-size:12px;padding-bottom:8px;border-bottom:1px solid var(--aline)}
+.rc .sub:last-child{border-bottom:0;padding-bottom:0}
+.tip{position:fixed;pointer-events:none;background:var(--card2);color:var(--atext);border:1px solid var(--aline);border-radius:10px;padding:6px 9px;font:12px var(--ui);z-index:5}
+.note{margin-top:32px;color:var(--ink2);font-size:13.5px;max-width:70ch}
+@media (prefers-reduced-motion:no-preference){ .ring-arc{transition:stroke-dashoffset .6s ease} }
+
+.cmp{display:grid;grid-template-columns:1fr auto auto auto;gap:8px 10px;align-items:center;font-size:14px}
+.cmp .hd{font-size:11px;color:var(--adim);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.cmp .n{text-align:right;font-variant-numeric:tabular-nums}
+.delta{font-size:12px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--card2);color:var(--atext);white-space:nowrap;text-align:center}
+.pb{display:flex;flex-direction:column;gap:4px}
+.pb .track{position:relative;height:12px;background:var(--card2);border-radius:6px}
+.pb .fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+.pb .yd{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--atext);border-radius:1px}
+.pb .full{position:absolute;top:-3px;bottom:-3px;width:0;border-left:2px dotted var(--adim)}
+.head{font-size:17px;font-weight:700;line-height:1.3}
+</style>
+<div class="wrap">
+  <h1>Today vs yesterday</h1>
+  <p class="lede">Five ways to compare today with yesterday, with days running <b>midnight to midnight</b>. Each mockup compares today so far with <b>yesterday at the same time</b> (2:30 PM), and also shows yesterday's full-day total. All numbers are made-up example data, not Aveer's.</p>
+  <div class="gallery" id="gallery"></div>
+  <p class="note">Example: it's 2:30 PM. Today so far: 6 feeds (4 breastfeeds, 1 h 42 min; 1 formula, 45 mL; 1 breast milk bottle, 40 mL), 4 wet and 2 dirty. Yesterday by 2:30 PM: 5 feeds, 3 wet, 1 dirty. Yesterday's full day: 9 feeds, 7 wet, 3 dirty. Arrows show direction only, in neutral colors, because more isn't automatically better. The rings show progress toward the daily targets.</p>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const NOW_H = 14.5, NOW_TXT = '2:30 PM';
+// feed and wet-diaper times (hours after midnight)
+const T = { feeds:[0.67,3.17,5.75,8.33,11.08,13.67], wet:[2,6.5,9,12.5], dirty:[6.5,10.2] };
+const Y = { feeds:[1.33,4,7.25,10.5,13,15.75,18.5,21.17,23.5], wet:[2.5,7,12,16,19.5,21,23], dirty:[8,17,22.5] };
+const by = (arr, h) => arr.filter(x => x <= h).length;
+const M = [ // metric, today, yesterday by now, yesterday full, unit
+  { k:'Feeds',            t:6,   yn:by(Y.feeds, NOW_H), yf:9,   u:'',     target:8 },
+  { k:'Breast time',      t:102, yn:80,  yf:155, u:'min' },
+  { k:'Formula',          t:45,  yn:30,  yf:90,  u:'mL' },
+  { k:'Breast milk bottle', t:40, yn:60, yf:100, u:'mL' },
+  { k:'Wet diapers',      t:4,   yn:by(Y.wet, NOW_H), yf:7, u:'', target:6 },
+  { k:'Dirty diapers',    t:2,   yn:by(Y.dirty, NOW_H), yf:3, u:'', target:3 },
+];
+const fmt = (v, u) => u === 'min' ? (v >= 60 ? Math.floor(v / 60) + ' h ' + (v % 60) + ' m' : v + ' min') : v + (u ? ' ' + u : '');
+const dlt = (a, b, u) => { const d = a - b; if(!d) return '<span class="delta">= same</span>'; return `<span class="delta">${d > 0 ? '▲' : '▼'} ${fmt(Math.abs(d), u)}</span>`; };
+const phone = (inner, sub) => `<div class="phone"><div class="ph-top"><b>Today · Sat Oct 17</b><span>${sub || 'since 12:00 AM · now ' + NOW_TXT}</span></div>${inner}</div>`;
+
+// A: rings with a yesterday-by-now tick
+function ring(label, m, color){
+  const r = 34, c = 2 * Math.PI * r, frac = Math.min(1, m.t / m.target), yfrac = Math.min(1, m.yn / m.target);
+  const ang = yfrac * 2 * Math.PI - Math.PI / 2, x1 = 42 + 28 * Math.cos(ang), y1 = 42 + 28 * Math.sin(ang), x2 = 42 + 41 * Math.cos(ang), y2 = 42 + 41 * Math.sin(ang);
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0">
+   <svg viewBox="0 0 84 84" width="84" height="84"><circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--card2)" stroke-width="8"/>
+   <circle cx="42" cy="42" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - frac)}" transform="rotate(-90 42 42)"/>
+   <line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--atext)" stroke-width="3" stroke-linecap="round" data-tip="Yesterday by ${NOW_TXT}: ${m.yn}"/>
+   <text x="42" y="41" text-anchor="middle" font-size="20" font-weight="700" fill="var(--atext)">${m.t}</text>
+   <text x="42" y="56" text-anchor="middle" font-size="10" fill="var(--adim)">of ${m.target}+</text></svg>
+   <div style="font-size:13px;font-weight:600">${label}</div>${dlt(m.t, m.yn, '')}<div class="dim">yday ${m.yn} by now · ${m.yf} total</div></div>`;
+}
+const A = phone(`<div class="c"><div class="h">Today's targets · white tick = yesterday by now</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">${ring('Feeds', M[0], 'var(--accent)')}${ring('Wet', M[4], 'var(--wet)')}${ring('Dirty', M[5], 'var(--dirty)')}</div></div>
+  <div class="c"><div class="h">How he fed · vs yesterday by now</div><div class="stack" style="display:flex;flex-direction:column;gap:10px;font-size:14px">
+   <div class="row"><span><i class="dot" style="background:var(--breast)"></i>Breastfeed ×4</span><span><b class="num">1 h 42 m</b> ${dlt(102, 80, 'min')}</span></div>
+   <div class="row"><span><i class="dot" style="background:var(--formula)"></i>Formula ×1</span><span><b class="num">45 mL</b> ${dlt(45, 30, 'mL')}</span></div>
+   <div class="row"><span><i class="dot" style="background:var(--bmilk)"></i>Breast milk bottle ×1</span><span><b class="num">40 mL</b> ${dlt(40, 60, 'mL')}</span></div></div></div>`);
+
+// B: delta table
+const B = phone(`<div class="c"><div class="h">Today vs yesterday</div>
+  <div class="cmp"><span class="hd"></span><span class="hd n">Today</span><span class="hd n">Yday<br>by now</span><span class="hd n">Change</span>
+  ${M.map(m => `<span>${m.k}</span><b class="n">${fmt(m.t, m.u)}</b><span class="n dim" style="font-size:14px">${fmt(m.yn, m.u)}</span>${dlt(m.t, m.yn, m.u)}`).join('')}</div></div>
+  <div class="c"><div class="h">Yesterday's full day</div><div class="dim" style="font-size:13px;line-height:1.6">${M.map(m => m.k + ' ' + fmt(m.yf, m.u)).join(' · ')}</div></div>`);
+
+// C: paired progress bars
+const C = phone(`<div class="c"><div class="h">Today's bar · white line = yesterday by now · dotted = yesterday's total</div>
+  <div style="display:flex;flex-direction:column;gap:16px">${M.map((m, i) => { const max = Math.max(m.t, m.yf) * 1.08;
+   const col = ['var(--accent)','var(--breast)','var(--formula)','var(--bmilk)','var(--wet)','var(--dirty)'][i];
+   return `<div class="pb"><div class="row" style="font-size:14px"><span>${m.k}</span><span><b class="num">${fmt(m.t, m.u)}</b> <span class="dim">/ ${fmt(m.yf, m.u)} yday</span></span></div>
+   <div class="track"><div class="fill" style="width:${m.t / max * 100}%;background:${col}" data-tip="Today ${fmt(m.t, m.u)}"></div>
+   <div class="yd" style="left:${m.yn / max * 100}%" data-tip="Yesterday by ${NOW_TXT}: ${fmt(m.yn, m.u)}"></div><div class="full" style="left:${m.yf / max * 100}%" data-tip="Yesterday total: ${fmt(m.yf, m.u)}"></div></div></div>`; }).join('')}</div></div>`);
+
+// D: cumulative pace lines
+function pace(title, tArr, yArr, color){
+  const W = 320, H = 150, L = 26, R = 10, Tp = 10, Bt = 24, maxY = Math.max(tArr.length, yArr.length) + 1;
+  const X = h => L + h / 24 * (W - L - R), Yp = v => Tp + (1 - v / maxY) * (H - Tp - Bt);
+  const steps = (arr, end) => { let d = `M${X(0)},${Yp(0)}`, n = 0; arr.filter(h => h <= end).forEach(h => { d += ` H${X(h)} V${Yp(++n)}`; }); return d + ` H${X(end)}`; };
+  let g = '';
+  for(let v = 0; v <= maxY; v += Math.max(1, Math.round(maxY / 4))) g += `<line x1="${L}" x2="${W - R}" y1="${Yp(v)}" y2="${Yp(v)}" stroke="var(--aline)"/><text x="${L - 6}" y="${Yp(v) + 3}" text-anchor="end" font-size="9" fill="var(--adim)">${v}</text>`;
+  [[0,'12a'],[6,'6a'],[12,'12p'],[18,'6p'],[24,'12a']].forEach(([h, l]) => g += `<text x="${X(h)}" y="${H - 8}" text-anchor="middle" font-size="9" fill="var(--adim)">${l}</text>`);
+  g += `<path d="${steps(yArr, 24)}" fill="none" stroke="var(--yday)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  g += `<path d="${steps(tArr, NOW_H)}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+  g += `<line x1="${X(NOW_H)}" x2="${X(NOW_H)}" y1="${Tp}" y2="${H - Bt}" stroke="var(--adim)" stroke-dasharray="2 3"/>`;
+  g += `<circle cx="${X(NOW_H)}" cy="${Yp(by(tArr, NOW_H))}" r="4.5" fill="${color}" stroke="var(--card)" stroke-width="2" data-tip="Today by ${NOW_TXT}: ${by(tArr, NOW_H)}"/>`;
+  g += `<circle cx="${X(NOW_H)}" cy="${Yp(by(yArr, NOW_H))}" r="4" fill="var(--yday)" stroke="var(--card)" stroke-width="2" data-tip="Yesterday by ${NOW_TXT}: ${by(yArr, NOW_H)}"/>`;
+  return `<div class="row" style="font-size:14px;margin-bottom:4px"><b>${title}</b><span class="dim">today ${by(tArr, NOW_H)} · yday by now ${by(yArr, NOW_H)}</span></div><svg viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`;
+}
+const D = phone(`<div class="c"><div class="h">Running total through the day</div>${pace('Feeds', T.feeds, Y.feeds, 'var(--accent)')}
+  <div class="legend" style="margin:4px 0 12px"><span><i class="dot" style="background:var(--accent)"></i>Today</span><span><i class="dot" style="background:var(--yday)"></i>Yesterday (dashed)</span></div>
+  ${pace('Wet diapers', T.wet, Y.wet, 'var(--wet)')}</div>`);
+
+// E: headline + tiles with chips
+const E = phone(`<div class="c"><div class="head">1 more feed than yesterday at this time</div><div class="dim" style="margin-top:4px">Wet diapers ahead by 1 · dirty ahead by 1 · less breast milk from bottles (−20 mL)</div></div>
+  <div class="tiles">${M.map(m => `<div class="tile"><span class="k">${m.k}</span><div class="v num" style="font-size:24px">${fmt(m.t, m.u)}</div><div class="s">${dlt(m.t, m.yn, m.u)} vs yday by now</div><div class="s">Yday total ${fmt(m.yf, m.u)}</div></div>`).join('')}</div>`);
+
+const mocks = [
+  ['A', 'Rings + yesterday tick', 'Keeps the rings you chose. A white tick on each ring marks where yesterday was at this time.', A],
+  ['B', 'Comparison table', 'Every metric in one table: today, yesterday by now, and the change. Densest and most precise.', B],
+  ['C', 'Progress bars', 'Today as a bar, yesterday-by-now as a line, yesterday\'s total as a dotted line. Shows how close you are to yesterday\'s full day.', C],
+  ['D', 'Running-total lines', 'Today vs yesterday as a climbing line through the day. Shows pace and gaps, not just totals.', D],
+  ['E', 'Headline + tiles', 'Leads with one sentence that sums up the day, then tiles with change chips.', E],
+];
+document.getElementById('gallery').innerHTML = mocks.map(([l, t, w, html]) =>
+  `<section class="mock"><div class="mhead"><span class="letter">${l}</span><h2>${t}</h2></div><p class="why">${w}</p>${html}</section>`).join('');
+const tip = document.getElementById('tip');
+document.addEventListener('pointerover', e => { const t = e.target.closest('[data-tip]'); if(!t){ tip.hidden = true; return; } tip.textContent = t.dataset.tip; tip.hidden = false; });
+document.addEventListener('pointermove', e => { if(!tip.hidden){ tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = (e.clientY + 14) + 'px'; } });
+</script>
