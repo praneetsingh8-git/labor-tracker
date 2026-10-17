@@ -1,0 +1,1567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Aveer">
+<meta name="theme-color" content="#f1f4f6" id="themeColor">
+<script>try{var m=localStorage.getItem('lt_themeMode');m=m&&JSON.parse(m);if(m==='light'||m==='dark')document.documentElement.dataset.theme=m}catch(e){}</script>
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<script src="content.js"></script>
+<title>Aveer & Navjot</title>
+<style>
+/* Theme: Mist & Sand. Light on :root; dark via system setting (auto) or the header toggle. */
+:root{
+  --bg:#f1f4f6; --card:#ffffff; --card2:#e8edf1; --line:#dde3e8;
+  --text:#27313b; --dim:#66727d; --faint:#93a0ab;
+  --accent:#5b84a8; --accInk:#ffffff; --accent2:#9a7a45; --soft:#d3e2ef;
+  --go:#3f8a6a; --warn:#a8740f; --bad:#c0485b; --blue:#3f6f9a;
+  --navbg:rgba(241,244,246,.94); --shadow:0 1px 2px rgba(39,49,59,.06);
+  --breast:#3f7fc0; --formula:#cc6b3d; --bmilk:#2f9a72; --wet:#7a6fd0; --both:#b8860b; --dirty:#c9547f; --yday:#8f9aa5;
+  --r:18px; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#10151a; --card:#1a2129; --card2:#232c35; --line:#2b3540;
+  --text:#e5ebf0; --dim:#95a3af; --faint:#66727d;
+  --accent:#8fb3d4; --accInk:#0d1a26; --accent2:#d6b98a; --soft:#2a4258;
+  --go:#7fbf9f; --warn:#d9a640; --bad:#e07a8a; --blue:#8fb3d4;
+  --navbg:rgba(16,21,26,.94); --shadow:none;
+  --breast:#3987e5; --formula:#d95926; --bmilk:#199e70; --wet:#9085e9; --both:#c98500; --dirty:#d55181; --yday:#6f7d8a;
+  color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#10151a; --card:#1a2129; --card2:#232c35; --line:#2b3540;
+  --text:#e5ebf0; --dim:#95a3af; --faint:#66727d;
+  --accent:#8fb3d4; --accInk:#0d1a26; --accent2:#d6b98a; --soft:#2a4258;
+  --go:#7fbf9f; --warn:#d9a640; --bad:#e07a8a; --blue:#8fb3d4;
+  --navbg:rgba(16,21,26,.94); --shadow:none;
+  --breast:#3987e5; --formula:#d95926; --bmilk:#199e70; --wet:#9085e9; --both:#c98500; --dirty:#d55181; --yday:#6f7d8a;
+  color-scheme:dark }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom));min-height:100vh;user-select:none;-webkit-user-select:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;width:100%;user-select:text;-webkit-user-select:text}
+textarea{min-height:90px;resize:vertical}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 0 6px}
+.clock{font-variant-numeric:tabular-nums;font-size:30px;font-weight:600;letter-spacing:.5px}
+.date{color:var(--dim);font-size:13px}
+.sync{font-size:12px;color:var(--faint);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.dot.ok{background:var(--go)}.dot.busy{background:var(--warn)}.dot.err{background:var(--bad)}
+.gear{width:40px;height:40px;border-radius:12px;background:var(--card);font-size:20px}
+.card{background:var(--card);border-radius:var(--r);padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+.h{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);margin:0 0 10px;font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+.bigbtn{display:block;width:100%;aspect-ratio:1/0.62;border-radius:28px;background:var(--accent);color:var(--accInk);font-weight:800;font-size:30px;letter-spacing:1px;box-shadow:var(--shadow);transition:transform .08s}
+.bigbtn:active{transform:scale(.98)}
+.bigbtn.running{background:var(--go);color:var(--bg)}
+.bigbtn .t{display:block;font-size:56px;font-weight:700;letter-spacing:0;font-variant-numeric:tabular-nums;line-height:1.1}
+.bigbtn .s{display:block;font-size:15px;font-weight:600;opacity:.8;letter-spacing:.5px}
+.timers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.timer{background:var(--card2);border-radius:14px;padding:12px}
+.timer .l{font-size:12px;color:var(--dim)}
+.timer .v{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.stat .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .l{font-size:11px;color:var(--dim)}
+.banner{border-radius:14px;padding:12px 14px;margin:12px 0;font-weight:600;font-size:15px}
+.banner.warn{background:color-mix(in srgb,var(--warn) 13%,transparent);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent)}
+.banner.info{background:var(--card2);color:var(--dim);font-weight:400;font-size:13px}
+.row{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .main{flex:1;min-width:0}
+.row .t1{font-weight:600}
+.row .t2{color:var(--dim);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .ic{width:34px;height:34px;border-radius:10px;background:var(--card2);display:grid;place-items:center;font-size:18px;flex:none}
+.row .side{text-align:right;font-variant-numeric:tabular-nums;font-size:14px;color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 14px;border-radius:999px;background:var(--card2);border:1px solid var(--line);font-size:15px;font-weight:600}
+.chip.on{background:var(--accent);color:var(--accInk);border-color:var(--accent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.tile{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;font-weight:700;font-size:16px;min-height:74px}
+.tile small{display:block;font-weight:500;color:var(--dim);font-size:12px;margin-top:2px}
+.tile.live{background:color-mix(in srgb,var(--go) 15%,transparent);border-color:var(--go);color:var(--go)}
+.tile .big{font-size:24px;font-variant-numeric:tabular-nums}
+.btn{display:block;width:100%;padding:14px;border-radius:14px;background:var(--card2);border:1px solid var(--line);font-weight:600;text-align:center}
+.btn.primary{background:var(--accent);color:var(--accInk);border-color:var(--accent)}
+.btn.danger{color:var(--bad)}
+.muted{color:var(--dim);font-size:13px}
+.empty{color:var(--faint);text-align:center;padding:18px 0;font-size:14px}
+.ago{font-size:22px;font-weight:700}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--navbg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;padding:8px 0;border-radius:12px;font-size:12px;color:var(--dim);font-weight:600}
+nav button b{display:block;font-size:22px;line-height:1.1}
+nav button.on{color:var(--accent)}
+.page{display:none}.page.on{display:block}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10;display:none}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:11;background:var(--card);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;display:none}
+.sheet.on,.sheet-bg.on{display:block}
+.sheet h3{margin:0 0 14px;font-size:20px}
+.field{margin:0 0 12px}
+.field label{display:block;font-size:13px;color:var(--dim);margin:0 0 6px}
+.stack>*+*{margin-top:10px}
+.day{font-size:13px;color:var(--accent2);font-weight:700;margin:14px 0 2px;text-transform:uppercase;letter-spacing:.6px}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:10px 16px;border-radius:999px;font-size:14px;z-index:20;display:none;align-items:center;gap:12px;white-space:nowrap}
+.toast.on{display:flex}
+.toast button{color:var(--accent);font-weight:700}
+.pain .chip{padding:9px 0;width:calc((100% - 40px)/6);text-align:center}
+.medrow{display:flex;justify-content:space-between;gap:8px;font-size:14px;margin:4px 0}
+.ok{color:var(--go)}.wait{color:var(--warn)}.over{color:var(--bad)}
+.subhead{display:flex;align-items:center;gap:10px;margin:6px 0 4px}
+.subhead h2{margin:0;font-size:22px}
+.back{padding:8px 12px;border-radius:12px;background:var(--card);font-weight:700;color:var(--accent)}
+.links{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.links .tile{font-size:14px;min-height:64px;padding:12px 6px}
+.tip{font-size:15px;line-height:1.45}
+.tip + .tip{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.tip b{display:block;font-size:12px;color:var(--accent2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
+.check{width:30px;height:30px;border-radius:50%;border:2px solid var(--faint);display:grid;place-items:center;flex:none;font-size:16px}
+.check.on{background:var(--go);border-color:var(--go);color:var(--bg)}
+.prog{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;margin:6px 0 2px}
+.prog i{display:block;height:100%;background:var(--go)}
+.grp{font-size:13px;color:var(--accent2);font-weight:700;margin:14px 0 2px;text-transform:uppercase;letter-spacing:.6px}
+.fu{display:grid;grid-template-columns:1fr 130px 34px;gap:6px;margin-bottom:6px}
+.fu input{padding:10px}
+a.ext{color:var(--blue);font-weight:600;text-decoration:none}
+.daily{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.daily:last-child{border-bottom:0}
+input[type=datetime-local],input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;text-align:left}
+.rings{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}
+.rings .rl{font-size:13px;font-weight:600}
+.sc-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:15px}
+.sc-row b{font-variant-numeric:tabular-nums}
+.sdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}
+.sc-sep{border-top:1px solid var(--line);margin:12px 0}
+.ring-arc{transition:stroke-dashoffset .6s ease}
+@media (prefers-reduced-motion:reduce){.ring-arc{transition:none}}
+.av{width:40px;height:40px;border-radius:50%;background:var(--accent);color:var(--accInk);display:grid;place-items:center;font-weight:800;font-size:19px;flex:none}
+.hname{font-size:20px;font-weight:800;line-height:1.1}
+.hbtn{width:38px;height:38px;border-radius:12px;background:var(--card);font-size:17px;box-shadow:var(--shadow);display:grid;place-items:center}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--card2);border-radius:12px;padding:3px;gap:3px;margin:8px 0 4px}
+.seg button{padding:8px 0;border-radius:9px;color:var(--dim);font-weight:700;font-size:14px}
+.seg button.on{background:var(--card);color:var(--text);box-shadow:var(--shadow)}
+.ctitle{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
+.ctitle b{font-size:17px}
+.win{position:relative;height:12px;border-radius:6px;background:var(--card2);margin:14px 0 4px}
+.win .band{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--soft)}
+.win .now{position:absolute;top:-4px;bottom:-4px;width:3px;border-radius:2px;background:var(--text)}
+.win .lim{position:absolute;top:-4px;bottom:-4px;width:0;border-left:2px dotted var(--warn)}
+.scale{position:relative;height:14px;font-size:11px;color:var(--dim)}
+.scale span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.est{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.est > div{background:var(--card2);border-radius:12px;padding:9px 11px;min-width:0}
+.est b{display:block;font-size:17px}
+.delta{font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:99px;background:var(--card2);color:var(--text);white-space:nowrap}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:color-mix(in srgb,var(--go) 16%,transparent);color:var(--go)}
+.pill.low{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.pill.na{background:var(--card2);color:var(--dim)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;font-weight:700;text-align:right;padding:4px 4px 8px}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{white-space:nowrap;padding:9px 4px;border-top:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+.tbl td.y{color:var(--dim)}
+.qrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.qrow .tile{min-height:64px;padding:12px 6px;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--dim);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all;background:var(--card2);padding:10px;border-radius:10px;user-select:text;-webkit-user-select:text}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div style="display:flex;align-items:center;gap:10px;min-width:0">
+      <div class="av">A</div>
+      <div style="min-width:0"><div class="hname">Aveer</div><div class="date" id="date"></div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="text-align:right"><div class="num" id="clock" style="font-weight:700;font-size:15px">--:--</div><div class="sync" id="syncState" style="justify-content:flex-end"><span class="dot"></span><span>local</span></div></div>
+      <button class="hbtn" id="themeBtn" aria-label="Theme: auto">◐</button>
+      <button class="hbtn" id="gearBtn" aria-label="Settings">⚙︎</button>
+    </div>
+  </header>
+
+  <!-- LABOR -->
+  <section class="page" id="p-labor">
+    <div class="subhead"><button class="back" data-back>‹ Back</button><h2>Contractions</h2></div>
+    <button class="bigbtn" id="cBtn">
+      <span class="s" id="cBtnSub">TAP WHEN IT STARTS</span>
+      <span class="t" id="cBtnTime">START</span>
+    </button>
+    <div class="timers">
+      <div class="timer"><div class="l">Since last one started</div><div class="v" id="tSinceStart">—</div></div>
+      <div class="timer"><div class="l">Resting since it ended</div><div class="v" id="tRest">—</div></div>
+    </div>
+    <div id="rateLast"></div>
+    <div id="pattern"></div>
+
+    <div class="card">
+      <div class="h">Last 60 minutes</div>
+      <div class="stats">
+        <div class="stat"><div class="v" id="sCount">0</div><div class="l">contractions</div></div>
+        <div class="stat"><div class="v" id="sDur">—</div><div class="l">avg length</div></div>
+        <div class="stat"><div class="v" id="sInt">—</div><div class="l">avg apart</div></div>
+      </div>
+    </div>
+
+    <div class="chips" style="margin:4px 0 4px">
+      <button class="chip" data-quick="Water broke">💧 Water broke</button>
+      <button class="chip" data-quick="Bloody show">🩸 Bloody show</button>
+      <button class="chip" data-quick="Called hospital">📞 Called</button>
+      <button class="chip" data-note="labor">✏️ Note</button>
+    </div>
+
+    <div class="card">
+      <div class="h">Contractions</div>
+      <div id="cList"></div>
+    </div>
+  </section>
+
+  <!-- BABY -->
+  <section class="page on" id="p-baby">
+    <div class="seg" id="babySeg"><button class="on" data-bt="today">Today</button><button data-bt="log">Log</button><button data-bt="trends">Trends</button></div>
+
+    <div id="bt-today">
+      <div id="fuBanner"></div>
+      <div class="card" id="nextFeed"></div>
+
+      <div class="card" id="scoreCard">
+        <div class="ctitle"><div class="h" style="margin:0" id="dayStatsTitle">Today so far</div><span class="muted">tick = yesterday by now</span></div>
+        <div class="rings" id="scRings"></div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle"><b>🍼 Feeding</b><span class="muted" id="feedSum"></span></div>
+        <div id="scFeeds" class="stack"></div>
+        <div class="grid2" style="margin-top:12px">
+          <button class="tile" id="bfL"><div class="big" id="bfLt">Left</div><small id="bfLs">tap to start</small></button>
+          <button class="tile" id="bfR"><div class="big" id="bfRt">Right</div><small id="bfRs">tap to start</small></button>
+        </div>
+        <div class="grid2" style="margin-top:8px">
+          <button class="tile" data-bottle="formula" style="min-height:56px;padding:12px 6px">🍼 Formula</button>
+          <button class="tile" data-bottle="breastmilk" style="min-height:56px;padding:12px 6px">🍼 Breast milk</button>
+        </div>
+        <button class="btn" id="pastFeed" style="margin-top:8px">＋ Log a past feed</button>
+      </div>
+
+      <div class="card">
+        <div class="ctitle"><b>💧 Diapers</b><span class="muted" id="scDiaperTitle"></span></div>
+        <div id="scDiapers" class="sc-row"></div>
+        <div class="qrow">
+          <button class="tile" data-diaper="wet">💧<small>Wet</small></button>
+          <button class="tile" data-diaper="both">💧💩<small>Wet + dirty</small></button>
+          <button class="tile" data-diaper="dirty">💩<small>Dirty</small></button>
+        </div>
+        <div class="muted" id="lastDiaper" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <div class="ctitle"><b>😴 Sleep</b><span class="muted" id="sleepInfo"></span></div>
+        <button class="tile" id="sleepBtn" style="width:100%"><div class="big" id="sleepT">Fell asleep</div><small id="sleepS">tap when baby falls asleep</small></button>
+      </div>
+
+      <div class="card">
+        <div class="ctitle"><b>⚖️ Weight</b><span class="muted" id="wtWhen"></span></div>
+        <div class="sc-row"><b class="num" id="wtNow" style="font-size:18px">—</b><button class="chip" id="quickWeight">＋ Weight</button></div>
+        <div class="muted" id="wtDiff" style="margin-top:4px"></div>
+      </div>
+
+      <div class="card">
+        <div class="h" id="dayTitle">Aveer</div>
+        <div class="tip" id="tipToday"></div>
+        <div class="tip" id="tipNext"></div>
+      </div>
+      <div class="links">
+        <button class="tile" data-go="docs">📄<small>Documents</small></button>
+        <button class="tile" data-go="health">🩺<small>Health</small></button>
+        <button class="tile" data-go="ms">⭐<small>Milestones</small></button>
+      </div>
+      <button class="btn" data-note="baby">✏️ Add note</button>
+    </div>
+
+    <div id="bt-log" hidden>
+      <div class="card"><div id="babyList"></div></div>
+    </div>
+
+    <div id="bt-trends" hidden>
+      <div class="card"><div class="ctitle"><b>Today vs yesterday</b><span class="muted" id="cmpWhen"></span></div><div style="overflow-x:auto"><table class="tbl" id="cmpTable"></table></div>
+        <div class="muted" id="ydayFull" style="margin-top:10px"></div></div>
+      <div class="card"><div class="h">Running total through the day</div><div id="paceFeeds"></div><div id="paceWet" style="margin-top:14px"></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Today</span><span><i style="background:var(--yday)"></i>Yesterday (dashed)</span></div></div>
+      <div class="card"><div class="ctitle"><b>Targets</b><button class="chip" id="editTargets">Edit</button></div><div style="overflow-x:auto"><table class="tbl" id="tgtTable"></table></div>
+        <div class="muted" style="margin-top:10px">"On pace" compares today with the share of the target expected by this time of day. Targets are general guides for healthy full-term babies; your doctor's numbers come first.</div></div>
+    </div>
+  </section>
+
+  <!-- MOM -->
+  <section class="page" id="p-mom">
+    <div id="stockBanner"></div>
+    <div class="card"><div class="h">Navjot · daily medicines</div><div id="dailyCards"></div></div>
+    <div class="card" id="medCards"></div>
+    <div class="grid2">
+      <button class="btn" id="otherMedBtn">💊 Other medicine</button>
+      <button class="btn" data-note="mom">✏️ Note</button>
+    </div>
+    <div class="card">
+      <div class="h">Today's doses</div>
+      <div id="formView"></div>
+    </div>
+    <div class="card">
+      <div class="h">Recent</div>
+      <div id="momList"></div>
+    </div>
+    <p class="muted">Pain-medicine limits are copied from the hospital's self-administration form. The 4-hour Synthroid gap is a common pharmacist rule of thumb; confirm timing with your pharmacist.</p>
+  </section>
+
+  <!-- MORE -->
+  <section class="page" id="p-more">
+    <div class="card stack">
+      <button class="btn" data-go="docs">📄 Documents &amp; registrations</button>
+      <button class="btn" data-go="health">🩺 Health &amp; visits</button>
+      <button class="btn" data-go="ms">⭐ Milestones</button>
+      <button class="btn" data-go="labor">⏱ Contraction tracker</button>
+      <button class="btn" id="moreSettings">⚙︎ Settings &amp; sync</button>
+    </div>
+  </section>
+
+  <!-- DOCUMENTS -->
+  <section class="page" id="p-docs">
+    <div class="subhead"><button class="back" data-back>‹ Back</button><h2>Documents</h2></div>
+    <div class="card"><div id="docsProgress"></div></div>
+    <div class="card"><div id="docsList"></div></div>
+    <p class="muted">Ontario list for a baby born in Ontario to permanent-resident parents. Rules and timelines change; the linked government pages are the source of truth.</p>
+  </section>
+
+  <!-- HEALTH -->
+  <section class="page" id="p-health">
+    <div class="subhead"><button class="back" data-back>‹ Back</button><h2>Health</h2></div>
+    <div class="grid2" style="margin:10px 0">
+      <button class="btn primary" id="addVisit">+ Visit</button>
+      <button class="btn" id="addWeight">+ Weight</button>
+    </div>
+    <div class="card"><div class="h">Follow-ups</div><div id="fuList"></div></div>
+    <div class="card"><div class="h">Visits</div><div id="visitList"></div></div>
+    <div class="card"><div class="h">Weight</div><div id="growthList"></div></div>
+  </section>
+
+  <!-- MILESTONES -->
+  <section class="page" id="p-ms">
+    <div class="subhead"><button class="back" data-back>‹ Back</button><h2>Milestones</h2></div>
+    <div class="card"><div class="h" id="msNowTitle">Now</div><div class="tip" id="msNow"></div></div>
+    <button class="btn" id="addMoment">+ Add a special moment</button>
+    <div class="card"><div id="msList"></div></div>
+    <p class="muted" id="msNote"></p>
+  </section>
+
+  <!-- LOG -->
+  <section class="page" id="p-log">
+    <div class="chips" id="logFilter" style="margin:10px 0">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="contraction">Contractions</button>
+      <button class="chip" data-f="feed">Feeds</button>
+      <button class="chip" data-f="diaper">Diapers</button>
+      <button class="chip" data-f="sleep">Sleep</button>
+      <button class="chip" data-f="med">Meds</button>
+      <button class="chip" data-f="visit">Visits</button>
+      <button class="chip" data-f="milestone">Milestones</button>
+      <button class="chip" data-f="note">Notes</button>
+    </div>
+    <div class="card"><div id="logList"></div></div>
+    <div class="grid2">
+      <button class="btn" id="shareBtn">Share summary</button>
+      <button class="btn" id="csvBtn">Export CSV</button>
+    </div>
+  </section>
+</div>
+
+<nav>
+  <button class="on" data-tab="baby"><b>👶</b>Aveer</button>
+  <button data-tab="mom"><b>💊</b>Navjot</button>
+  <button data-tab="log"><b>📋</b>Log</button>
+  <button data-tab="more"><b>☰</b>More</button>
+</nav>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
+
+<script>
+'use strict';
+// ---------- Config ----------
+const SB_URL = 'https://urvdztlqvfpzifdcndur.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVydmR6dGxxdmZwemlmZGNuZHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1MzgyMTgsImV4cCI6MjEwMjExNDIxOH0.ABqrNa197i5rY0wZZ6bhoAjTXH8cPlkphwmBGkFlr6U';
+
+// ---------- Storage ----------
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let events = LS.get('lt_events', {});      // id -> event
+let dirty = new Set(LS.get('lt_dirty', []));
+let syncKey = LS.get('lt_key', null);
+let lastPull = LS.get('lt_lastpull', null);
+let settings = LS.get('lt_settings', { wake: true });
+
+function save(){ LS.set('lt_events', events); LS.set('lt_dirty', [...dirty]); }
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() :
+  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); }));
+
+function put(ev){
+  ev.updated = Date.now();
+  events[ev.id] = ev;
+  dirty.add(ev.id);
+  save(); render(); scheduleSync();
+}
+function add(type, start, end, data){
+  const ev = { id: uid(), type, start, end, data: data || {}, deleted: false };
+  put(ev); return ev;
+}
+function remove(id){
+  const ev = events[id]; if(!ev) return;
+  ev.deleted = true; put(ev);
+  toast('Deleted', () => { ev.deleted = false; put(ev); });
+}
+const live = () => Object.values(events).filter(e => !e.deleted);
+const byType = t => live().filter(e => e.type === t).sort((a,b) => b.start - a.start);
+
+// ---------- Formatting ----------
+const pad = n => String(n).padStart(2,'0');
+function dur(ms, withH){
+  if(ms == null || ms < 0) return '—';
+  const s = Math.floor(ms/1000), h = Math.floor(s/3600), m = Math.floor(s%3600/60), ss = s%60;
+  if(h || withH) return h + ':' + pad(m) + ':' + pad(ss);
+  return m + ':' + pad(ss);
+}
+function durWords(ms){
+  if(ms == null) return '—';
+  const s = Math.round(ms/1000);
+  if(s < 90) return s + 's';
+  const m = Math.round(s/60);
+  if(m < 60) return m + ' min';
+  return Math.floor(m/60) + 'h ' + (m%60) + 'm';
+}
+const tf = new Intl.DateTimeFormat(undefined, { hour:'numeric', minute:'2-digit' });
+const tfs = new Intl.DateTimeFormat(undefined, { hour:'numeric', minute:'2-digit', second:'2-digit' });
+const df = new Intl.DateTimeFormat(undefined, { weekday:'short', month:'short', day:'numeric' });
+const t = ms => tf.format(new Date(ms));
+const mdf = new Intl.DateTimeFormat(undefined, { month:'short', day:'numeric' });
+const dt = ms => mdf.format(new Date(ms)) + ' · ' + tf.format(new Date(ms));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+const INT = ['', 'Mild', 'Moderate', 'Strong'];
+
+// ---------- Contractions ----------
+function runningContraction(){ return byType('contraction').find(e => e.end == null); }
+$('cBtn').onclick = () => {
+  const r = runningContraction();
+  if(r){ r.end = Date.now(); put(r); askIntensity(r.id); }
+  else add('contraction', Date.now(), null);
+};
+
+function contractionStats(){
+  const now = Date.now();
+  const done = byType('contraction').filter(e => e.end != null); // newest first
+  const hour = done.filter(e => e.start >= now - 3600e3);
+  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+  const durs = hour.map(e => e.end - e.start);
+  const ints = [];
+  for(let i=0;i<hour.length-1;i++) ints.push(hour[i].start - hour[i+1].start);
+  return { done, hour, avgDur: avg(durs), avgInt: avg(ints) };
+}
+
+function askIntensity(id){
+  openSheet(`
+    <h3>How strong was it?</h3>
+    <div class="grid3">
+      <button class="tile" data-i="1">Mild</button>
+      <button class="tile" data-i="2">Moderate</button>
+      <button class="tile" data-i="3">Strong</button>
+    </div>
+    <div style="margin-top:12px"><button class="btn" id="skipI">Skip</button></div>`);
+  $('sheet').querySelectorAll('[data-i]').forEach(b => b.onclick = () => {
+    const ev = events[id]; ev.data.intensity = +b.dataset.i; put(ev); closeSheet();
+  });
+  $('skipI').onclick = closeSheet;
+}
+
+// ---------- Feeds ----------
+function runningFeed(){ return byType('feed').find(e => e.data.kind === 'breast' && e.end == null); }
+function breast(side){
+  const r = runningFeed(), now = Date.now();
+  if(r && r.data.side === side){ r.end = now; put(r); return; }
+  if(r){ r.end = now; put(r); }
+  add('feed', now, null, { kind:'breast', side });
+}
+$('bfL').onclick = () => breast('L');
+$('bfR').onclick = () => breast('R');
+
+function timeFields(startDefault){
+  return `<div class="field"><label>Start time</label><input type="datetime-local" id="ftStart" value="${toLocalInput(startDefault)}"></div>
+    <div class="field"><label>How long (minutes)</label>
+      <div class="chips" id="ftMinChips">${[5,10,15,20,30,45].map(v=>`<button class="chip" data-min="${v}">${v}</button>`).join('')}</div>
+      <input type="number" inputmode="numeric" id="ftMin" placeholder="or type minutes" style="margin-top:8px"></div>`;
+}
+function bindTimeFields(){ $('ftMinChips').querySelectorAll('[data-min]').forEach(c => c.onclick = () => { $('ftMin').value = c.dataset.min; $('ftMinChips').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c)); }); }
+function readTimeFields(){
+  const v = $('ftStart').value, start = v && v !== toLocalInput(Date.now()) ? fromLocalInput(v) : Date.now();
+  const m = parseFloat($('ftMin').value);
+  return { start, end: isNaN(m) ? start : start + m * 60e3 };
+}
+$('pastFeed').onclick = () => {
+  openSheet(`<h3>Log a past breastfeed</h3>
+    <div class="field"><label>Side</label><div class="chips" id="pfSide"><button class="chip on" data-v="L">Left</button><button class="chip" data-v="R">Right</button></div></div>
+    ${timeFields(Date.now() - 20 * 60e3)}
+    ${contField(Date.now() - 20 * 60e3)}
+    <div class="field"><label>Remark (optional)</label><input id="pfNote"></div>
+    <button class="btn primary" id="pfSave">Save</button>`);
+  bindChips('pfSide'); bindChips('fCont'); bindTimeFields();
+  $('pfSave').onclick = () => {
+    const { start, end } = readTimeFields();
+    if(end <= start){ alert('Enter how long the feed lasted.'); return; }
+    if(start > Date.now()){ alert('Start time is in the future.'); return; }
+    add('feed', start, end, { kind:'breast', side: $('pfSide').querySelector('.chip.on').dataset.v, note: $('pfNote').value.trim(), cont: readCont() });
+    closeSheet();
+  };
+};
+document.querySelectorAll('[data-bottle]').forEach(b => b.onclick = () => {
+  const milk = b.dataset.bottle;
+  openSheet(`
+    <h3>Bottle · ${milk === 'formula' ? 'Formula' : 'Breast milk'}</h3>
+    ${timeFields(Date.now())}
+    ${contField(Date.now())}
+    <div class="field"><label>Amount (ml, optional)</label>
+      <div class="chips" id="mlChips">${[10,20,30,45,60,90,120].map(v=>`<button class="chip" data-ml="${v}">${v}</button>`).join('')}</div>
+      <input type="number" inputmode="numeric" id="mlIn" placeholder="or type ml" style="margin-top:8px">
+    </div>
+    <div class="field"><label>Remark (optional)</label><input id="bNote" placeholder="e.g. spit up a little"></div>
+    <button class="btn primary" id="bSave">Save</button>`);
+  $('mlChips').querySelectorAll('[data-ml]').forEach(c => c.onclick = () => { $('mlIn').value = c.dataset.ml; });
+  bindTimeFields(); bindChips('fCont');
+  $('bSave').onclick = () => {
+    const { start, end } = readTimeFields(), ml = parseFloat($('mlIn').value);
+    add('feed', start, end, { kind:'bottle', milk, ml: isNaN(ml) ? null : ml, note: $('bNote').value.trim(), cont: readCont() });
+    closeSheet();
+  };
+});
+
+// ---------- Diapers ----------
+document.querySelectorAll('[data-diaper]').forEach(b => b.onclick = () => {
+  const now = Date.now();
+  const ev = add('diaper', now, now, { kind: b.dataset.diaper });
+  toast('Diaper logged', () => { ev.deleted = true; put(ev); }, 'Undo', () => editEvent(ev.id), 'Add remark');
+});
+
+// ---------- Sleep ----------
+function runningSleep(){ return byType('sleep').find(e => e.end == null); }
+$('sleepBtn').onclick = () => {
+  const r = runningSleep(), now = Date.now();
+  if(r){ r.end = now; put(r); } else add('sleep', now, null, {});
+};
+
+// ---------- Mom meds (limits from the hospital SAM form) ----------
+const MEDS = {
+  acet: { name:'Acetaminophen', mg:500, tabs:[1,2], gapH:4, maxTabs:8, rule:'1 or 2 tablets every 4–6 h · max 8 tablets / 24 h' },
+  ibu:  { name:'Ibuprofen', mg:400, tabs:[1], gapH:4, maxTabs:6, rule:'1 tablet every 4–6 h · max 2400 mg (6 tablets) / 24 h' }
+};
+function medStatus(key){
+  const m = MEDS[key], now = Date.now();
+  const doses = byType('med').filter(e => e.data.med === key);
+  const last = doses[0];
+  const tabs24 = doses.filter(e => e.start > now - 24*3600e3).reduce((a,e) => a + (e.data.tablets||0), 0);
+  const nextAt = last ? last.start + m.gapH*3600e3 : null;
+  return { m, last, tabs24, nextAt };
+}
+function painChips(id, cur){
+  return `<div class="chips pain" id="${id}">${[0,1,2,3,4,5,6,7,8,9,10].map(i=>`<button class="chip ${cur===i?'on':''}" data-v="${i}">${i}</button>`).join('')}</div>`;
+}
+function medSheet(key){
+  const m = key === 'other' ? null : MEDS[key];
+  openSheet(`
+    <h3>${m ? esc(m.name) + ' ' + m.mg + ' mg' : 'Other medicine'}</h3>
+    ${m ? '' : `<div class="field"><label>Medicine and dose</label><input id="mName" placeholder="e.g. Stool softener 100 mg"></div>`}
+    <div class="field"><label>Time taken</label><input type="datetime-local" id="mTime" value="${toLocalInput(Date.now())}"></div>
+    ${m ? `<div class="field"><label># Tablets</label><div class="chips" id="mTabs">${m.tabs.map((n,i)=>`<button class="chip ${i===m.tabs.length-1?'on':''}" data-v="${n}">${n}</button>`).join('')}</div></div>` : ''}
+    <div class="field"><label>Pain score (0 = none, 10 = worst)</label>${painChips('mPain')}</div>
+    <div class="field"><label>Remark (optional)</label><input id="mNote"></div>
+    <button class="btn primary" id="mSave">Save</button>`);
+  ['mTabs','mPain'].forEach(b => { const el = $(b); if(el) el.querySelectorAll('[data-v]').forEach(c => c.onclick = () => { el.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }); });
+  $('mSave').onclick = () => {
+    const tv = $('mTime').value, at = tv && tv !== toLocalInput(Date.now()) ? fromLocalInput(tv) : Date.now();
+    const pc = $('mPain').querySelector('.chip.on');
+    const data = { med: key, pain: pc ? +pc.dataset.v : null, note: $('mNote').value.trim() };
+    if(m){
+      data.tablets = +$('mTabs').querySelector('.chip.on').dataset.v;
+      const st = medStatus(key);
+      const warn = [];
+      if(st.last && at - st.last.start < m.gapH*3600e3) warn.push('Only ' + durWords(at - st.last.start) + ' since the last dose (form says every 4–6 hours).');
+      if(st.tabs24 + data.tablets > m.maxTabs) warn.push('This makes ' + (st.tabs24 + data.tablets) + ' tablets in 24 h (form max is ' + m.maxTabs + ').');
+      if(warn.length && !confirm(warn.join('\n') + '\n\nLog it anyway? Check with the nurse if unsure.')) return;
+    } else {
+      data.name = $('mName').value.trim();
+      if(!data.name){ alert('Enter the medicine name.'); return; }
+    }
+    add('med', at, at, data); closeSheet();
+  };
+}
+$('otherMedBtn').onclick = () => medSheet('other');
+
+// ---------- Notes ----------
+document.querySelectorAll('[data-note]').forEach(b => b.onclick = () => noteSheet(b.dataset.note));
+document.querySelectorAll('[data-quick]').forEach(b => b.onclick = () => {
+  const now = Date.now();
+  const ev = add('note', now, now, { text: b.dataset.quick, ctx: 'labor' });
+  toast('Logged: ' + b.dataset.quick, () => { ev.deleted = true; put(ev); });
+});
+function noteSheet(ctx){
+  openSheet(`
+    <h3>Note · ${t(Date.now())}</h3>
+    <div class="field"><textarea id="nText" placeholder="What happened?"></textarea></div>
+    <button class="btn primary" id="nSave">Save note</button>`);
+  setTimeout(() => $('nText').focus(), 50);
+  $('nSave').onclick = () => {
+    const text = $('nText').value.trim(); if(!text) return closeSheet();
+    const now = Date.now(); add('note', now, now, { text, ctx }); closeSheet();
+  };
+}
+
+// ---------- Edit any event ----------
+function toLocalInput(ms){ const d = new Date(ms); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes()); }
+function fromLocalInput(v, keepSec){ if(!v) return null; const d = new Date(v); return d.getTime() + (keepSec||0); }
+function editEvent(id){
+  const ev = events[id]; if(!ev) return;
+  const hasEnd = ev.type === 'contraction' || ev.type === 'sleep' || ev.type === 'feed';
+  const d = ev.data;
+  let extra = '';
+  if(ev.type === 'contraction') extra = `<div class="field"><label>Intensity</label><div class="chips" id="eInt">${[1,2,3].map(i=>`<button class="chip ${d.intensity===i?'on':''}" data-v="${i}">${INT[i]}</button>`).join('')}</div></div>`;
+  if(ev.type === 'feed' && d.kind === 'breast') extra = `<div class="field"><label>Side</label><div class="chips" id="eSide">${['L','R'].map(s=>`<button class="chip ${d.side===s?'on':''}" data-v="${s}">${s==='L'?'Left':'Right'}</button>`).join('')}</div></div>`;
+  if(ev.type === 'feed' && d.kind === 'bottle') extra = `<div class="field"><label>Amount (ml)</label><input type="number" inputmode="numeric" id="eMl" value="${d.ml ?? ''}"></div>
+    <div class="field"><label>Milk</label><div class="chips" id="eMilk">${['formula','breastmilk'].map(s=>`<button class="chip ${d.milk===s?'on':''}" data-v="${s}">${s==='formula'?'Formula':'Breast milk'}</button>`).join('')}</div></div>`;
+  if(ev.type === 'feed') extra += contField(ev.start, ev.id, d.cont);
+  if(ev.type === 'diaper') extra = `<div class="field"><label>Type</label><div class="chips" id="eDiaper">${['wet','dirty','both'].map(s=>`<button class="chip ${d.kind===s?'on':''}" data-v="${s}">${s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div></div>`;
+  if(ev.type === 'growth') extra = `<div class="field"><label>Weight (kg)</label><input type="number" step="0.001" inputmode="decimal" id="eKg" value="${d.kg ?? ''}"></div>`;
+  if(ev.type === 'stock') extra = `<div class="field"><label>Pills counted</label><input type="number" inputmode="numeric" id="eCount" value="${d.count ?? ''}"></div>`;
+  if(ev.type === 'med') extra = (MEDS[d.med] ? `<div class="field"><label># Tablets</label><input type="number" inputmode="numeric" id="eTabs" value="${d.tablets ?? ''}"></div>` : `<div class="field"><label>Medicine and dose</label><input id="eName" value="${esc(d.name)}"></div>`)
+    + `<div class="field"><label>Pain score</label>${painChips('ePain', d.pain)}</div>`;
+  openSheet(`
+    <h3>${esc(title(ev))}</h3>
+    <div class="field"><label>${hasEnd ? 'Started' : 'Time'}</label><input type="datetime-local" id="eStart" value="${toLocalInput(ev.start)}"></div>
+    ${hasEnd ? `<div class="field"><label>Ended ${ev.end==null?'(still running)':''}</label><input type="datetime-local" id="eEnd" value="${ev.end==null?'':toLocalInput(ev.end)}"></div>` : ''}
+    ${extra}
+    <div class="field"><label>${ev.type === 'note' ? 'Note' : 'Remark'}</label><textarea id="eNote">${esc(ev.type === 'note' ? d.text : d.note)}</textarea></div>
+    <div class="stack">
+      <button class="btn primary" id="eSave">Save</button>
+      <button class="btn danger" id="eDel">Delete</button>
+    </div>`);
+  const pick = (box, key) => { const el = $(box); if(!el) return; el.querySelectorAll('[data-v]').forEach(c => c.onclick = () => { el.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }); };
+  ['eInt','eSide','eMilk','eDiaper','ePain','fCont'].forEach(b => pick(b));
+  const sel = box => { const c = $(box) && $(box).querySelector('.chip.on'); return c ? c.dataset.v : undefined; };
+  $('eSave').onclick = () => {
+    // keep original seconds if the minute wasn't changed
+    const sVal = $('eStart').value;
+    if(sVal && sVal !== toLocalInput(ev.start)) ev.start = fromLocalInput(sVal);
+    if(hasEnd){
+      const eVal = $('eEnd').value;
+      if(eVal && eVal !== (ev.end==null?'':toLocalInput(ev.end))) ev.end = fromLocalInput(eVal);
+      if(ev.end != null && ev.end < ev.start){ alert('End is before start.'); return; }
+    } else ev.end = ev.start;
+    const note = $('eNote').value.trim();
+    if(ev.type === 'note') d.text = note; else d.note = note;
+    if(sel('eInt')) d.intensity = +sel('eInt');
+    if(sel('eSide')) d.side = sel('eSide');
+    if(sel('eMilk')) d.milk = sel('eMilk');
+    if(sel('eDiaper')) d.kind = sel('eDiaper');
+    if(sel('ePain') !== undefined) d.pain = +sel('ePain');
+    if(ev.type === 'feed' && $('fCont')) d.cont = readCont();
+    if($('eTabs')){ const v = parseInt($('eTabs').value); d.tablets = isNaN(v) ? null : v; }
+    if($('eName')) d.name = $('eName').value.trim();
+    if($('eKg')){ const v = parseFloat($('eKg').value); if(!isNaN(v)) d.kg = v; }
+    if($('eCount')){ const v = parseInt($('eCount').value); if(!isNaN(v)) d.count = v; }
+    if($('eMl')){ const v = parseFloat($('eMl').value); d.ml = isNaN(v) ? null : v; }
+    put(ev); closeSheet();
+  };
+  $('eDel').onclick = () => { closeSheet(); remove(id); };
+}
+
+// ---------- Rendering ----------
+function title(ev){
+  const d = ev.data;
+  if(ev.type === 'contraction') return 'Contraction';
+  if(ev.type === 'feed') return d.kind === 'breast' ? 'Breastfeed · ' + (d.side === 'L' ? 'Left' : 'Right') : 'Bottle · ' + (d.milk === 'formula' ? 'Formula' : 'Breast milk');
+  if(ev.type === 'diaper') return 'Diaper · ' + ({wet:'Wet',dirty:'Dirty',both:'Wet + dirty'}[d.kind] || '');
+  if(ev.type === 'sleep') return 'Sleep';
+  if(ev.type === 'med') return MEDS[d.med] ? MEDS[d.med].name + ' ' + MEDS[d.med].mg + ' mg' : DAILY[d.med] ? DAILY[d.med].name + (d.med === 'synthroid' && d.dose ? ' ' + d.dose : '') : (d.name || 'Medicine');
+  if(ev.type === 'stock') return 'Synthroid pill count: ' + d.count + (d.dose ? ' (' + d.dose + ')' : '');
+  if(ev.type === 'visit') return 'Visit · ' + (d.kind || 'Appointment');
+  if(ev.type === 'growth') return 'Weight · ' + fmtKg(d.kg);
+  if(ev.type === 'task'){ const r = REGS.find(x => x.key === d.key); return (d.done ? '✓ ' : '') + (r ? r.title : d.key); }
+  if(ev.type === 'milestone') return d.title || (MS_ITEMS[d.key] || {}).title || 'Milestone';
+  return 'Note';
+}
+function icon(ev){
+  if(ev.type === 'contraction') return '⏱';
+  if(ev.type === 'feed') return ev.data.kind === 'breast' ? '🤱' : '🍼';
+  if(ev.type === 'diaper') return ev.data.kind === 'wet' ? '💧' : '💩';
+  if(ev.type === 'sleep') return '😴';
+  if(ev.type === 'med') return '💊';
+  if(ev.type === 'stock') return '📦';
+  if(ev.type === 'visit') return '🩺';
+  if(ev.type === 'growth') return '⚖️';
+  if(ev.type === 'task') return '📄';
+  if(ev.type === 'milestone') return '⭐';
+  return '✏️';
+}
+function rowHtml(ev, extraSide){
+  const d = ev.data; let sub = [], side = extraSide || '';
+  if(ev.type === 'contraction'){
+    if(d.intensity) sub.push(INT[d.intensity]);
+    if(!side) side = ev.end == null ? 'running' : dur(ev.end - ev.start);
+  }
+  if(ev.type === 'feed'){
+    if(d.kind === 'breast') side = ev.end == null ? 'running' : durWords(ev.end - ev.start);
+    else side = [d.ml != null ? d.ml + ' ml' : '', ev.end && ev.end > ev.start ? durWords(ev.end - ev.start) : ''].filter(Boolean).join(' · ');
+  }
+  if(ev.type === 'sleep') side = ev.end == null ? 'asleep' : durWords(ev.end - ev.start);
+  if(ev.type === 'med'){
+    if(d.tablets) side = d.tablets + (d.tablets === 1 ? ' tab' : ' tabs');
+    if(d.pain != null) sub.push('pain ' + d.pain + '/10');
+  }
+  if(ev.type === 'feed' && CONT[ev.id]) sub.push('part of ' + t(CONT[ev.id]) + ' feed');
+  if(ev.type === 'visit'){ side = esc(d.provider || ''); if(d.weightKg) sub.push(fmtKg(d.weightKg)); }
+  const note = ev.type === 'note' ? d.text : d.note;
+  if(note) sub.push(note);
+  return `<div class="row" data-id="${ev.id}">
+    <div class="ic">${icon(ev)}</div>
+    <div class="main"><div class="t1">${ev.type === 'note' ? esc(d.text) : esc(title(ev))}</div>
+      <div class="t2">${esc(dt(ev.start))}${ev.type !== 'note' && sub.length ? ' · ' + esc(sub.join(' · ')) : ''}</div></div>
+    <div class="side">${side}</div></div>`;
+}
+function openEditor(id){
+  const ev = events[id]; if(!ev) return;
+  if(ev.type === 'visit') return visitSheet(id);
+  if(ev.type === 'task') return regSheet(ev.data.key);
+  if(ev.type === 'milestone') return msSheet(ev.data.key, id);
+  editEvent(id);
+}
+function bindRows(el){ el.querySelectorAll('.row[data-id]').forEach(r => r.onclick = () => openEditor(r.dataset.id)); }
+
+let logFilter = 'all', CONT = {};
+function render(){
+  CONT = {}; sessionsOf(byType('feed').filter(f => f.start > Date.now() - 14 * 864e5)).forEach(x => x.items.slice(1).forEach(f => CONT[f.id] = x.start));
+  // contractions
+  const { done, hour, avgDur, avgInt } = contractionStats();
+  const all = byType('contraction');
+  $('sCount').textContent = hour.length;
+  $('sDur').textContent = avgDur ? durWords(avgDur) : '—';
+  $('sInt').textContent = avgInt ? durWords(avgInt) : '—';
+
+  // pattern hint (5-1-1 is a common guideline; nurse instruction overrides)
+  const now = Date.now();
+  const coversHour = hour.length && (now - hour[hour.length-1].start) >= 50*60e3;
+  let p = '';
+  if(coversHour && avgInt && avgInt <= 5.5*60e3 && avgDur >= 55e3)
+    p = `<div class="banner warn">⚠️ Last hour: about every ${durWords(avgInt)}, lasting ~${durWords(avgDur)}. This matches the common "5-1-1" pattern. Call your hospital / nurse.</div>`;
+  else if(done.length < 3)
+    p = `<div class="banner info">Tap START when a contraction begins and STOP when it ends. "Apart" is measured start-to-start, which is what nurses ask for. Tap any entry to fix a time or add a remark.</div>`;
+  $('pattern').innerHTML = p;
+
+  // list with interval (start-to-start)
+  const list = all.slice(0, 60);
+  $('cList').innerHTML = list.length ? list.map((e,i) => {
+    const prev = list[i+1];
+    const gap = prev ? 'every ' + durWords(e.start - prev.start) : '';
+    const len = e.end == null ? 'running' : dur(e.end - e.start);
+    return rowHtml(e, `<div style="color:var(--text);font-weight:600">${len}</div><div style="font-size:12px">${gap}</div>`);
+  }).join('') : '<div class="empty">No contractions yet</div>';
+  bindRows($('cList'));
+
+  // baby
+  const babyEvents = live().filter(e => ['feed','diaper','sleep','growth','visit','milestone'].includes(e.type) || (e.type === 'note' && e.data.ctx === 'baby')).sort((a,b)=>b.start-a.start);
+  { let html = '', lastDay = ''; babyEvents.slice(0, 200).forEach(e => { const dd = df.format(new Date(e.start)); if(dd !== lastDay){ html += `<div class="day">${dd}</div>`; lastDay = dd; } html += rowHtml(e); });
+    $('babyList').innerHTML = html || '<div class="empty">Nothing logged yet</div>'; }
+  bindRows($('babyList'));
+  const day = now - 24*3600e3;
+  const diapers = byType('diaper');
+  // day-of-life totals (each day runs from the birth time, 4:24 AM)
+  const dn = dayOf(now);
+  renderScore(now); renderNextFeed(now); renderTrends(now); renderWeightCard();
+  $('lastDiaper').textContent = diapers[0] ? 'Last diaper ' + t(diapers[0].start) + ' (' + diapers[0].data.kind + ')' : '';
+  const tip = tipFor(dn);
+  $('dayTitle').textContent = `${CONTENT.baby} · Day ${dn} · ${ageText(now)}`;
+  $('tipToday').innerHTML = '<b>Today</b>' + esc(tip.today);
+  $('tipNext').innerHTML = '<b>Coming up · be ready</b>' + esc(tip.next);
+
+  // sleep total in last 24h (clipped to the window)
+  $('sleepInfo').textContent = byType('sleep').length ? durWords(rangeStats(midnightOf(now), now).sleepMs) + ' today' : '';
+
+  // mom
+  renderMeds(now);
+  renderDaily(now);
+  renderDocs(); renderHealth(); renderMs(now);
+  const momEvents = live().filter(e => e.type === 'med' || e.type === 'stock' || (e.type === 'note' && e.data.ctx === 'mom')).sort((a,b)=>b.start-a.start);
+  $('momList').innerHTML = momEvents.slice(0, 15).map(e => rowHtml(e)).join('') || '<div class="empty">Nothing logged yet</div>';
+  bindRows($('momList'));
+  const midnight = new Date(); midnight.setHours(0,0,0,0);
+  const todays = byType('med').filter(e => e.start >= midnight.getTime()).reverse();
+  const groups = {};
+  todays.forEach(e => { const k = title(e); (groups[k] = groups[k] || []).push(e); });
+  $('formView').innerHTML = Object.keys(groups).length ? Object.entries(groups).map(([k, list]) =>
+    `<div style="font-weight:700;margin:8px 0 2px">${esc(k)}</div>` +
+    `<div class="medrow muted"><span>Time</span><span># Tablets</span><span>Pain</span></div>` +
+    list.map(e => `<div class="medrow num"><span>${esc(t(e.start))}</span><span>${e.data.tablets ?? '—'}</span><span>${e.data.pain ?? '—'}</span></div>`).join('')
+  ).join('') : '<div class="empty">No medicine logged today</div>';
+
+  // log
+  let logEvents = live().filter(e => e.type !== 'settings').sort((a,b)=>b.start-a.start);
+  if(logFilter !== 'all') logEvents = logEvents.filter(e => e.type === logFilter);
+  let html = '', lastDay = '';
+  logEvents.slice(0, 400).forEach(e => {
+    const dd = df.format(new Date(e.start));
+    if(dd !== lastDay){ html += `<div class="day">${dd}</div>`; lastDay = dd; }
+    html += rowHtml(e);
+  });
+  $('logList').innerHTML = html || '<div class="empty">Nothing logged yet</div>';
+  bindRows($('logList'));
+  tick();
+}
+
+function tick(){
+  const now = Date.now(), d = new Date(now);
+  $('clock').textContent = tf.format(d);
+  $('date').textContent = ageText(now) + ' · ' + df.format(d);
+
+  const r = runningContraction();
+  const cs = byType('contraction');
+  const btn = $('cBtn');
+  if(r){
+    btn.classList.add('running');
+    $('cBtnSub').textContent = 'CONTRACTION · TAP TO STOP';
+    $('cBtnTime').textContent = dur(now - r.start);
+  } else {
+    btn.classList.remove('running');
+    $('cBtnSub').textContent = 'TAP WHEN IT STARTS';
+    $('cBtnTime').textContent = 'START';
+  }
+  const lastStarted = r ? cs[1] : cs[0];
+  const lastDone = cs.find(e => e.end != null);
+  $('tSinceStart').textContent = cs[0] ? dur(now - cs[0].start) : '—';
+  $('tRest').textContent = r ? 'now' : (lastDone ? dur(now - lastDone.end) : '—');
+  $('rateLast').innerHTML = r && lastStarted ? `<div class="banner info" style="text-align:center">This one started ${durWords(r.start - lastStarted.start)} after the previous one</div>` : '';
+
+  // sleep
+  const sl = runningSleep();
+  $('sleepBtn').classList.toggle('live', !!sl);
+  $('sleepT').textContent = sl ? dur(now - sl.start, now - sl.start >= 3600e3) : 'Fell asleep';
+  if(sl) $('sleepS').textContent = 'asleep since ' + t(sl.start) + ' · tap when awake';
+  else { const ls = byType('sleep')[0]; $('sleepS').textContent = ls && ls.end && now - ls.end < 12 * 3600e3 ? 'awake for ' + durWords(now - ls.end) + ' · tap when asleep' : 'tap when baby falls asleep'; }
+
+  // feeds
+  const f = runningFeed();
+  ['L','R'].forEach(s => {
+    const tile = $('bf'+s), on = f && f.data.side === s;
+    tile.classList.toggle('live', !!on);
+    $('bf'+s+'t').textContent = on ? dur(now - f.start) : (s === 'L' ? 'Left' : 'Right');
+    $('bf'+s+'s').textContent = on ? 'tap to stop' : (f ? 'tap to switch' : 'tap to start');
+  });
+
+  // running entries in lists show live durations on next render; keep cheap here
+}
+
+function renderMeds(now){
+  $('medCards').innerHTML = '<div class="h">Pain medicine</div>' + Object.keys(MEDS).map(k => {
+    const { m, last, tabs24, nextAt } = medStatus(k);
+    let next;
+    if(!last) next = '<span class="ok">No doses logged</span>';
+    else if(tabs24 >= m.maxTabs) next = '<span class="over">24-hour max reached (' + tabs24 + '/' + m.maxTabs + ')</span>';
+    else if(now >= nextAt) next = '<span class="ok">Can take now (4 h passed)</span>';
+    else next = '<span class="wait">Next from ' + t(nextAt) + ' · in ' + durWords(nextAt - now) + '</span>';
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <div><div class="t1" style="font-weight:700">${m.name} ${m.mg} mg</div><div class="muted">${m.rule}</div></div>
+        <button class="btn primary" style="width:auto;padding:10px 16px;white-space:nowrap;flex:none" data-med="${k}">Took it</button>
+      </div>
+      <div style="margin-top:6px;font-size:14px">${last ? 'Last: ' + t(last.start) + ' (' + last.data.tablets + ' tab) · ' + durWords(now - last.start) + ' ago<br>' : ''}${next} · ${tabs24}/${m.maxTabs} tablets in 24 h</div>
+    </div>`;
+  }).join('');
+  $('medCards').querySelectorAll('[data-med]').forEach(b => b.onclick = () => medSheet(b.dataset.med));
+}
+
+// ---------- Aveer: day of life ----------
+const BIRTH = new Date(CONTENT.birth).getTime();   // parsed as local time
+const B = new Date(BIRTH);
+function dayStart(n){ return new Date(B.getFullYear(), B.getMonth(), B.getDate() + n - 1, B.getHours(), B.getMinutes()).getTime(); }
+function dayOf(ts){ let n = Math.floor((ts - BIRTH) / 864e5) + 1; while(n > 1 && ts < dayStart(n)) n--; while(ts >= dayStart(n + 1)) n++; return Math.max(1, n); }
+function ageText(now){
+  const ms = now - BIRTH; if(ms < 0) return 'not born yet';
+  const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5);
+  if(d < 60) return (d ? d + 'd ' : '') + h + 'h old';
+  const wk = Math.floor(d / 7); return wk < 26 ? wk + ' weeks old' : Math.floor(d / 30.44) + ' months old';
+}
+const wetMin = n => CONTENT.wetMin[n] || 6;
+function tipFor(n){ let tip = CONTENT.tips[0]; CONTENT.tips.forEach(x => { if(x.from <= n) tip = x; }); return tip; }
+// ---------- calendar days (midnight to midnight) ----------
+function midnightOf(ts){ const d = new Date(ts); d.setHours(0,0,0,0); return d.getTime(); }
+function minusDay(ts){ const d = new Date(ts); d.setDate(d.getDate() - 1); return d.getTime(); }
+function mergeMs(){ const sv = events[TARGET_ID] && !events[TARGET_ID].deleted ? events[TARGET_ID].data : {}; return (sv.mergeMin != null && sv.mergeMin !== '' ? +sv.mergeMin : 45) * 60e3; }
+// which earlier feed a new entry at `start` would continue (null if none within 90 min)
+function prevSessionFor(start, excludeId){
+  const before = byType('feed').filter(f => f.id !== excludeId && f.start < start);
+  if(!before.length) return null;
+  const ss = sessionsOf(before), l = ss[ss.length - 1], gap = start - l.last;
+  return gap <= 90 * 60e3 ? { start: l.start, gap, auto: gap <= mergeMs() } : null;
+}
+function contField(start, excludeId, current){
+  const p = prevSessionFor(start, excludeId); if(!p) return '';
+  const part = current === true || (current !== false && p.auto);
+  return `<div class="field"><label>Part of the ${t(p.start)} feed? <span class="muted">(${durWords(p.gap)} after it)</span></label>
+    <div class="chips" id="fCont"><button class="chip ${part ? 'on' : ''}" data-v="yes">Yes, same feed (after a break)</button><button class="chip ${part ? '' : 'on'}" data-v="no">No, a new feed</button></div>
+    <div class="muted">Same feed: the next-feed timer counts from ${t(p.start)} and amounts add up.</div></div>`;
+}
+function readCont(){ const c = $('fCont') && $('fCont').querySelector('.chip.on'); return c ? c.dataset.v === 'yes' : undefined; }
+function sessionsOf(list){ const out = []; list.slice().sort((a,b)=>a.start-b.start).forEach(f => { const l = out[out.length - 1];
+  const join = f.data.cont === true ? !!l : f.data.cont === false ? false : (l && f.start - l.last <= mergeMs());
+  if(join){ l.items.push(f); l.last = Math.max(l.last, f.end || f.start); } else out.push({ start: f.start, last: f.end || f.start, items: [f] }); }); return out; }
+function rangeStats(a, b){
+  const now = Date.now(), inR = e => e.start >= a && e.start < b;
+  const feeds = byType('feed').filter(inR), dia = byType('diaper').filter(inR);
+  const breast = feeds.filter(f => f.data.kind === 'breast'), formula = feeds.filter(f => f.data.kind === 'bottle' && f.data.milk === 'formula'),
+        bmilk = feeds.filter(f => f.data.kind === 'bottle' && f.data.milk !== 'formula');
+  const mins = (list, side) => list.filter(f => !side || f.data.side === side).reduce((s, f) => s + Math.max(0, (Math.min(f.end ?? now, b) - f.start) / 60e3), 0);
+  const ml = list => list.reduce((s, f) => s + (f.data.ml || 0), 0);
+  const wetOnly = dia.filter(d => d.data.kind === 'wet').length, both = dia.filter(d => d.data.kind === 'both').length, dirtyOnly = dia.filter(d => d.data.kind === 'dirty').length;
+  const sleepMs = byType('sleep').reduce((s, e) => s + Math.max(0, Math.min(e.end ?? now, b) - Math.max(e.start, a)), 0);
+  return { feeds: sessionsOf(feeds).length, feedTimes: sessionsOf(feeds).map(x => x.start), breast: sessionsOf(breast).length, breastMin: Math.round(mins(breast)),
+    L: Math.round(mins(breast, 'L')), R: Math.round(mins(breast, 'R')), formula: formula.length, formulaMl: ml(formula), bmilk: bmilk.length, bmilkMl: ml(bmilk),
+    wetOnly, both, dirtyOnly, wet: wetOnly + both, dirty: dirtyOnly + both, diapers: dia.length,
+    wetTimes: dia.filter(d => d.data.kind !== 'dirty').map(d => d.start).sort((x, y) => x - y), sleepMs };
+}
+const minTxt = m => { m = Math.round(m); return m >= 60 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : m + ' min'; };
+const deltaHtml = (d, fmt) => `<span class="delta">${d > 0 ? '▲ ' : d < 0 ? '▼ ' : '= '}${d ? (fmt ? fmt(Math.abs(d)) : Math.abs(d)) : 'same'}</span>`;
+
+// ---------- targets (editable, synced) ----------
+const TARGET_ID = keyId('settings:targets');
+const AGE_ML = [[1,5,15],[2,10,20],[3,15,30],[4,30,60],[8,45,75],[15,60,90],[29,90,120],[61,120,150],[121,150,180]];
+function targets(){
+  const sv = (events[TARGET_ID] && !events[TARGET_ID].deleted) ? events[TARGET_ID].data : {}, dn = dayOf(Date.now());
+  const age = AGE_ML.filter(r => r[0] <= dn).pop();
+  const v = k => sv[k] != null && sv[k] !== '' ? +sv[k] : null;
+  return { feeds: v('feeds') ?? CONTENT.feedsMin, wet: v('wet') ?? wetMin(dn), dirty: v('dirty') ?? (dn >= 5 ? 3 : 1),
+    gapMin: v('gapMin') ?? 2, gapMax: v('gapMax') ?? 3, maxGap: v('maxGap') ?? 4,
+    mlMin: v('mlMin') ?? age[1], mlMax: v('mlMax') ?? age[2], mergeMin: v('mergeMin') ?? 45, custom: sv, dn };
+}
+$('editTargets').onclick = () => {
+  const c = targets().custom || {}, T = targets(), f = (id, label, ph, hint) => `<div class="field"><label>${label}</label><input type="number" inputmode="decimal" id="${id}" value="${c[id] ?? ''}" placeholder="${ph}">${hint ? `<div class="muted">${hint}</div>` : ''}</div>`;
+  openSheet(`<h3>Daily targets</h3><p class="muted">Leave a box empty to use the automatic value for his age (shown in grey).</p>
+    ${f('feeds', 'Feeds per day', T.feeds)}${f('wet', 'Wet diapers per day', wetMin(T.dn), 'Automatic: rises from 1 on day 1 to 6+ from day 5')}${f('dirty', 'Dirty diapers per day', T.dn >= 5 ? 3 : 1)}
+    <div class="grid2">${f('gapMin', 'Feed every, from (h)', 2)}${f('gapMax', 'to (h)', 3)}</div>${f('maxGap', 'Longest gap allowed (h)', 4, 'Usually 4 h until back to birth weight, or what his doctor says')}
+    <div class="grid2">${f('mlMin', 'Bottle from (mL)', AGE_ML.filter(r => r[0] <= T.dn).pop()[1])}${f('mlMax', 'to (mL)', AGE_ML.filter(r => r[0] <= T.dn).pop()[2])}</div>
+    ${f('mergeMin', 'Count as one feed if resumed within (min)', 45, 'A break for burping, a nap or a top-up within this time is the same feed')}
+    <div class="stack"><button class="btn primary" id="tgSave">Save targets</button><button class="btn" id="tgReset">Use automatic values</button></div>`);
+  const keys = ['feeds','wet','dirty','gapMin','gapMax','maxGap','mlMin','mlMax','mergeMin'];
+  $('tgSave').onclick = () => { const data = {}; keys.forEach(k => { const v = $(k).value.trim(); data[k] = v === '' ? null : +v; }); upsertKeyed(TARGET_ID, 'settings', data); closeSheet(); toast('Targets saved'); };
+  $('tgReset').onclick = () => { const data = {}; keys.forEach(k => data[k] = null); upsertKeyed(TARGET_ID, 'settings', data); closeSheet(); toast('Using automatic targets'); };
+};
+
+// ---------- Today: rings with yesterday-by-now tick ----------
+function scoreRing(label, v, target, yn, color){
+  const r = 34, c = 2 * Math.PI * r, frac = Math.min(1, v / target), a = Math.min(1, yn / target) * 2 * Math.PI - Math.PI / 2;
+  return `<div><svg viewBox="0 0 84 84" width="84" height="84" role="img" aria-label="${label}: ${v} of ${target}, yesterday by now ${yn}">
+      <circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--card2)" stroke-width="8"/>
+      <circle class="ring-arc" cx="42" cy="42" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"
+        stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - frac)}" transform="rotate(-90 42 42)"/>
+      <line x1="${42 + 27 * Math.cos(a)}" y1="${42 + 27 * Math.sin(a)}" x2="${42 + 41 * Math.cos(a)}" y2="${42 + 41 * Math.sin(a)}" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
+      <text x="42" y="41" text-anchor="middle" font-size="20" font-weight="700" fill="var(--text)">${v}</text>
+      <text x="42" y="56" text-anchor="middle" font-size="10" fill="var(--dim)">of ${target}+</text>
+    </svg><div class="rl">${label} ${deltaHtml(v - yn)}</div><div class="muted" style="font-size:12px">yday ${yn} by now</div></div>`;
+}
+function renderScore(now){
+  const a = midnightOf(now), T = targets(), td = rangeStats(a, now), yn = rangeStats(minusDay(a), minusDay(now));
+  $('dayStatsTitle').textContent = 'Today so far';
+  $('scRings').innerHTML = scoreRing('Feeds', td.feeds, T.feeds, yn.feeds, 'var(--accent)')
+    + scoreRing('Wet', td.wet, T.wet, yn.wet, 'var(--wet)') + scoreRing('Dirty', td.dirty, T.dirty, yn.dirty, 'var(--dirty)');
+  const row = (color, label, count, val, d, fmt) => `<div class="sc-row"><span><i class="sdot" style="background:${color}"></i>${label} ×${count}</span><span><b>${val}</b> ${deltaHtml(d, fmt)}</span></div>`;
+  $('feedSum').textContent = `${td.feeds} today`;
+  $('scFeeds').innerHTML = row('var(--breast)', 'Breastfeed', td.breast, minTxt(td.breastMin), td.breastMin - yn.breastMin, minTxt)
+    + row('var(--formula)', 'Formula', td.formula, td.formulaMl + ' mL', td.formulaMl - yn.formulaMl, v => v + ' mL')
+    + row('var(--bmilk)', 'Breast milk bottle', td.bmilk, td.bmilkMl + ' mL', td.bmilkMl - yn.bmilkMl, v => v + ' mL')
+    + `<div class="muted">Left ${minTxt(td.L)} · Right ${minTxt(td.R)} · Bottles ${td.formulaMl + td.bmilkMl} mL · changes vs yesterday by now</div>`;
+  $('scDiaperTitle').textContent = `${td.diapers} today`;
+  $('scDiapers').innerHTML = `<span><i class="sdot" style="background:var(--wet)"></i>Wet ${td.wetOnly}</span><span><i class="sdot" style="background:var(--both)"></i>Wet+dirty ${td.both}</span><span><i class="sdot" style="background:var(--dirty)"></i>Dirty ${td.dirtyOnly}</span>`;
+}
+
+// ---------- Next feed ----------
+function renderNextFeed(now){
+  const T = targets(), feeds = byType('feed');
+  if(!feeds.length){ $('nextFeed').innerHTML = '<div class="h">Next feed</div><div class="muted">Log a feed and the next feeding window will appear here.</div>'; return; }
+  const sess = sessionsOf(feeds.filter(f => f.start > now - 30 * 3600e3)), last = sess[sess.length - 1] || { start: feeds[0].start, items: [feeds[0]] };
+  const ints = sess.filter(x => x.start > now - 24 * 3600e3).map((x, i, arr) => i ? x.start - arr[i - 1].start : null).filter(Boolean).sort((x, y) => x - y);
+  const H = 3600e3, personal = ints.length >= 3, med = personal ? ints[Math.floor(ints.length / 2)] : null;
+  let w0 = T.gapMin * H, w1 = T.gapMax * H;
+  if(personal){ const c = Math.min(Math.max(med, T.gapMin * H), T.gapMax * H); w0 = c - 0.5 * H; w1 = c + 0.5 * H; }
+  const from = last.start + w0, to = last.start + w1, latest = last.start + T.maxGap * H, running = runningFeed();
+  let status;
+  if(running) status = `<span style="color:var(--go);font-weight:800">Feeding now</span>`;
+  else if(now < from) status = `<span style="color:var(--accent);font-weight:800">in ${durWords(from - now)}</span>`;
+  else if(now <= to) status = `<span style="color:var(--accent);font-weight:800">Now</span>`;
+  else if(now <= latest) status = `<span class="pill low">Due · ${durWords(now - last.start)} since last</span>`;
+  else status = `<span class="pill low">Over ${T.maxGap} h since last feed</span>`;
+  const span = latest - last.start + 0.35 * H, pos = ts => Math.min(100, Math.max(0, (ts - last.start) / span * 100)).toFixed(1) + '%';
+  const parts = {}; last.items.forEach(f => { const k = f.data.kind === 'breast' ? (f.data.side === 'L' ? 'Left' : 'Right') : (f.data.milk === 'formula' ? 'Formula' : 'Breast milk');
+    parts[k] = parts[k] || { min: 0, ml: [] }; if(f.data.kind === 'breast') parts[k].min += ((f.end ?? now) - f.start) / 60e3; else if(f.data.ml) parts[k].ml.push(f.data.ml); });
+  const lastDesc = Object.entries(parts).map(([k, v]) => v.ml.length ? `${k} ${v.ml.join(' + ')}${v.ml.length > 1 ? ' = ' + v.ml.reduce((a, b) => a + b, 0) : ''} mL` : v.min ? `${k} ${minTxt(v.min)}` : k).join(' · ');
+  const sessMl = last.items.reduce((a, f) => a + (f.data.kind === 'bottle' ? f.data.ml || 0 : 0), 0);
+  const lastBreast = feeds.find(f => f.data.kind === 'breast'), lastBottle = feeds.find(f => f.data.kind === 'bottle' && f.data.ml);
+  const wt = latestWeight(), byWt = wt && T.dn >= 5 ? Math.round(wt.kg * 150 / T.feeds / 5) * 5 : null;
+  $('nextFeed').innerHTML = `<div class="ctitle"><div class="h" style="margin:0">Next feed</div><span class="muted">last: ${t(last.start)} · ${esc(lastDesc)}</span></div>
+    <div class="sc-row" style="align-items:baseline"><b style="font-size:24px">${t(from)} – ${t(to)}</b>${status}</div>
+    <div class="win"><div class="band" style="left:${pos(from)};width:calc(${pos(to)} - ${pos(from)})"></div><div class="lim" style="left:${pos(latest)}"></div><div class="now" style="left:${pos(now)}"></div></div>
+    <div class="scale"><span style="left:0;transform:none">${t(last.start)}</span><span style="left:${pos(latest)};transform:translateX(-100%);padding-right:4px;color:var(--warn)">by ${t(latest)}</span></div>
+    <div class="est"><div><span class="muted">If bottle</span><b>${T.mlMin} – ${T.mlMax} mL</b><span class="muted">${byWt ? '≈ ' + byWt + ' mL by weight' : 'typical for day ' + T.dn}${sessMl ? ' · last feed ' + sessMl + ' mL' : lastBottle ? ' · last bottle ' + lastBottle.data.ml + ' mL' : ''}</span></div>
+      <div><span class="muted">If breast</span><b>Start ${lastBreast && lastBreast.data.side === 'L' ? 'Right' : 'Left'}</b><span class="muted">${lastBreast ? 'last breast: ' + (lastBreast.data.side === 'L' ? 'Left' : 'Right') : 'no breastfeed yet'}</span></div></div>
+    <div class="muted" style="margin-top:10px">${personal ? `Based on his last 24 h: a feed every ${durWords(med)} on average.` : `Using the ${T.gapMin}–${T.gapMax} h guide until there's a day of history.`} Feed earlier if he shows hunger cues; don't push him to finish a bottle.</div>`;
+}
+
+// ---------- Weight card ----------
+function latestWeight(){
+  const g = live().filter(e => e.type === 'growth' || (e.type === 'visit' && e.data.weightKg)).sort((a,b)=>b.start-a.start);
+  return g.length ? { kg: g[0].type === 'growth' ? g[0].data.kg : g[0].data.weightKg, at: g[0].start, all: g } : null;
+}
+function renderWeightCard(){
+  const w = latestWeight();
+  $('wtNow').textContent = w ? fmtKg(w.kg) : 'No weight yet';
+  $('wtWhen').textContent = w ? 'last: ' + mdf.format(new Date(w.at)) : '';
+  if(w && w.all.length > 1){ const first = w.all[w.all.length - 1], kg0 = first.type === 'growth' ? first.data.kg : first.data.weightKg;
+    $('wtDiff').textContent = `${Math.round((w.kg - kg0) * 1000) >= 0 ? '+' : ''}${Math.round((w.kg - kg0) * 1000)} g since ${mdf.format(new Date(first.start))}`; }
+  else $('wtDiff').textContent = w ? '' : 'Add his birth weight first, then each check-up.';
+}
+$('quickWeight').onclick = () => $('addWeight').click();
+
+// ---------- Trends ----------
+function paceChart(title, tTimes, yTimes, a, now, color){
+  const W = 320, Hh = 140, L = 24, R = 10, Tp = 8, Bt = 22, day = 864e5, nowH = (now - a) / 36e5;
+  const tH = tTimes.map(x => (x - a) / 36e5), yH = yTimes.map(x => (x - minusDay(a)) / 36e5);
+  const maxY = Math.max(tH.length, yH.length, 3) + 1;
+  const X = h => L + h / 24 * (W - L - R), Y = v => Tp + (1 - v / maxY) * (Hh - Tp - Bt);
+  const steps = (arr, end) => { let d = `M${X(0)},${Y(0)}`, n = 0; arr.filter(h => h <= end).forEach(h => { d += ` H${X(h)} V${Y(++n)}`; }); return d + ` H${X(end)}`; };
+  let g = '';
+  const step = Math.max(1, Math.round(maxY / 4));
+  for(let v = 0; v <= maxY; v += step) g += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${L - 6}" y="${Y(v) + 3}" text-anchor="end" font-size="9" fill="var(--dim)">${v}</text>`;
+  [[0,'12a'],[6,'6a'],[12,'12p'],[18,'6p'],[24,'12a']].forEach(([h, l]) => g += `<text x="${X(h)}" y="${Hh - 6}" text-anchor="middle" font-size="9" fill="var(--dim)">${l}</text>`);
+  g += `<path d="${steps(yH, 24)}" fill="none" stroke="var(--yday)" stroke-width="2" stroke-dasharray="4 3"/>`;
+  g += `<path d="${steps(tH, nowH)}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
+  g += `<line x1="${X(nowH)}" x2="${X(nowH)}" y1="${Tp}" y2="${Hh - Bt}" stroke="var(--dim)" stroke-dasharray="2 3"/>`;
+  const tn = tH.filter(h => h <= nowH).length, yn = yH.filter(h => h <= nowH).length;
+  g += `<circle cx="${X(nowH)}" cy="${Y(yn)}" r="4" fill="var(--yday)" stroke="var(--card)" stroke-width="2"/><circle cx="${X(nowH)}" cy="${Y(tn)}" r="4.5" fill="${color}" stroke="var(--card)" stroke-width="2"/>`;
+  return `<div class="sc-row" style="font-size:14px"><b>${title}</b><span class="muted">today ${tn} · yday ${yn} by now · ${yH.length} total</span></div><svg viewBox="0 0 ${W} ${Hh}" width="100%" role="img" aria-label="${title}: today ${tn}, yesterday ${yn} by now">${g}</svg>`;
+}
+function renderTrends(now){
+  const a = midnightOf(now), T = targets(), td = rangeStats(a, now), yn = rangeStats(minusDay(a), minusDay(now)), yf = rangeStats(minusDay(a), a);
+  $('cmpWhen').textContent = 'at ' + t(now);
+  const rows = [['Feeds', 'feeds'], ['Breast time', 'breastMin', minTxt], ['Formula', 'formulaMl', v => v + ' mL'], ['Breast milk bottle', 'bmilkMl', v => v + ' mL'],
+    ['Wet diapers', 'wet'], ['Dirty diapers', 'dirty'], ['Sleep', 'sleepMs', v => minTxt(v / 60e3)]];
+  $('cmpTable').innerHTML = `<tr><th></th><th>Today</th><th>Yday by now</th><th>Change</th></tr>` + rows.map(([l, k, f]) => { f = f || (v => v);
+    const d = td[k] - yn[k]; return `<tr><td>${l}</td><td><b>${f(td[k])}</b></td><td class="y">${f(yn[k])}</td><td>${deltaHtml(k === 'sleepMs' ? Math.round(d / 60e3) : d, k === 'sleepMs' ? minTxt : f === undefined ? null : (k === 'feeds' || k === 'wet' || k === 'dirty' ? null : f))}</td></tr>`; }).join('');
+  $('ydayFull').textContent = `Yesterday's full day: ${yf.feeds} feeds · ${minTxt(yf.breastMin)} at breast · ${yf.formulaMl + yf.bmilkMl} mL bottles · ${yf.wet} wet · ${yf.dirty} dirty · ${minTxt(yf.sleepMs / 60e3)} sleep`;
+  $('paceFeeds').innerHTML = paceChart('Feeds', td.feedTimes, yf.feedTimes, a, now, 'var(--accent)');
+  $('paceWet').innerHTML = paceChart('Wet diapers', td.wetTimes, yf.wetTimes, a, now, 'var(--wet)');
+  const frac = Math.min(1, (now - a) / 864e5);
+  const st = (v, target) => v >= target ? '<span class="pill ok">Met</span>' : v >= Math.floor(target * frac) ? '<span class="pill ok">On pace</span>' : '<span class="pill low">Behind</span>';
+  const yst = (v, target) => v >= target ? '<span class="pill ok">Met</span>' : '<span class="pill low">Below</span>';
+  const tr = [['Feeds', T.feeds + '+', td.feeds, yf.feeds, T.feeds], ['Wet', T.wet + '+', td.wet, yf.wet, T.wet], ['Dirty', T.dirty + '+', td.dirty, yf.dirty, T.dirty]];
+  $('tgtTable').innerHTML = `<tr><th></th><th>Target</th><th>Today</th><th></th><th>Yday</th><th></th></tr>` + tr.map(([l, tt, v, y, n]) =>
+    `<tr><td>${l}</td><td class="y">${tt}</td><td><b>${v}</b></td><td>${st(v, n)}</td><td class="y">${y}</td><td>${yst(y, n)}</td></tr>`).join('')
+    + `<tr><td>Feed gap</td><td class="y">${T.gapMin}–${T.gapMax} h</td><td colspan="4" class="y">max gap ${T.maxGap} h</td></tr>`
+    + `<tr><td>Same feed</td><td class="y">≤ ${T.mergeMin} min</td><td colspan="4" class="y">resumed after a break</td></tr>`
+    + `<tr><td>Bottle</td><td class="y">${T.mlMin}–${T.mlMax} mL</td><td colspan="4" class="y">${T.custom && T.custom.mlMin != null ? 'your setting' : 'automatic for his age'}</td></tr>`;
+}
+
+// ---------- Aveer sub-tabs ----------
+let babyTab = LS.get('lt_babytab', 'today');
+function showBabyTab(k){ babyTab = k; LS.set('lt_babytab', k); ['today','log','trends'].forEach(x => $('bt-' + x).hidden = x !== k);
+  $('babySeg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.bt === k)); }
+$('babySeg').querySelectorAll('button').forEach(b => b.onclick = () => { showBabyTab(b.dataset.bt); window.scrollTo(0, 0); });
+showBabyTab(babyTab);
+
+// ---------- theme toggle: auto → light → dark ----------
+let themeMode = LS.get('lt_themeMode', 'auto');
+function applyTheme(){
+  if(themeMode === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = themeMode;
+  $('themeBtn').innerHTML = { auto:'<svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>',
+    light:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    dark:'<svg width="20" height="20" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>' }[themeMode];
+  $('themeBtn').setAttribute('aria-label', 'Theme: ' + themeMode);
+  const dark = themeMode === 'dark' || (themeMode === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  $('themeColor').setAttribute('content', dark ? '#10151a' : '#f1f4f6');
+}
+$('themeBtn').onclick = () => { themeMode = { auto:'light', light:'dark', dark:'auto' }[themeMode]; LS.set('lt_themeMode', themeMode); applyTheme(); toast('Theme: ' + { auto:'automatic (follows iPhone)', light:'light', dark:'dark' }[themeMode]); };
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+applyTheme();
+
+function feedSessions(list){ return sessionsOf(list).length; }
+function feedSessionsOld(list){ let n = 0, last = null; list.slice().sort((a,b)=>a.start-b.start).forEach(f => { if(last == null || f.start - last > 15*60e3) n++; last = f.end || f.start; }); return n; }
+function dayStats(n){
+  const a = dayStart(n), b = Math.min(dayStart(n + 1), Date.now()), inDay = e => e.start >= a && e.start < dayStart(n + 1);
+  const feeds = byType('feed').filter(inDay), dia = byType('diaper').filter(inDay);
+  const sleepMs = byType('sleep').reduce((s,e) => s + Math.max(0, Math.min(e.end ?? Date.now(), b) - Math.max(e.start, a)), 0);
+  return { feeds: feedSessions(feeds), wet: dia.filter(d => d.data.kind !== 'dirty').length, dirty: dia.filter(d => d.data.kind !== 'wet').length,
+           ml: feeds.reduce((s,f) => s + (f.data.ml || 0), 0), sleepMs };
+}
+function fmtKg(kg){ if(kg == null) return '—'; const lb = kg * 2.20462, l = Math.floor(lb), oz = Math.round((lb - l) * 16); return kg.toFixed(2) + ' kg (' + (oz === 16 ? (l + 1) + ' lb 0' : l + ' lb ' + oz) + ' oz)'; }
+
+// deterministic ids so a checklist item is one synced record
+function keyId(str){
+  let out = '';
+  for(let seed = 1; out.length < 32; seed++){
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for(let i = 0; i < str.length; i++){ const c = str.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    out += (h1 >>> 0).toString(16).padStart(8, '0');
+  }
+  const h = out.slice(0, 32).split('');
+  h[12] = '4'; h[16] = '89ab'[parseInt(h[16], 16) & 3];
+  return h.slice(0,8).join('') + '-' + h.slice(8,12).join('') + '-' + h.slice(12,16).join('') + '-' + h.slice(16,20).join('') + '-' + h.slice(20).join('');
+}
+function upsertKeyed(id, type, data, start){
+  const ev = events[id] || { id, type, start: start || Date.now(), end: null, data: {}, deleted: false };
+  ev.deleted = false; Object.assign(ev.data, data); if(start) ev.start = start; ev.end = ev.start;
+  put(ev); return ev;
+}
+
+// ---------- Navjot: daily medicines ----------
+const DAILY = {
+  synthroid: { name:'Synthroid', slot:'Morning · empty stomach' },
+  pregpink:  { name:'Pregvit pink', slot:'Morning' },
+  pregblue:  { name:'Pregvit blue', slot:'Evening' },
+  iron:      { name:'Iron (Heme Boost)', slot:'Evening' }
+};
+const AFTER_SYNTH = ['pregpink','pregblue','iron'];  // contain iron/calcium
+function todayMidnight(){ const m = new Date(); m.setHours(0,0,0,0); return m.getTime(); }
+function synthStock(){
+  const st = byType('stock').find(e => e.data.med === 'synthroid');
+  if(!st) return null;
+  const used = byType('med').filter(e => e.data.med === 'synthroid' && e.start > st.start).reduce((a,e) => a + (e.data.tablets || 1), 0);
+  return { left: st.data.count - used, dose: st.data.dose || '', counted: st.start };
+}
+function renderDaily(now){
+  const mid = todayMidnight();
+  const synthToday = byType('med').find(e => e.data.med === 'synthroid' && e.start >= mid);
+  const okAfter = synthToday ? synthToday.start + 4 * 3600e3 : null;
+  const stock = synthStock();
+  $('dailyCards').innerHTML = Object.entries(DAILY).map(([k, m]) => {
+    const dose = byType('med').find(e => e.data.med === k && e.start >= mid);
+    let hint = esc(m.slot);
+    if(k === 'synthroid') hint += stock ? ` · ${stock.left} pills left${stock.dose ? ' · ' + esc(stock.dose) : ''}` : ' · <a class="ext" data-stock>set pill count</a>';
+    if(!dose && okAfter && AFTER_SYNTH.includes(k) && now < okAfter) hint += `<br><span class="wait">Synthroid at ${t(synthToday.start)} → from ${t(okAfter)}</span>`;
+    return `<div class="daily">
+      <div class="check ${dose ? 'on' : ''}">${dose ? '✓' : ''}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:700">${esc(m.name)}</div><div class="muted">${hint}</div></div>
+      ${dose ? `<button class="chip" data-edit="${dose.id}">${t(dose.start)}</button>` : `<button class="btn primary" style="width:auto;padding:10px 16px" data-take="${k}">Take</button>`}
+    </div>`;
+  }).join('') + `<div style="margin-top:10px"><button class="btn" data-stock>📦 Update Synthroid pill count</button></div>`;
+  $('dailyCards').querySelectorAll('[data-take]').forEach(b => b.onclick = () => takeDaily(b.dataset.take));
+  $('dailyCards').querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editEvent(b.dataset.edit));
+  $('dailyCards').querySelectorAll('[data-stock]').forEach(b => b.onclick = stockSheet);
+  let banner = '';
+  if(stock && stock.left <= 7) banner = `<div class="banner warn">📦 Synthroid: ${Math.max(0, stock.left)} pills left (about ${Math.max(0, stock.left)} days). Request a refill now; renewals can need the doctor.</div>`;
+  $('stockBanner').innerHTML = banner;
+}
+function takeDaily(k){
+  const now = Date.now(), mid = todayMidnight();
+  const synthToday = byType('med').find(e => e.data.med === 'synthroid' && e.start >= mid);
+  if(AFTER_SYNTH.includes(k) && synthToday && now - synthToday.start < 4 * 3600e3 &&
+     !confirm(`Synthroid was taken at ${t(synthToday.start)}. Iron and calcium are usually kept about 4 hours apart from it (from ${t(synthToday.start + 4*3600e3)}).\n\nLog ${DAILY[k].name} now anyway?`)) return;
+  const st = synthStock();
+  const ev = add('med', now, now, { med: k, tablets: 1, dose: k === 'synthroid' && st ? st.dose : undefined });
+  toast(DAILY[k].name + ' logged', () => { ev.deleted = true; put(ev); }, 'Undo', () => editEvent(ev.id), 'Change time');
+}
+function stockSheet(){
+  const st = synthStock();
+  openSheet(`<h3>Synthroid pills on hand</h3>
+    <div class="field"><label>Pills in the bottle right now</label><input type="number" inputmode="numeric" id="stCount" value="${st ? Math.max(0, st.left) : ''}"></div>
+    <div class="field"><label>Dose (as on the label)</label><input id="stDose" placeholder="e.g. 75 mcg" value="${esc(st ? st.dose : '')}"></div>
+    <p class="muted">Each logged Synthroid dose counts down from here. You'll get a warning in the app and in the daily email at 7 days left.</p>
+    <button class="btn primary" id="stSave">Save</button>`);
+  $('stSave').onclick = () => {
+    const c = parseInt($('stCount').value); if(isNaN(c)){ alert('Enter the number of pills.'); return; }
+    const now = Date.now(); add('stock', now, now, { med:'synthroid', count:c, dose:$('stDose').value.trim() }); closeSheet();
+  };
+}
+
+// ---------- Documents & registrations ----------
+const REGS = CONTENT.regs;
+const regEv = key => events[keyId('reg:' + key)];
+function renderDocs(){
+  const groups = ['Required','Recommended','Good to have'];
+  const req = REGS.filter(r => r.group === 'Required'), reqDone = req.filter(r => (regEv(r.key) || {data:{}}).data.done).length;
+  const allDone = REGS.filter(r => (regEv(r.key) || {data:{}}).data.done).length;
+  $('docsProgress').innerHTML = `<div style="font-weight:700">${reqDone} of ${req.length} required done</div><div class="prog"><i style="width:${Math.round(reqDone/req.length*100)}%"></i></div><div class="muted">${allDone} of ${REGS.length} items overall</div>`;
+  $('docsList').innerHTML = groups.map(g => `<div class="grp">${g}</div>` + REGS.filter(r => r.group === g).map(r => {
+    const ev = regEv(r.key), done = ev && ev.data.done;
+    let due = '';
+    if(done) due = '<span class="ok">Done ' + df.format(new Date(ev.data.doneAt || ev.start)) + '</span>';
+    else if(r.due_days != null){ const dt = dayStart(1) + r.due_days * 864e5, left = Math.ceil((dt - Date.now()) / 864e5);
+      due = `<span class="${left < 0 ? 'over' : left <= 7 ? 'wait' : ''}">Due ${df.format(new Date(dt))} · ${left < 0 ? Math.abs(left) + ' days overdue' : left + ' days left'}</span>`; }
+    const note = ev && ev.data.note ? '<br>📝 ' + esc(ev.data.note) : '';
+    return `<div class="row"><button class="check ${done ? 'on' : ''}" data-tog="${r.key}">${done ? '✓' : ''}</button>
+      <div class="main" data-reg="${r.key}"><div class="t1">${esc(r.title)}</div><div class="t2" style="white-space:normal">${due}${note}</div></div></div>`;
+  }).join('')).join('');
+  $('docsList').querySelectorAll('[data-tog]').forEach(b => b.onclick = () => toggleReg(b.dataset.tog));
+  $('docsList').querySelectorAll('[data-reg]').forEach(b => b.onclick = () => regSheet(b.dataset.reg));
+}
+function toggleReg(key){ const ev = regEv(key), done = !(ev && ev.data.done); upsertKeyed(keyId('reg:' + key), 'task', { kind:'reg', key, done, doneAt: done ? Date.now() : null }, Date.now()); }
+function regSheet(key){
+  const r = REGS.find(x => x.key === key), ev = regEv(key), d = ev ? ev.data : {};
+  openSheet(`<h3>${esc(r.title)}</h3>
+    <p class="muted" style="font-size:15px;color:var(--text)">${esc(r.what)}</p>
+    ${r.link ? `<p><a class="ext" href="${r.link}" target="_blank" rel="noopener">Open official page ↗</a></p>` : ''}
+    <div class="field"><label>Notes (reference numbers, dates, who called…)</label><textarea id="rNote">${esc(d.note)}</textarea></div>
+    <div class="stack"><button class="btn primary" id="rSave">${d.done ? 'Save' : 'Save'}</button>
+    <button class="btn" id="rTog">${d.done ? 'Mark as not done' : '✓ Mark as done'}</button></div>`);
+  $('rSave').onclick = () => { upsertKeyed(keyId('reg:' + key), 'task', { kind:'reg', key, note: $('rNote').value.trim() }); closeSheet(); };
+  $('rTog').onclick = () => { const done = !d.done; upsertKeyed(keyId('reg:' + key), 'task', { kind:'reg', key, note: $('rNote').value.trim(), done, doneAt: done ? Date.now() : null }, Date.now()); closeSheet(); };
+}
+
+// ---------- Health: visits, voice memos, follow-ups, weight ----------
+const VISIT_KINDS = ['Pediatrician','Family doctor','Hospital','Public health nurse','Midwife','Lactation','Emergency','Other'];
+function openFollowups(){
+  const out = [];
+  byType('visit').forEach(v => (v.data.followups || []).forEach(f => { if(!f.done) out.push({ ...f, visit: v }); }));
+  return out.sort((a,b) => (a.due || '9') < (b.due || '9') ? -1 : 1);
+}
+function renderHealth(){
+  const fus = openFollowups();
+  $('fuList').innerHTML = fus.length ? fus.map(f => `<div class="row"><button class="check" data-fu="${f.visit.id}|${f.id}"></button>
+    <div class="main" data-v="${f.visit.id}"><div class="t1" style="white-space:normal">${esc(f.text)}</div><div class="t2">${f.due ? 'Due ' + esc(f.due) + ' · ' : ''}from ${esc(f.visit.data.kind || 'visit')} ${df.format(new Date(f.visit.start))}</div></div></div>`).join('')
+    : '<div class="empty">No open follow-ups</div>';
+  $('fuList').querySelectorAll('[data-fu]').forEach(b => b.onclick = () => {
+    const [vid, fid] = b.dataset.fu.split('|'), v = events[vid], f = v.data.followups.find(x => x.id === fid);
+    f.done = true; put(v); toast('Follow-up done', () => { f.done = false; put(v); });
+  });
+  $('fuList').querySelectorAll('[data-v]').forEach(b => b.onclick = () => visitSheet(b.dataset.v));
+  $('fuBanner').innerHTML = fus.length ? `<div class="banner warn" data-go="health">🩺 ${fus.length} open follow-up${fus.length > 1 ? 's' : ''}: ${esc(fus[0].text)}${fus[0].due ? ' (due ' + esc(fus[0].due) + ')' : ''}</div>` : '';
+  const vb = $('fuBanner').querySelector('[data-go]'); if(vb) vb.onclick = () => go('health');
+  const visits = byType('visit');
+  $('visitList').innerHTML = visits.map(v => rowHtml(v)).join('') || '<div class="empty">No visits yet. Tap + Visit after an appointment.</div>';
+  bindRows($('visitList'));
+  const growth = live().filter(e => e.type === 'growth' || (e.type === 'visit' && e.data.weightKg)).sort((a,b)=>b.start-a.start);
+  const kgOf = e => e.type === 'growth' ? e.data.kg : e.data.weightKg;
+  $('growthList').innerHTML = growth.length ? growth.map((g,i) => {
+    const prev = growth[i+1], diff = prev ? Math.round((kgOf(g) - kgOf(prev)) * 1000) : null;
+    return `<div class="row" data-id="${g.id}"><div class="ic">⚖️</div><div class="main"><div class="t1">${fmtKg(kgOf(g))}</div><div class="t2">${df.format(new Date(g.start))}${g.data.note ? ' · ' + esc(g.data.note) : ''}</div></div><div class="side">${diff == null ? '' : (diff >= 0 ? '+' : '') + diff + ' g'}</div></div>`;
+  }).join('') : '<div class="empty">No weights yet. Add his birth weight first.</div>';
+  bindRows($('growthList'));
+}
+function weightInputs(kg){
+  return `<div class="field"><label>Weight</label><div class="grid2"><input type="number" step="0.01" inputmode="decimal" id="wVal" value="${kg != null ? kg.toFixed(3) : ''}" placeholder="e.g. 3.45">
+    <div class="chips" id="wUnit"><button class="chip on" data-v="kg">kg</button><button class="chip" data-v="lb">lb</button></div></div>
+    <div class="muted">For lb, use decimals (7 lb 8 oz = 7.5)</div></div>`;
+}
+function readWeight(){
+  const v = parseFloat($('wVal').value); if(isNaN(v)) return null;
+  const u = $('wUnit').querySelector('.chip.on').dataset.v; return u === 'lb' ? v / 2.20462 : v;
+}
+function bindChips(id){ const el = $(id); if(el) el.querySelectorAll('[data-v]').forEach(c => c.onclick = () => { el.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); }); }
+$('addWeight').onclick = () => {
+  openSheet(`<h3>Add weight</h3>
+    <div class="field"><label>Date</label><input type="datetime-local" id="wTime" value="${toLocalInput(Date.now())}"></div>
+    ${weightInputs()}
+    <div class="field"><label>Note</label><input id="wNote" placeholder="e.g. birth weight, home scale, clinic"></div>
+    <button class="btn primary" id="wSave">Save</button>`);
+  bindChips('wUnit');
+  $('wSave').onclick = () => { const kg = readWeight(); if(kg == null){ alert('Enter a weight.'); return; }
+    const at = fromLocalInput($('wTime').value) || Date.now(); add('growth', at, at, { kg, note: $('wNote').value.trim() }); closeSheet(); };
+};
+$('addVisit').onclick = () => visitSheet(null);
+
+const mediaUrl = path => SB_URL + '/storage/v1/object/public/lt-media/' + path;
+async function uploadMedia(file){
+  if(!syncKey) throw new Error('Turn on sync first (⚙︎) so recordings are stored in the cloud.');
+  const ext = (file.name.split('.').pop() || 'm4a').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const path = syncKey + '/' + uid() + '.' + ext;
+  const res = await fetch(SB_URL + '/storage/v1/object/lt-media/' + path, {
+    method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': file.type || 'audio/mp4', 'x-upsert': 'false' }, body: file });
+  if(!res.ok) throw new Error('Upload failed (' + res.status + '): ' + (await res.text()).slice(0, 120));
+  return { path, name: file.name, size: file.size, at: Date.now() };
+}
+function visitSheet(id){
+  const ev = id ? events[id] : null, d = ev ? JSON.parse(JSON.stringify(ev.data)) : { kind: 'Pediatrician', followups: [], audio: [] };
+  d.followups = d.followups || []; d.audio = d.audio || [];
+  const fuRow = f => `<div class="fu" data-fid="${f.id}"><input value="${esc(f.text)}" placeholder="What to do"><input type="date" value="${esc(f.due || '')}"><button class="chip" data-rm>✕</button></div>`;
+  openSheet(`<h3>${ev ? 'Visit' : 'New visit'}</h3>
+    <div class="field"><label>Date & time</label><input type="datetime-local" id="vTime" value="${toLocalInput(ev ? ev.start : Date.now())}"></div>
+    <div class="field"><label>Type</label><div class="chips" id="vKind">${VISIT_KINDS.map(k => `<button class="chip ${d.kind === k ? 'on' : ''}" data-v="${k}">${k}</button>`).join('')}</div></div>
+    <div class="field"><label>Doctor / place</label><input id="vProv" value="${esc(d.provider)}" placeholder="e.g. Dr. X, SHN Birchmount"></div>
+    ${weightInputs(d.weightKg)}
+    <div class="field"><label>Notes from the visit</label><textarea id="vNotes" placeholder="What did they check, say, prescribe?">${esc(d.notes)}</textarea></div>
+    <div class="field"><label>Voice memo</label>
+      <div id="vAudio">${d.audio.map(a => `<div style="margin-bottom:6px"><audio controls preload="none" src="${mediaUrl(a.path)}" style="width:100%"></audio><div class="muted">${esc(a.name)}</div></div>`).join('')}</div>
+      <input type="file" id="vFile" accept="audio/*,.m4a">
+      <div class="muted" id="vUp">In Voice Memos: tap the recording → ••• → Save to Files, then pick it here.</div></div>
+    <div class="field"><label>Transcript (paste from Voice Memos)</label><textarea id="vTrans" placeholder="In Voice Memos tap the transcript icon, select all, copy, paste here">${esc(d.transcript)}</textarea>
+      <div class="muted">The daily report turns transcripts into a short summary and follow-ups, shown below after the next report.</div></div>
+    ${d.ai_summary ? `<div class="field"><label>Summary (AI, check against the recording)</label><div class="banner info" style="white-space:pre-wrap;color:var(--text)">${esc(d.ai_summary)}</div></div>` : ''}
+    <div class="field"><label>Follow-ups</label><div id="vFu">${d.followups.map(fuRow).join('')}</div><button class="chip" id="vFuAdd">+ Add follow-up</button></div>
+    <div class="stack"><button class="btn primary" id="vSave">Save visit</button>${ev ? '<button class="btn danger" id="vDel">Delete visit</button>' : ''}</div>`);
+  bindChips('vKind');
+  const bindRm = () => $('vFu').querySelectorAll('[data-rm]').forEach(b => b.onclick = () => b.parentElement.remove());
+  bindRm();
+  $('vFuAdd').onclick = () => { $('vFu').insertAdjacentHTML('beforeend', fuRow({ id: uid(), text: '', due: '' })); bindRm(); };
+  $('vFile').onchange = async () => {
+    const f = $('vFile').files[0]; if(!f) return;
+    $('vUp').textContent = 'Uploading ' + f.name + '…';
+    try{ const a = await uploadMedia(f); d.audio.push(a); $('vAudio').insertAdjacentHTML('beforeend', `<div class="muted">✓ ${esc(a.name)} uploaded</div>`); $('vUp').textContent = 'Uploaded. Remember to Save the visit.'; }
+    catch(e){ $('vUp').textContent = e.message; }
+  };
+  $('vSave').onclick = () => {
+    const at = fromLocalInput($('vTime').value) || Date.now();
+    const old = Object.fromEntries((d.followups || []).map(f => [f.id, f]));
+    const data = Object.assign(d, {
+      kind: $('vKind').querySelector('.chip.on').dataset.v, provider: $('vProv').value.trim(),
+      weightKg: readWeight(), notes: $('vNotes').value.trim(), transcript: $('vTrans').value.trim(),
+      followups: [...$('vFu').querySelectorAll('.fu')].map(r => { const [tx, du] = r.querySelectorAll('input'); const id = r.dataset.fid;
+        return { id, text: tx.value.trim(), due: du.value, done: old[id] ? old[id].done : false }; }).filter(f => f.text)
+    });
+    if(ev){ ev.start = at; ev.end = at; ev.data = data; put(ev); } else add('visit', at, at, data);
+    closeSheet();
+  };
+  if(ev) $('vDel').onclick = () => { closeSheet(); remove(id); };
+}
+
+// ---------- Milestones ----------
+const MS_ITEMS = {};
+CONTENT.milestones.forEach(b => b.items.forEach(([key, title]) => MS_ITEMS[key] = { key, title, band: b.band }));
+function renderMs(now){
+  const months = (now - BIRTH) / (30.44 * 864e5);
+  const bands = CONTENT.milestones.filter(b => b.months > 0);
+  const curBand = bands.find(b => months <= b.months) || bands[bands.length - 1];
+  $('msNowTitle').textContent = 'Coming up · ' + curBand.band;
+  $('msNow').textContent = curBand.learn;
+  $('msNote').textContent = CONTENT.milestoneNote;
+  const custom = byType('milestone').filter(e => e.data.custom);
+  $('msList').innerHTML = CONTENT.milestones.map(b => {
+    const items = b.items.map(([key, title]) => {
+      const ev = events[keyId('ms:' + key)], got = ev && !ev.deleted;
+      return `<div class="row" data-ms="${key}"><div class="check ${got ? 'on' : ''}">${got ? '⭐' : ''}</div>
+        <div class="main"><div class="t1" style="white-space:normal;font-weight:${got ? 700 : 500}">${esc(title)}</div><div class="t2">${got ? df.format(new Date(ev.start)) + (ev.data.note ? ' · ' + esc(ev.data.note) : '') : ''}</div></div></div>`;
+    }).join('');
+    const extra = b.band === 'Firsts' ? custom.map(e => `<div class="row" data-id="${e.id}"><div class="check on">⭐</div><div class="main"><div class="t1">${esc(e.data.title)}</div><div class="t2">${df.format(new Date(e.start))}${e.data.note ? ' · ' + esc(e.data.note) : ''}</div></div></div>`).join('') : '';
+    return `<div class="grp">${b.band}${b === curBand ? ' · now' : ''}</div>` + items + extra;
+  }).join('');
+  $('msList').querySelectorAll('[data-ms]').forEach(r => r.onclick = () => msSheet(r.dataset.ms));
+  bindRows($('msList'));
+}
+function msSheet(key, customId){
+  const id = customId || keyId('ms:' + key), ev = events[id], got = ev && !ev.deleted;
+  const title = ev && ev.data.title || (MS_ITEMS[key] || {}).title || '';
+  openSheet(`<h3>${key ? esc(title) : 'Special moment'}</h3>
+    ${key ? '' : `<div class="field"><label>What happened?</label><input id="msTitle" value="${esc(title)}" placeholder="e.g. First time meeting Nani"></div>`}
+    <div class="field"><label>When</label><input type="datetime-local" id="msTime" value="${toLocalInput(got ? ev.start : Date.now())}"></div>
+    <div class="field"><label>Note</label><textarea id="msNoteIn">${esc(got ? ev.data.note : '')}</textarea></div>
+    <div class="stack"><button class="btn primary" id="msSave">⭐ ${got ? 'Save' : 'Mark achieved'}</button>${got ? '<button class="btn danger" id="msUn">Remove</button>' : ''}</div>`);
+  $('msSave').onclick = () => {
+    const at = fromLocalInput($('msTime').value) || Date.now(), note = $('msNoteIn').value.trim();
+    if(key) upsertKeyed(id, 'milestone', { key, note, title: MS_ITEMS[key].title }, at);
+    else { const tt = $('msTitle').value.trim(); if(!tt){ alert('Add a title.'); return; }
+      if(ev){ ev.start = ev.end = at; Object.assign(ev.data, { title: tt, note }); put(ev); } else add('milestone', at, at, { custom: true, title: tt, note }); }
+    closeSheet();
+  };
+  if(got) $('msUn').onclick = () => { closeSheet(); remove(id); };
+}
+$('addMoment').onclick = () => msSheet(null);
+
+// ---------- Tabs ----------
+let curTab = 'baby';
+function showPage(id){ document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === 'p-' + id)); window.scrollTo(0,0); }
+function go(id){ showPage(id); render(); }
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  curTab = b.dataset.tab; showPage(curTab); LS.set('lt_tab', curTab);
+  if(curTab === 'mom') renderMeds(Date.now());
+});
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => showPage(curTab));
+$('moreSettings').onclick = () => $('gearBtn').click();
+{ let tab = LS.get('lt_tab', 'baby'); if(!['baby','mom','log','more'].includes(tab)) tab = 'baby';
+  const b = document.querySelector(`nav [data-tab="${tab}"]`); if(b) b.click(); }
+$('logFilter').querySelectorAll('[data-f]').forEach(c => c.onclick = () => {
+  logFilter = c.dataset.f;
+  $('logFilter').querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c));
+  render();
+});
+
+// ---------- Sheet / toast ----------
+function openSheet(html){ $('sheet').innerHTML = html; $('sheet').classList.add('on'); $('sheetBg').classList.add('on'); }
+function closeSheet(){ $('sheet').classList.remove('on'); $('sheetBg').classList.remove('on'); }
+$('sheetBg').onclick = closeSheet;
+let toastTimer;
+function toast(msg, undo, undoLabel, alt, altLabel){
+  $('toastMsg').textContent = msg;
+  const u = $('toastUndo');
+  u.textContent = undoLabel || 'Undo';
+  u.style.display = undo ? '' : 'none';
+  u.onclick = () => { $('toast').classList.remove('on'); undo && undo(); };
+  let a = $('toastAlt'); if(a) a.remove();
+  if(alt){ a = document.createElement('button'); a.id = 'toastAlt'; a.textContent = altLabel; a.onclick = () => { $('toast').classList.remove('on'); alt(); }; $('toast').appendChild(a); }
+  $('toast').classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('on'), 5000);
+}
+
+// ---------- Export ----------
+function rowsForExport(){
+  return live().sort((a,b)=>a.start-b.start).map(e => {
+    const d = e.data;
+    return {
+      date: new Date(e.start).toLocaleDateString(), start: tfs.format(new Date(e.start)),
+      end: e.end && e.end !== e.start ? tfs.format(new Date(e.end)) : '',
+      type: title(e),
+      duration: e.end && e.end !== e.start ? dur(e.end - e.start) : '',
+      detail: [d.intensity ? INT[d.intensity] : '', d.ml != null ? d.ml + ' ml' : '', d.tablets ? d.tablets + ' tab' : '', d.pain != null ? 'pain ' + d.pain + '/10' : '', d.kg ? fmtKg(d.kg) : '', d.weightKg ? fmtKg(d.weightKg) : ''].filter(Boolean).join(' '),
+      note: e.type === 'note' ? d.text : (d.note || '')
+    };
+  });
+}
+$('csvBtn').onclick = () => {
+  const rows = rowsForExport(), cols = ['date','start','end','type','duration','detail','note'];
+  const csv = [cols.join(',')].concat(rows.map(r => cols.map(c => '"' + String(r[c]).replace(/"/g,'""') + '"').join(','))).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const file = new File([blob], 'tracker-' + new Date().toISOString().slice(0,10) + '.csv', { type: 'text/csv' });
+  if(navigator.canShare && navigator.canShare({ files: [file] })) navigator.share({ files: [file] }).catch(()=>{});
+  else { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = file.name; a.click(); }
+};
+$('shareBtn').onclick = () => {
+  const { hour, avgDur, avgInt } = contractionStats();
+  const lines = [];
+  if(byType('contraction').length){
+    lines.push(`Contractions, last hour: ${hour.length}, avg ${durWords(avgInt)} apart, lasting ~${durWords(avgDur)}`);
+    byType('contraction').slice(0, 12).forEach((e,i,a) => lines.push(`${t(e.start)}  ${e.end ? dur(e.end-e.start) : 'running'}${a[i+1] ? '  (' + durWords(e.start - a[i+1].start) + ' apart)' : ''}${e.data.intensity ? '  ' + INT[e.data.intensity] : ''}`));
+  }
+  byType('note').slice(0, 5).forEach(n => lines.push(`${t(n.start)}  ${n.data.text}`));
+  const text = lines.join('\n') || 'Nothing logged yet';
+  if(navigator.share) navigator.share({ text }).catch(()=>{});
+  else navigator.clipboard.writeText(text).then(() => toast('Copied'));
+};
+
+// ---------- Settings / sync ----------
+$('gearBtn').onclick = () => {
+  const link = syncKey ? location.origin + location.pathname + '#join=' + syncKey : '';
+  openSheet(`
+    <h3>Settings</h3>
+    <div class="h">Sync between phones</div>
+    ${syncKey ? `
+      <p class="muted">Sync is ON. Sync code for the other phone:</p>
+      <div class="code" id="sLink" style="font-size:20px;text-align:center">${esc(syncKey)}</div>
+      <div class="grid2" style="margin-top:10px">
+        <button class="btn" id="sCopy">Copy link</button>
+        <button class="btn" id="sNow">Sync now</button>
+      </div>
+      <p class="muted" id="sStatus"></p>
+      <button class="btn danger" id="sOff">Turn off sync on this phone</button>
+    ` : `
+      <p class="muted">Data is saved on this phone only. Turn on sync to share one log between both iPhones. Anyone with the sync link can see the log, so share it only with each other.</p>
+      <button class="btn primary" id="sOn">Turn on sync</button>
+    `}
+    <div class="field" style="margin-top:16px"><label>${syncKey ? 'Switch to' : 'Or join'} the code from the other phone</label><input id="sJoin" placeholder="type or paste code" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+    <button class="btn" id="sJoinBtn">Join</button>
+    <div class="h" style="margin-top:20px">Screen</div>
+    <button class="btn" id="wakeBtn">${settings.wake ? '✅ Keep screen awake: ON' : 'Keep screen awake: OFF'}</button>
+    <p class="muted">Tip: Safari → Share → "Add to Home Screen" to open it like an app.</p>
+  `);
+  const S = $('sStatus'); if(S) S.textContent = syncMsg;
+  if($('sCopy')) $('sCopy').onclick = () => navigator.clipboard.writeText(link).then(() => toast('Link copied'));
+  if($('sNow')) $('sNow').onclick = () => { lastPull = null; sync(); };
+  if($('sOff')) $('sOff').onclick = () => { if(confirm('Stop syncing on this phone? Data stays on this phone.')){ syncKey = null; LS.set('lt_key', null); setSync('local'); closeSheet(); } };
+  if($('sOn')) $('sOn').onclick = () => { setKey(randomKey()); closeSheet(); $('gearBtn').click(); };
+  if($('sJoinBtn')) $('sJoinBtn').onclick = () => {
+    let v = $('sJoin').value.trim(); const m = v.match(/join=([A-Za-z0-9]+)/); if(m) v = m[1];
+    if(v.length < 16){ alert('That code looks too short.'); return; }
+    if(v === syncKey){ closeSheet(); return; }
+    setKey(v); closeSheet(); toast('Joined. Pulling history…');
+  };
+  $('wakeBtn').onclick = () => { settings.wake = !settings.wake; LS.set('lt_settings', settings); wake(); $('gearBtn').click(); };
+};
+function randomKey(){ const a = new Uint8Array(18); crypto.getRandomValues(a); return Array.from(a, b => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 56]).join(''); }
+function setKey(k){
+  syncKey = k; LS.set('lt_key', k); lastPull = null; LS.set('lt_lastpull', null);
+  Object.keys(events).forEach(id => dirty.add(id)); save(); // push everything we already have
+  sync();
+}
+// join via link
+{ const m = location.hash.match(/join=([A-Za-z0-9]{16,})/); if(m){ if(m[1] !== syncKey) setKey(m[1]); history.replaceState(null, '', location.pathname); } }
+
+let syncMsg = '', syncing = false, syncTimer;
+function setSync(state, msg){
+  const el = $('syncState');
+  el.querySelector('.dot').className = 'dot ' + ({ok:'ok',busy:'busy',err:'err'}[state] || '');
+  el.querySelector('span:last-child').textContent = state === 'local' ? 'this phone' : state === 'ok' ? 'synced' : state === 'busy' ? 'syncing' : 'offline';
+  syncMsg = msg || '';
+}
+function scheduleSync(){ clearTimeout(syncTimer); syncTimer = setTimeout(sync, 400); }
+async function rpc(fn, body){
+  const res = await fetch(SB_URL + '/rest/v1/rpc/' + fn, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok) throw new Error(fn + ' ' + res.status + ' ' + (await res.text()).slice(0,200));
+  const text = await res.text(); // lt_push returns 204 with an empty body
+  return text ? JSON.parse(text) : null;
+}
+async function sync(){
+  if(!syncKey){ setSync('local'); return; }
+  if(syncing){ scheduleSync(); return; }
+  syncing = true; setSync('busy');
+  try{
+    const ids = [...dirty];
+    if(ids.length){
+      const payload = ids.map(id => events[id]).filter(Boolean).map(e => ({ id:e.id, type:e.type, start_ts:e.start, end_ts:e.end, data:e.data, deleted:e.deleted, updated:e.updated }));
+      await rpc('lt_push', { p_key: syncKey, p_events: payload });
+      // only clear ids that weren't changed again while pushing
+      ids.forEach(id => { const e = events[id]; if(e && payload.find(p => p.id === id && p.updated === e.updated)) dirty.delete(id); });
+      save();
+    }
+    const since = lastPull ? new Date(new Date(lastPull).getTime() - 120e3).toISOString() : null;
+    const rows = await rpc('lt_pull', { p_key: syncKey, p_since: since });
+    let changed = false, maxTs = lastPull;
+    rows.forEach(r => {
+      const l = events[r.id];
+      if(!l || (!dirty.has(r.id) && Number(r.updated) > (l.updated || 0))){
+        events[r.id] = { id:r.id, type:r.type, start:Number(r.start_ts), end:r.end_ts == null ? null : Number(r.end_ts), data:r.data || {}, deleted:r.deleted, updated:Number(r.updated) };
+        changed = true;
+      }
+      if(!maxTs || r.synced_at > maxTs) maxTs = r.synced_at;
+    });
+    lastPull = maxTs; LS.set('lt_lastpull', lastPull);
+    if(changed){ save(); render(); }
+    setSync('ok', 'Last synced ' + tfs.format(new Date()));
+  }catch(e){
+    setSync('err', 'Sync failed (data is safe on this phone): ' + e.message);
+  }finally{ syncing = false; }
+}
+setInterval(() => { if(document.visibilityState === 'visible') sync(); }, 8000);
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible'){ sync(); wake(); render(); } });
+window.addEventListener('online', sync);
+
+// ---------- Wake lock ----------
+let wl = null;
+async function wake(){
+  try{
+    if(settings.wake && 'wakeLock' in navigator && document.visibilityState === 'visible'){ if(!wl) { wl = await navigator.wakeLock.request('screen'); wl.addEventListener('release', () => wl = null); } }
+    else if(!settings.wake && wl){ await wl.release(); wl = null; }
+  }catch(e){}
+}
+document.addEventListener('click', wake, { once: true });
+
+// ---------- Boot ----------
+render(); sync(); wake();
+setInterval(tick, 250);
+setInterval(render, 15000); // refresh running rows / stats
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
