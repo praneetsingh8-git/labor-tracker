@@ -111,6 +111,15 @@ a.ext{color:var(--blue);font-weight:600;text-decoration:none}
 .daily{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
 .daily:last-child{border-bottom:0}
 input[type=datetime-local],input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;text-align:left}
+.score{--breast:#3987e5;--formula:#d95926;--bmilk:#199e70;--wet:#9085e9;--both:#c98500;--dirty:#d55181}
+.rings{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}
+.rings .rl{font-size:13px;font-weight:600}
+.sc-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:15px}
+.sc-row b{font-variant-numeric:tabular-nums}
+.sdot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}
+.sc-sep{border-top:1px solid var(--line);margin:12px 0}
+.ring-arc{transition:stroke-dashoffset .6s ease}
+@media (prefers-reduced-motion:reduce){.ring-arc{transition:none}}
 .code{font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all;background:var(--card2);padding:10px;border-radius:10px;user-select:text;-webkit-user-select:text}
 </style>
 </head>
@@ -165,6 +174,18 @@ input[type=datetime-local],input[type=date]{-webkit-appearance:none;appearance:n
 
   <!-- BABY -->
   <section class="page on" id="p-baby">
+    <div class="card score" id="scoreCard">
+      <div class="h" id="dayStatsTitle">Today</div>
+      <div class="rings" id="scRings"></div>
+      <div class="sc-sep"></div>
+      <div class="h">How he fed</div>
+      <div id="scFeeds" class="stack"></div>
+      <div class="sc-sep"></div>
+      <div class="h" id="scDiaperTitle">Diapers</div>
+      <div id="scDiapers" class="sc-row"></div>
+      <div class="muted" id="dCompare" style="margin-top:12px;text-align:center"></div>
+      <div class="muted" id="lastDiaper" style="margin-top:4px;text-align:center"></div>
+    </div>
     <div class="card">
       <div class="h" id="dayTitle">Aveer</div>
       <div class="tip" id="tipToday"></div>
@@ -213,17 +234,6 @@ input[type=datetime-local],input[type=date]{-webkit-appearance:none;appearance:n
       <div class="h">Sleep</div>
       <button class="tile" id="sleepBtn" style="width:100%"><div class="big" id="sleepT">😴 Fell asleep</div><small id="sleepS">tap when baby falls asleep</small></button>
       <div class="muted" id="sleepInfo" style="margin-top:8px;text-align:center"></div>
-    </div>
-
-    <div class="card">
-      <div class="h" id="dayStatsTitle">Today</div>
-      <div class="stats">
-        <div class="stat"><div class="v" id="dFeeds">0</div><div class="l">feeds</div></div>
-        <div class="stat"><div class="v" id="dWet">0</div><div class="l">wet</div></div>
-        <div class="stat"><div class="v" id="dDirty">0</div><div class="l">dirty</div></div>
-      </div>
-      <div class="muted" id="dCompare" style="margin-top:10px;text-align:center"></div>
-      <div class="muted" id="lastDiaper" style="margin-top:4px;text-align:center"></div>
     </div>
 
     <button class="btn" data-note="baby">✏️ Add note</button>
@@ -716,9 +726,9 @@ function render(){
   const day = now - 24*3600e3;
   const diapers = byType('diaper');
   // day-of-life totals (each day runs from the birth time, 4:24 AM)
-  const dn = dayOf(now), cur = dayStats(dn);
+  const dn = dayOf(now);
   $('dayStatsTitle').textContent = 'Day ' + dn + ' so far · since ' + t(dayStart(dn));
-  $('dFeeds').textContent = cur.feeds; $('dWet').textContent = cur.wet; $('dDirty').textContent = cur.dirty;
+  renderScore(dn);
   let cmp = '';
   if(dn > 1){ const pv = dayStats(dn - 1); cmp = `Day ${dn-1}: ${pv.feeds} feeds · ${pv.wet} wet · ${pv.dirty} dirty · slept ${durWords(pv.sleepMs)}`; }
   cmp += (cmp ? '<br>' : '') + `Typical for day ${dn}: ${CONTENT.feedsMin}+ feeds, ${wetMin(dn)}+ wet diapers`;
@@ -849,6 +859,38 @@ function ageText(now){
 }
 const wetMin = n => CONTENT.wetMin[n] || 6;
 function tipFor(n){ let tip = CONTENT.tips[0]; CONTENT.tips.forEach(x => { if(x.from <= n) tip = x; }); return tip; }
+function scoreRing(label, v, target, color, sub){
+  const r = 34, c = 2 * Math.PI * r, frac = Math.min(1, v / target);
+  return `<div><svg viewBox="0 0 84 84" width="84" height="84" role="img" aria-label="${label}: ${v} of ${target}">
+      <circle cx="42" cy="42" r="${r}" fill="none" stroke="var(--card2)" stroke-width="8"/>
+      <circle class="ring-arc" cx="42" cy="42" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round"
+        stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - frac)}" transform="rotate(-90 42 42)"/>
+      <text x="42" y="41" text-anchor="middle" font-size="20" font-weight="700" fill="var(--text)">${v}</text>
+      <text x="42" y="56" text-anchor="middle" font-size="10" fill="var(--dim)">of ${target}+</text>
+    </svg><div class="rl">${label}</div><div class="muted" style="font-size:12px">${sub}</div></div>`;
+}
+const minTxt = m => { m = Math.round(m); return m >= 60 ? Math.floor(m / 60) + ' h ' + (m % 60) + ' min' : m + ' min'; };
+function renderScore(n){
+  const a = dayStart(n), b = dayStart(n + 1), inDay = e => e.start >= a && e.start < b, now = Date.now();
+  const feeds = byType('feed').filter(inDay), dia = byType('diaper').filter(inDay);
+  const breast = feeds.filter(f => f.data.kind === 'breast'), formula = feeds.filter(f => f.data.kind === 'bottle' && f.data.milk === 'formula'),
+        bmilk = feeds.filter(f => f.data.kind === 'bottle' && f.data.milk !== 'formula');
+  const mins = (list, side) => list.filter(f => !side || f.data.side === side).reduce((s, f) => s + Math.max(0, ((f.end ?? now) - f.start) / 60e3), 0);
+  const ml = list => list.reduce((s, f) => s + (f.data.ml || 0), 0);
+  const wetOnly = dia.filter(d => d.data.kind === 'wet').length, both = dia.filter(d => d.data.kind === 'both').length, dirtyOnly = dia.filter(d => d.data.kind === 'dirty').length;
+  const dirtyMin = n >= 5 ? 3 : 1;
+  $('scRings').innerHTML = scoreRing('Feeds', feedSessions(feeds), CONTENT.feedsMin, 'var(--accent)', 'all types')
+    + scoreRing('Wet', wetOnly + both, wetMin(n), 'var(--wet)', 'incl. wet+dirty')
+    + scoreRing('Dirty', dirtyOnly + both, dirtyMin, 'var(--dirty)', 'incl. wet+dirty');
+  const row = (color, label, count, val) => `<div class="sc-row"><span><i class="sdot" style="background:${color}"></i>${label} ×${count}</span><b>${val}</b></div>`;
+  const bTotal = ml(formula) + ml(bmilk);
+  $('scFeeds').innerHTML = row('var(--breast)', 'Breastfeed', feedSessions(breast), minTxt(mins(breast)))
+    + row('var(--formula)', 'Formula', formula.length, ml(formula) + ' mL')
+    + row('var(--bmilk)', 'Breast milk bottle', bmilk.length, ml(bmilk) + ' mL')
+    + `<div class="muted">Left ${minTxt(mins(breast, 'L'))} · Right ${minTxt(mins(breast, 'R'))} · Bottles ${bTotal} mL total</div>`;
+  $('scDiaperTitle').textContent = 'Diapers · ' + dia.length;
+  $('scDiapers').innerHTML = `<span><i class="sdot" style="background:var(--wet)"></i>Wet ${wetOnly}</span><span><i class="sdot" style="background:var(--both)"></i>Wet+dirty ${both}</span><span><i class="sdot" style="background:var(--dirty)"></i>Dirty ${dirtyOnly}</span>`;
+}
 function feedSessions(list){ let n = 0, last = null; list.slice().sort((a,b)=>a.start-b.start).forEach(f => { if(last == null || f.start - last > 15*60e3) n++; last = f.end || f.start; }); return n; }
 function dayStats(n){
   const a = dayStart(n), b = Math.min(dayStart(n + 1), Date.now()), inDay = e => e.start >= a && e.start < dayStart(n + 1);
