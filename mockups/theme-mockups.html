@@ -1,0 +1,135 @@
+<title>Aveer App Themes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Nunito:wght@500;600;700;800&display=swap">
+<style>
+/* Layout: three theme rows, each a day phone and a night phone side by side; page chrome follows the viewer theme, each phone carries its own theme tokens. */
+:root{
+  --page:#f4f2ef; --ink:#221f1c; --ink2:#5f5a54; --line:#e2ddd6; --tag:#e6efe8; --tagInk:#2f5a40;
+  --display:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --app:"Nunito", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --page:#0e0d0c; --ink:#efebe6; --ink2:#a59f97; --line:#2a2724; --tag:#1f2e25; --tagInk:#a9d3b8; color-scheme:dark } }
+:root[data-theme="dark"]{ --page:#0e0d0c; --ink:#efebe6; --ink2:#a59f97; --line:#2a2724; --tag:#1f2e25; --tagInk:#a9d3b8; color-scheme:dark }
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font:15px/1.45 -apple-system, system-ui, sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 48px}
+h1{font:700 clamp(28px,5vw,40px)/1.1 var(--display);margin:0 0 8px;text-wrap:balance}
+.lede{color:var(--ink2);max-width:66ch;margin:0}
+.lede b{color:var(--ink)}
+.theme{margin-top:40px;display:flex;flex-direction:column;gap:12px}
+.thead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.thead h2{font:700 22px var(--display);margin:0}
+.letter{font:700 13px var(--display);background:var(--tag);color:var(--tagInk);border-radius:6px;padding:2px 8px}
+.swatches{display:flex;gap:6px;flex-wrap:wrap}
+.sw{width:26px;height:26px;border-radius:8px;border:1px solid var(--line)}
+.why{color:var(--ink2);margin:0;max-width:70ch;font-size:14px}
+.pair{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:18px}
+.cap{font-size:12px;color:var(--ink2);font-weight:600;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+
+/* ---------- phone (all colors from per-phone tokens) ---------- */
+.ph{background:var(--bg);color:var(--text);border-radius:30px;padding:16px 14px 18px;border:1px solid var(--line);font-family:var(--app);display:flex;flex-direction:column;gap:10px;max-width:390px;width:100%}
+.top{display:flex;align-items:center;gap:10px;padding:0 2px}
+.av{width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--accInk);display:grid;place-items:center;font:800 18px var(--app);flex:none}
+.nm{font-weight:800;font-size:19px;line-height:1.1}
+.sub{color:var(--dim);font-size:12px}
+.sync{margin-left:auto;display:flex;align-items:center;gap:5px;color:var(--dim);font-size:11px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--card2);border-radius:12px;padding:3px;gap:3px;font-size:13px;font-weight:700;text-align:center}
+.seg span{padding:7px 0;border-radius:9px;color:var(--dim)}
+.seg span.on{background:var(--card);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.cd{background:var(--card);border-radius:18px;padding:13px 14px;border:1px solid var(--cardLine)}
+.h{font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);font-weight:700;margin:0 0 8px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.num{font-variant-numeric:tabular-nums}
+.big{font-size:24px;font-weight:800;line-height:1.1}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-size:12.5px;font-weight:700;color:var(--text)}
+.chip.p{background:var(--accent);border-color:var(--accent);color:var(--accInk)}
+.delta{font-size:11px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--card2);color:var(--text)}
+.win{position:relative;height:12px;border-radius:6px;background:var(--card2);margin:12px 0 4px}
+.win .band{position:absolute;top:0;bottom:0;border-radius:6px;background:var(--soft)}
+.win .now{position:absolute;top:-4px;bottom:-4px;width:3px;border-radius:2px;background:var(--text)}
+.win .lim{position:absolute;top:-4px;bottom:-4px;width:0;border-left:2px dotted var(--warn)}
+.scale{display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+.est{display:flex;gap:10px;margin-top:10px}
+.est > div{flex:1;background:var(--card2);border-radius:12px;padding:8px 10px;min-width:0}
+.est b{display:block;font-size:17px}
+.note{margin-top:28px;color:var(--ink2);font-size:13.5px;max-width:72ch}
+svg text{font-family:var(--app)}
+</style>
+
+<div class="wrap">
+  <h1>Aveer's app, three gentle themes</h1>
+  <p class="lede">Three gender-neutral themes, each shown in <b>day</b> and <b>night</b>. The app would switch automatically with your iPhone's light/dark setting. Every screen is the layout you chose: <b>Today / Log / Trends tabs</b> with separate <b>Feeding, Diapers and Weight</b> cards for quick entry, plus the new <b>Next feed</b> card. Example data only.</p>
+  <div id="themes"></div>
+  <p class="note">The colors for breast, formula and breast milk, and for wet, wet + dirty and dirty, are the same in all three themes (slightly brighter at night) and pass colour-blind and contrast checks on every background. Only the backgrounds, text and accent change between themes.</p>
+</div>
+
+<script>
+const DATA = {
+  day:   { breast:'#3f7fc0', formula:'#cc6b3d', bmilk:'#2f9a72', wet:'#7a6fd0', both:'#b8860b', dirty:'#c9547f' },
+  night: { breast:'#3987e5', formula:'#d95926', bmilk:'#199e70', wet:'#9085e9', both:'#c98500', dirty:'#d55181' },
+};
+const THEMES = [
+  { id:'A', name:'Sage & Oat', why:'Soft oat background with sage green. Calm and natural, like a linen nursery. The most "baby app" of the three.',
+    day:  { bg:'#f4f1ea', card:'#fffdf9', card2:'#ece7dd', line:'#e2dccf', cardLine:'#ebe5d9', text:'#2e3630', dim:'#6d7468', accent:'#5f8f74', accInk:'#ffffff', soft:'#cfe1d4', ok:'#5f8f74', warn:'#b8860b' },
+    night:{ bg:'#121714', card:'#1b221e', card2:'#242d28', line:'#2c3630', cardLine:'#222a25', text:'#e6ece7', dim:'#9aa69e', accent:'#8dbc9f', accInk:'#0f1d15', soft:'#2f4a3a', ok:'#8dbc9f', warn:'#d9a640' } },
+  { id:'B', name:'Mist & Sand', why:'Cool misty grey-blue with warm sand. Quiet and airy, like early morning light. The calmest at night.',
+    day:  { bg:'#f1f4f6', card:'#ffffff', card2:'#e8edf1', line:'#dde3e8', cardLine:'#e6ebef', text:'#27313b', dim:'#66727d', accent:'#5b84a8', accInk:'#ffffff', soft:'#d3e2ef', ok:'#4f8f74', warn:'#b8860b' },
+    night:{ bg:'#10151a', card:'#1a2129', card2:'#232c35', line:'#2b3540', cardLine:'#202832', text:'#e5ebf0', dim:'#95a3af', accent:'#8fb3d4', accInk:'#0d1a26', soft:'#2a4258', ok:'#7fbf9f', warn:'#d9a640' } },
+  { id:'C', name:'Linen & Honey', why:'Warm linen with a honey accent. Cosy and soft, like a lamp-lit room. The warmest for night feeds.',
+    day:  { bg:'#f6f2ec', card:'#fffbf6', card2:'#efe7dc', line:'#e6dccd', cardLine:'#eee5d8', text:'#352e27', dim:'#786c60', accent:'#9a7524', accInk:'#ffffff', soft:'#efdcb0', ok:'#5f8f74', warn:'#b8860b' },
+    night:{ bg:'#17130f', card:'#221d17', card2:'#2c261f', line:'#352e26', cardLine:'#29231c', text:'#efe7dc', dim:'#a8998a', accent:'#d9b45e', accInk:'#2a1e05', soft:'#4a3b1c', ok:'#8dbc9f', warn:'#e0a64a' } },
+];
+
+function ring(label, v, target, yn, color){
+  const r = 30, c = 2 * Math.PI * r, f = Math.min(1, v / target), a = Math.min(1, yn / target) * 2 * Math.PI - Math.PI / 2;
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+   <svg viewBox="0 0 76 76" width="72" height="72" role="img" aria-label="${label} ${v} of ${target}"><circle cx="38" cy="38" r="${r}" fill="none" stroke="var(--card2)" stroke-width="7"/>
+   <circle cx="38" cy="38" r="${r}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - f)}" transform="rotate(-90 38 38)"/>
+   <line x1="${38 + 24 * Math.cos(a)}" y1="${38 + 24 * Math.sin(a)}" x2="${38 + 36 * Math.cos(a)}" y2="${38 + 36 * Math.sin(a)}" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
+   <text x="38" y="37" text-anchor="middle" font-size="18" font-weight="800" fill="var(--text)">${v}</text>
+   <text x="38" y="50" text-anchor="middle" font-size="9" fill="var(--dim)">of ${target}+</text></svg>
+   <div style="font-size:12px;font-weight:700">${label} <span class="delta">▲ ${v - yn}</span></div></div>`;
+}
+
+// Next feed example: last feed 5:30 AM formula 40 mL, now 6:45 AM; window 2-3 h after start; latest 4 h.
+function nextFeed(){
+  const span = 4.25, pos = h => (h / span * 100).toFixed(1) + '%';
+  return `<div class="cd"><div class="row"><div class="h" style="margin:0">Next feed</div><span class="sub">last: 5:30 AM · Formula 40 mL</span></div>
+    <div class="row" style="margin-top:6px;align-items:baseline"><div class="big">7:30 – 8:30 AM</div><div style="font-weight:700;color:var(--accent)">in 45 min</div></div>
+    <div class="win"><div class="band" style="left:${pos(2)};width:${(1 / span * 100).toFixed(1)}%"></div><div class="lim" style="left:${pos(4)}"></div><div class="now" style="left:${pos(1.25)}"></div></div>
+    <div class="scale"><span>5:30</span><span>now 6:45</span><span>window</span><span style="color:var(--warn)">by 9:30</span></div>
+    <div class="est"><div><span class="sub">If bottle</span><b>40 – 60 mL</b><span class="sub">Day 6 typical: 30 – 60</span></div><div><span class="sub">If breast</span><b>Start Left</b><span class="sub">last breast: Right</span></div></div>
+    <div class="sub" style="margin-top:8px">Based on his last 24 h: a feed every 2 h 40 min on average. Feed earlier if he shows hunger cues.</div></div>`;
+}
+
+function phone(t, mode){
+  const v = t[mode], d = DATA[mode];
+  const vars = Object.entries({ ...v, ...d }).map(([k, x]) => `--${k}:${x}`).join(';');
+  return `<div style="${vars}"><div class="cap">${mode === 'day' ? 'Day (light)' : 'Night (dark)'}</div><div class="ph">
+    <div class="top"><div class="av">A</div><div><div class="nm">Aveer</div><div class="sub">6 days old · Sat Oct 17</div></div><div class="sync"><i></i>synced</div></div>
+    <div class="seg"><span class="on">Today</span><span>Log</span><span>Trends</span></div>
+    ${nextFeed()}
+    <div class="cd"><div class="row"><div class="h" style="margin:0">Today so far</div><span class="sub">tick = yesterday by now</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px">${ring('Feeds', 3, 8, 2, 'var(--accent)')}${ring('Wet', 2, 6, 1, 'var(--wet)')}${ring('Dirty', 1, 3, 0, 'var(--dirty)')}</div></div>
+    <div class="cd"><div class="row"><b>🍼 Feeding</b><span class="sub">3 today · 52 min · 40 mL</span></div>
+      <div class="sub" style="margin-top:6px"><i class="dot" style="background:var(--breast)"></i>Breast ×2 · 52 min &nbsp; <i class="dot" style="background:var(--formula)"></i>Formula ×1 · 40 mL <br><i class="dot" style="background:var(--bmilk)"></i>Breast milk bottle ×0</div>
+      <div class="chips"><span class="chip p">Left</span><span class="chip">Right</span><span class="chip">Bottle</span><span class="chip">＋ Past feed</span></div></div>
+    <div class="cd"><div class="row"><b>💧 Diapers</b><span class="sub">3 today</span></div>
+      <div class="sub" style="margin-top:6px"><i class="dot" style="background:var(--wet)"></i>Wet 1 &nbsp; <i class="dot" style="background:var(--both)"></i>Wet + dirty 1 &nbsp; <i class="dot" style="background:var(--dirty)"></i>Dirty 1</div>
+      <div class="chips"><span class="chip">Wet</span><span class="chip">Wet + dirty</span><span class="chip">Dirty</span></div></div>
+    <div class="cd"><div class="row"><b>⚖️ Weight</b><span class="sub">last: Oct 15</span></div>
+      <div class="row" style="margin-top:6px"><span class="num" style="font-weight:800;font-size:17px">3.26 kg <span class="sub">(7 lb 3 oz)</span></span><span class="chip">＋ Weight</span></div></div>
+  </div></div>`;
+}
+
+document.getElementById('themes').innerHTML = THEMES.map(t => `<section class="theme">
+  <div class="thead"><span class="letter">${t.id}</span><h2>${t.name}</h2>
+    <div class="swatches">${['bg','card','accent','soft','text'].map(k => `<span class="sw" title="${k}" style="background:${t.day[k]}"></span>`).join('')}
+    ${['bg','card','accent','soft','text'].map(k => `<span class="sw" title="night ${k}" style="background:${t.night[k]}"></span>`).join('')}</div></div>
+  <p class="why">${t.why}</p>
+  <div class="pair">${phone(t, 'day')}${phone(t, 'night')}</div></section>`).join('');
+</script>
